@@ -3,6 +3,7 @@ import type { CollectionEntry } from "astro:content";
 import { getPostSortDate } from "@/data/post";
 import type { HTMLTag, Polymorphic } from "astro/types";
 import FormattedDate from "../FormattedDate.astro";
+import { Image } from "astro:assets";
 
 type Props<Tag extends HTMLTag> = Polymorphic<{ as: Tag }> & {
 	post: CollectionEntry<"post">;
@@ -13,11 +14,30 @@ const { as: Tag = "div", post, withDesc = true } = Astro.props;
 const postDate = getPostSortDate(post);
 ---
 
-<FormattedDate class="min-w-[120px] text-gray-600 dark:text-gray-400" date={postDate} />
-<Tag>
-	{post.data.draft && <span class="text-red-500">(Draft) </span>}
-	<a class="cactus-link text-accent font-bold no-underline hover:underline" data-astro-prefetch href={`/posts/${post.slug}/`}>
-		{post.data.title}
-	</a>
-</Tag>
-{withDesc && <p class="line-clamp-3">{post.data.description}</p>}
+<div class="flex items-center justify-between">
+	<div>
+		<FormattedDate class="min-w-[120px] text-gray-600 dark:text-gray-400" date={postDate} />
+		<Tag>
+			{post.data.draft && <span class="text-red-500">(Draft) </span>}
+			<a
+				class="cactus-link font-bold text-accent no-underline hover:underline"
+				data-astro-prefetch
+				href={`/posts/${post.slug}/`}
+			>
+				{post.data.title}
+			</a>
+		</Tag>
+		{withDesc && <p class="line-clamp-3">{post.data.description}</p>}
+	</div>
+	{
+		post.data.coverImage && (
+			<Image
+				alt={post.data.coverImage.alt}
+				class="mr-4 h-24 w-24 rounded object-cover"
+				fetchpriority="high"
+				loading="eager"
+				src={post.data.coverImage.src}
+			/>
+		)
+	}
+</div>
