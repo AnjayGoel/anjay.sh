@@ -15,7 +15,7 @@ export const siteConfig: SiteConfig = {
 	},
 	// Used as the default description meta property and webmanifest description
 	description:
-		"I write about software development, technology and occasionally other stuff like economics & finance.",
+		"I am Anjay. I love to write about software development, technology and occasionally other stuff like economics & finance.",
 	// HTML lang property, found in src/layouts/Base.astro L:18 & astro.config.ts L:48
 	lang: "en-US",
 	// Meta property, found in src/components/BaseHead.astro L:42
