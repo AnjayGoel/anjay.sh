@@ -1,0 +1,162 @@
+---
+import PageLayout from "@/layouts/Base.astro";
+import { Schema } from "astro-seo-schema";
+---
+
+<Schema
+	item={{
+		"@context": "https://schema.org",
+		"@type": "BreadcrumbList",
+		itemListElement: [
+			{
+				"@type": "ListItem",
+				position: 1,
+				name: "Home",
+				item: "https://anjaygoel.com",
+			},
+			{
+				"@type": "ListItem",
+				position: 2,
+				name: "Showcase",
+				item: "https://anjaygoel.com/showcase",
+			},
+		],
+	}}
+/>
+
+<PageLayout meta={{ title: "Showcase" }}>
+	<div>
+		<section>
+			<h1 class="title mb-6">Showcase</h1>
+			<p class="mb-8">
+				I enjoy building stuff that solves real-world problems. Here are some of the projects I've worked on.
+			</p>
+		</section>
+		
+		<div class="grid gap-8 md:grid-cols-2">
+			<!-- RedScout -->
+			<article class="group rounded-lg border border-accent/20 p-6 transition-all hover:border-accent/40 hover:shadow-lg h-full">
+				<div class="mb-4 flex items-center gap-3">
+					<svg class="h-8 w-8 text-accent" fill="currentColor" viewBox="0 0 24 24">
+						<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+					</svg>
+					<h2 class="text-xl font-semibold">RedScout</h2>
+				</div>
+				<p class="mb-4 text-sm text-textColor/80">
+					A Redis monitoring tool that provides namespace-level insights into your Redis database. 
+					Unlike traditional tools that focus on server-level metrics, RedScout breaks down memory usage, 
+					key TTLs, and operations per second by logical namespaces.
+				</p>
+				<div class="mb-4 flex flex-wrap gap-2">
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">Go</span>
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">Redis</span>
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">Monitoring</span>
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">CLI Tool</span>
+				</div>
+				<a 
+					href="https://github.com/AnjayGoel/RedScout" 
+					target="_blank" 
+					rel="noopener noreferrer"
+					class="inline-flex items-center gap-2 text-accent hover:underline"
+				>
+					View on GitHub
+					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+					</svg>
+				</a>
+			</article>
+
+			<!-- DashReels -->
+			<article class="group rounded-lg border border-accent/20 p-6 transition-all hover:border-accent/40 hover:shadow-lg h-full">
+				<div class="mb-4 flex items-center gap-3">
+					<svg class="h-8 w-8 text-accent" fill="currentColor" viewBox="0 0 24 24">
+						<path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+					</svg>
+					<h2 class="text-xl font-semibold">DashReels</h2>
+				</div>
+				<p class="mb-4 text-sm text-textColor/80">
+					A mobile app for short-form video content and entertainment. Features include free short dramas, 
+					multiple genres, personalized recommendations, and Picture-in-Picture mode for uninterrupted viewing.
+				</p>
+				<div class="mb-4 flex flex-wrap gap-2">
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">Mobile App</span>
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">Entertainment</span>
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">Short Videos</span>
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">Android</span>
+				</div>
+				<a 
+					href="https://play.google.com/store/apps/details?id=com.dashtoon.video.reels&hl=en_IN" 
+					target="_blank" 
+					rel="noopener noreferrer"
+					class="inline-flex items-center gap-2 text-accent hover:underline"
+				>
+					View on Play Store
+					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+					</svg>
+				</a>
+			</article>
+
+			<!-- DashToon App -->
+			<article class="group rounded-lg border border-accent/20 p-6 transition-all hover:border-accent/40 hover:shadow-lg h-full">
+				<div class="mb-4 flex items-center gap-3">
+					<svg class="h-8 w-8 text-accent" fill="currentColor" viewBox="0 0 24 24">
+						<path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+					</svg>
+					<h2 class="text-xl font-semibold">DashToon</h2>
+				</div>
+				<p class="mb-4 text-sm text-textColor/80">
+					A mobile application focused on comics and webtoons. Provides users with access to a wide variety 
+					of digital comics and manga content with an intuitive reading experience.
+				</p>
+				<div class="mb-4 flex flex-wrap gap-2">
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">Mobile App</span>
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">Comics</span>
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">Webtoons</span>
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">Android</span>
+				</div>
+				<a 
+					href="https://play.google.com/store/apps/details?id=com.dashtoon.app&hl=en_IN" 
+					target="_blank" 
+					rel="noopener noreferrer"
+					class="inline-flex items-center gap-2 text-accent hover:underline"
+				>
+					View on Play Store
+					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+					</svg>
+				</a>
+			</article>
+
+			<!-- Stable Roommate Generalised -->
+			<article class="group rounded-lg border border-accent/20 p-6 transition-all hover:border-accent/40 hover:shadow-lg h-full">
+				<div class="mb-4 flex items-center gap-3">
+					<svg class="h-8 w-8 text-accent" fill="currentColor" viewBox="0 0 24 24">
+						<path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 2a8 8 0 110 16 8 8 0 010-16zm0 3a5 5 0 100 10A5 5 0 0012 7zm0 2a3 3 0 110 6 3 3 0 010-6z"/>
+					</svg>
+					<h2 class="text-xl font-semibold">Generalised Stable Roommate</h2>
+				</div>
+				<p class="mb-4 text-sm text-textColor/80">
+					An algorithm & webapp to automatically group people into optimal teams based on their individual preferences.
+				</p>
+				<div class="mb-4 flex flex-wrap gap-2">
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">Python</span>
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">Algorithm</span>
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">Web App</span>
+					<span class="rounded-full bg-accent/20 px-2 py-1 text-xs">Group Formation</span>
+				</div>
+				<a 
+					href="https://github.com/AnjayGoel/stable-roommate-generalised" 
+					target="_blank" 
+					rel="noopener noreferrer"
+					class="inline-flex items-center gap-2 text-accent hover:underline"
+				>
+					View on GitHub
+					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+					</svg>
+				</a>
+			</article>
+		</div>
+	</div>
+</PageLayout> 
