@@ -22,7 +22,7 @@ import rehypeUnwrapImages from "rehype-unwrap-images";
 
 // https://astro.build/config
 export default defineConfig({
-	site: "https://anjaygoel.com",
+	site: "https://anjay.sh",
 	image: {
 		domains: ["webmention.io"],
 	},
