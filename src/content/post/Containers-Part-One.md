@@ -2,7 +2,7 @@
 title: "Containers Part I: They are just fancy processes"
 publishDate: 2025-10-15 01:30:47 +0530
 tags: [ containers, docker, kubernetes, til ]
-description: "Yes, containers are, at their core, just processes. Let's dig into Linux primitives that make it possible"
+description: "Containers are, at their core, just processes. Let's deep dive into Linux primitives that make it possible"
 ---
 
 A while ago, I stumbled upon some LinkedIn copy-pasta about Go 1.25 finally making `GOMAXPROCS` 'container-aware'.
@@ -26,7 +26,7 @@ will of course attach resources to dive deeper into specific topics. A lot if no
 free to correct me if I goof something up.
 
 Much of this first blog is borrowed from this highly recommended series
-of [videos by lizrice](https://www.youtube.com/watch?v=8fi7uSYlOdc&vl=en). So I won't explain
+of [videos by Liz Rice](https://www.youtube.com/watch?v=8fi7uSYlOdc&vl=en). So I won't explain
 these concepts in very detail.
 
 ## The kernal features that allow containerisation
@@ -59,7 +59,7 @@ or via the `setns` syscall to join an existing namespace. A few important namesp
 * UTS (`uts`): Isolates the hostname so that processes in different processes can have different hostnames and NIS
   domain names.
 
-Others include IPC (`ipc`), cgroups (`cgroup`) & time (`time`) (for (`CLOCK_MONOTONIC` and `CLOCK_BOOTTIME`)),
+Others include IPC (`ipc`), cgroups (`cgroup`) & time (`time`) for (`CLOCK_MONOTONIC` and `CLOCK_BOOTTIME`),
 
 ### Cgroups
 
@@ -69,10 +69,10 @@ will use cgroups v2. To create a cgroup, we have to create a folder with its nam
 pid's in a file `cgroup.procs` inside it. Files like `memory.max`, `pu.weight` in this folder describes the amount of
 resources this process can use.
 
-## A Simple Container In Go
+## Building our own container
 
-To create a simple container, we first need a root filesystem. We can get this by extracting it from an existing
-image. The following script extracts it from BusyBox:
+Now lets try to create our own container and run a shell in it. First we first need a root filesystem. We can
+get this by extracting it from any existing image. The following script extracts it from BusyBox:
 
 ```shell
 #!/bin/bash
@@ -91,7 +91,11 @@ docker export "$CONTAINER" | tar -C "$EXTRACT_DIR" -xvf -
 docker rm "$CONTAINER"
 ```
 
-Now let's create a simple container in go using a slightly updated version of the code from liz rice's series:
+Now let's compile and run a slightly modified code from Liz Rice'
+s [Containers From Scratch](https://github.com/lizrice/containers-from-scratch). Save this as `main.go`,
+compile it using `go build main.go` & then run the binary with sudo, passing the command to run, like following:
+`sudo ./main run /bin/sh`. You should see yourself inside a shell in the container!
+
 
 <div style="max-height: min(75vh, 1000px); overflow: scroll;">
 
@@ -273,15 +277,15 @@ func check(err error) {
 
 </div>
 
-What the above code does is:
+The code above does the following:
 
-* Starts the parent process, parses the command to run, its args etc.
-* Sets up a new cgroup limiting the CPU and memory usage for processes in it.
-* Clones a new process with new namespaces for mount, PID, UTS, and user etc.
-* Adds the cloned process to the cgroup created earlier.
-* Inside the cloned process, it sets up the new hostname, mounts a few special filesystem like proc, temp etc., while
-  also bind mounts the host dev devices like /dev/null, /dev/zero to the container.
-* Finally, it does a `chroot` to the new root filesystem and execs the command passed from the parent process.
+1. Starts the parent process, parses the command to run in container, its args etc.
+2. Sets up a new cgroup limiting the CPU and memory usage for processes in it.
+3. Clones the container process with new namespaces for mount, PID, UTS, and user etc.
+4. Adds the cloned process to the cgroup created earlier.
+5. Inside the cloned process, it sets up the new hostname, mounts a few special filesystem like proc, temp etc., while
+   also bind mounts the host dev devices like /dev/null, /dev/zero to the container.
+6. Finally, it does a `chroot` to the new root filesystem and execs the command passed from the parent process.
 
 And voilà! We have a simple container running a bash shell. You can try exploring the container using commands like
 `ps`, `ip`, `ls` to convince yourself that it is indeed isolated from the host system. Try removing a few
@@ -324,28 +328,12 @@ Looking at the output of `ps -e -o pid,user,cmd --forest`, we can find the conta
 The pid `159276` is the actual docker container process. Each docker container also has a shim process (pid `159253`)
 which we will discuss later.
 
-Now using the proc filesystem, we can confirm that this process has a cgroup & different namespaces.
+Now using the proc filesystem, we can confirm that this process has a cgroup & different namespace from other processes.
 
-#### Cgroups:
+#### Namespaces
 
-`cat /proc/<pid>/cgroup` gives the name of cgroup. It typically looks like this:
-
-```shell
-0::/system.slice/docker-<container-id>.scope
-```
-
-The corresponding cgroups folder can be found under:
-
-```shell
-/sys/fs/cgroup/system.slice/docker-<pid>.scope
-```
-
-Opening files such as `memory.max` and `cpu.max` in that directory confirms that this is where the process's resource
-limits are enforced using cgroups.
-
-#### Namespaces:
-
-Similarly, the namespaces are visible as symlinks under `proc/<pid>/cgroup`. Doing `sudo ls -al proc/<pid>/cgroup` gives
+The namespaces of a process are visible in the `proc` fs as symlinks under `/proc/<pid>/ns`. Doing
+`sudo ls -al /proc/<pid>/ns` gives
 us something like following
 
 ```shell
@@ -372,6 +360,23 @@ sudo nsenter -t 137649 -a
 
 Explore using `ls`, `ip` etc., we are indeed inside the docker container!.
 
+#### Cgroups
+
+Similar to namespaces, `cat /proc/<pid>/cgroup` gives the name of cgroup. It typically looks like this:
+
+```shell
+0::/system.slice/docker-<container-id>.scope
+```
+
+The corresponding cgroups folder can be found under:
+
+```shell
+/sys/fs/cgroup/system.slice/docker-<container-id>.scope
+```
+
+Opening files such as `memory.max` and `cpu.max` in that directory confirms that this is where the process's resource
+limits are enforced using cgroups.
+
 #### Root Filesystem
 
 We can also find the location of root fs using the following command
@@ -381,7 +386,7 @@ docker inspect <container> --format '{{.GraphDriver.Data.MergedDir}}'
 ```
 
 then cd into it using sudo. This is actually a
-union mount fs called "[OverlayFS](https://docs.kernel.org/filesystems/overlayfs.html)" as we will see later.
+"union mount" filesystem called "[OverlayFS](https://docs.kernel.org/filesystems/overlayfs.html)" as we will see later.
 
 So far, we have implemented a basic container ourselves and seen Docker containers in action using the same Linux
 primitives. Kubernetes pods are built on similar concepts. By default, containers in a pod share the ipc, network, and
@@ -392,3 +397,11 @@ containers in a pod. Meanwhile, cgroups are applied at the individual container 
 This should be enough to digest the fact that containers are, at their core, just processes. But calling them "fancy"
 feels like an understatement. They are indeed much more sophisticated than a typical process. In the next part, I hope
 to dive into even fancier aspects like networking, filesystems & security.
+
+## References
+
+- [Namespaces in operation, part 1: namespaces overview](https://lwn.net/Articles/531114/)
+- [Digging into Linux namespaces - part 1](https://blog.quarkslab.com/digging-into-linux-namespaces-part-1.html)
+- [The 7 most used Linux namespaces](https://www.redhat.com/en/blog/7-linux-namespaces)
+- [Control Group v2](https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html)
+- [A Linux sysadmin's introduction to cgroups](https://www.redhat.com/en/blog/cgroups-part-one)
