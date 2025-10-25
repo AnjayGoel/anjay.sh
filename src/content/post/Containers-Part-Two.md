@@ -5,15 +5,20 @@ tags: [ containers, docker, kubernetes, til ]
 description: "Yes, containers are, at their core, just processes. Let's dig into Linux primitives that make it possible"
 ---
 
+In part one, we built a plain & bare-bones container. To make it more useful, we need to configure quite a few things
+like networking (obviously), storage, security, etc. In this post, I want to explore how a few of these are
+implemented in practice and try to implement them ourselves wherever possible, comparing our approach with how Docker
+handles them.
 
-In part one, we built a plain & dumb container. To make it more useful, we need to configure a few things like
-networking (obviously), storage, security, etc.
+Before we get started, take a look at the output of `docker inspect <container_id>` to see all the configurations Docker
+does for a container. Notice stuff like `HostConfig`, `Mounts`, `NetworkSettings`, `GraphDriver` (File System) etc.
 
 ## Networking
 
-Let's first take a look at how networking works in containers. This is done via a virtual network interface
+Now, let's first take a look at how networking works in containers. This is done via a virtual network interface
 called [veth](https://man7.org/linux/man-pages/man4/veth.4.html) (Virtual Ethernet). It's quite similar to an
-ethernet cable joining two devices. The special thing it though is that ends of the veth pair can be moved to different
+ethernet cable joining two devices. The special thing about it though is that ends of the veth pair can be moved to
+different
 network namespaces. We can create a veth pair using the `ip`, then setup firewall & NAT using `iptables` as done below:
 
 <div style="max-height: min(75vh, 1000px); overflow: scroll;">
@@ -64,6 +69,7 @@ sudo iptables -t nat -A POSTROUTING -s $SUBNET -o $HOST_NET_IF -j MASQUERADE
 
 echo "[*] Done! Container should now have internet access."
 ```
+
 </div>
 
 
@@ -84,7 +90,7 @@ Then get the server containers IP using
 using `wget -qO- http://<ip>:5000`
 
 At the same time, if you run `ip link show` on the host, you will see `docker0` & two veth interfaces created for the
-server & busybox containers, like below:
+server & busybox container, like below:
 
 ```shell
 $ ip link show
@@ -100,9 +106,9 @@ $ ip link show
     link/ether 1a:c9:a7:ef:a0:95 brd ff:ff:ff:ff:ff:ff link-netnsid 1
 ```
 
-
-
 * Rootless: User namespace, user mapping, root & capabilities
 * Restricting syscalls
 * Overlay FS, Copy on write
 * SELinux, AppArmor, seccomp -> ?
+
+https://blog.mobyproject.org/where-are-containerds-graph-drivers-145fc9b7255
