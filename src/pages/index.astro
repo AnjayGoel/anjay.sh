@@ -42,7 +42,7 @@ const uniqueTags = getUniqueTags(allPosts);
 	<div>
 		<section>
 			<h1 class="title mb-6">Hi There!</h1>
-			<p class="mb-4">
+			<p class="mb-4 text-textMuted">
 				I am Anjay. I love to write about software development, technology and occasionally other
 				stuff like economics & finance. I hope you find something interesting here. <br />
 			</p>
@@ -64,7 +64,7 @@ const uniqueTags = getUniqueTags(allPosts);
 				<nav class="mt-8 flex items-center gap-x-4">
 					<a class="mr-3 me-auto py-2 sm:hover:text-accent" data-astro-prefetch href={"/posts"}>
 						<span class="sr-only">View All →</span>
-						View All →
+						View All ({allPosts.length}) →
 					</a>
 				</nav>
 			</section>

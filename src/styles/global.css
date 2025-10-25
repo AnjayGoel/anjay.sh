@@ -10,6 +10,7 @@
 		--theme-bg: 0deg 0% 98%;
 		--theme-link: 237deg 68% 57%;
 		--theme-text: 203deg 11% 15%;
+		--theme-text-muted: 203deg 11% 35%;
 		--theme-accent: 237deg 68% 57%;
 		--theme-accent-2: 0deg 0% 7%;
 		--theme-quote: 351deg 66% 48%;
@@ -17,9 +18,10 @@
 
 	:root[data-theme="dark"] {
 		color-scheme: dark;
-		--theme-bg: 210deg 6% 12%;
+		--theme-bg: 0deg 0% 10%;
 		--theme-link: 159deg 64% 45%;
-		--theme-text: 220deg 3% 79%;
+    --theme-text: 0deg 0% 100%;
+		--theme-text-muted: 220deg 3% 79%;
 		--theme-accent: 159deg 64% 45%;
 		--theme-accent-2: 0deg 0% 93%;
 		--theme-quote: 102deg 100% 86%;

@@ -50,10 +50,11 @@ export default {
 				link: "hsl(var(--theme-link) / <alpha-value>)",
 				quote: "hsl(var(--theme-quote) / <alpha-value>)",
 				textColor: "hsl(var(--theme-text) / <alpha-value>)",
+				textMuted: "hsl(var(--theme-text-muted) / <alpha-value>)",
 			},
 			fontFamily: {
 				// Add any custom fonts here
-				sans: [...fontFamily.sans],
+				sans: ["Inter", ...fontFamily.sans],
 				serif: [...fontFamily.serif],
 			},
 			transitionProperty: {
@@ -72,10 +73,10 @@ export default {
 							borderLeftWidth: "0",
 						},
 						code: {
-							"@apply bg-gray-100 text-gray-900 border border border-gray-300 rounded px-0.5": "",
+							"@apply bg-gray-100 text-gray-900 border border-[0.5px] border-gray-300 rounded px-1": "",
 						},
 						'[data-theme="dark"] code': {
-							"@apply bg-neutral-700 text-neutral-300 border border-neutral-700 rounded px-0.5": "",
+							"@apply bg-neutral-800 text-neutral-300 border-[0.5px] border-neutral-700 rounded px-1": "",
 						},
 						hr: {
 							borderTopStyle: "dashed",
