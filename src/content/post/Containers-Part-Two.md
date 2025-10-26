@@ -18,8 +18,8 @@ does for a container. Notice stuff like `HostConfig`, `Mounts`, `NetworkSettings
 Now, let's first take a look at how networking works in containers. This is done via a virtual network interface
 called [veth](https://man7.org/linux/man-pages/man4/veth.4.html) (Virtual Ethernet). It's quite similar to an
 ethernet cable joining two devices. The special thing about it though is that ends of the veth pair can be moved to
-different
-network namespaces. We can create a veth pair using the `ip`, then setup firewall & NAT using `iptables` as done below:
+different network namespaces. We can create a veth pair using the `ip`, then setup firewall & NAT using `iptables` as
+done below:
 
 <div style="max-height: min(75vh, 1000px); overflow: scroll;">
 
@@ -73,7 +73,8 @@ echo "[*] Done! Container should now have internet access."
 </div>
 
 
-There is another virtual interface typically used in container networking called `bridge`. A bridge is like a virtual
+There is another virtual interface typically used in container networking
+called [bridge](https://wiki.archlinux.org/title/Network_bridge). A bridge is like a virtual
 switch that allows us to connect multiple network interfaces. Docker creates a default bridge network called `docker0`
 on the host machine. When a container is started, Docker creates a veth pair, attaches one end to the container's
 network namespace, and the other end to the `docker0` (by default) bridge on the host.
@@ -106,9 +107,47 @@ $ ip link show
     link/ether 1a:c9:a7:ef:a0:95 brd ff:ff:ff:ff:ff:ff link-netnsid 1
 ```
 
+## Storage
+
+In part one, we saw how mount namespaces allow us to isolate mounts inside a container. For the root filesystem however,
+we simply extracted it from a docker image. In practice, container's root filesystem consists of multiple
+read only layers with a finale writable layer stacked on top of each other. These are the same layers you see when
+building or fetching a docker image. Each layer records a set of diffs / changes. These layers are merged into a single
+view using a union mount filesystem like [OverlayFS](https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html).
+
+This enables sharing common layers between multiple containers, saving disk space and improving startup time. When a
+container writes to its filesystem, the changes are recorded in the top writable layer, leaving the underlying read-only
+layers unchanged. When something is changed in the lower read-only layers, it is "copied up" to the top writable layer,
+this is called the"copy-on-write" strategy.
+
+The overlay filesystem can be setup using the `mount` command as shown below:
+
+```shell
+# mount -t overlay overlay -o lowerdir=/lower1:/lower2:/lower3,upperdir=/upper,workdir=/work /merged
+```
+
+Here, `/lower1`, `/lower2`, `/lower3` are the read-only layers, topmost on left to bottom on right, `/upper` is the
+writable top layer, `/work` is a working directory for OverlayFS, and `/merged` is the final merged view. You can try
+modifying the container code from part one to mount an overlay filesystem for the container's rootfs using the same
+mount syscall.
+
+Similarly, docker stores this layers under `/var/lib/docker/overlay2/` on the host. You can find these layers using
+`docker inspect -f '{{json .GraphDriver}}' <container-id> | jq`. If you run two containers from the same image, you’ll
+notice that they share the `LowerDir` but have different `UpperDir`. Try modifying / add some files inside these
+containers. you’ll see that the changes appear only in their respective `UpperDir`, leaving the shared lower layers
+untouched.
+
 * Rootless: User namespace, user mapping, root & capabilities
 * Restricting syscalls
-* Overlay FS, Copy on write
+
 * SELinux, AppArmor, seccomp -> ?
 
-https://blog.mobyproject.org/where-are-containerds-graph-drivers-145fc9b7255
+https://martinheinz.dev/blog/44
+https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html
+https://wiki.archlinux.org/title/Overlay_filesystem
+
+
+https://kubernetes.io/docs/concepts/workloads/pods/user-namespaces/
+https://kubernetes.io/docs/tutorials/security/seccomp/
+https://lwn.net/Articles/978846/
+https://www.cloudfoundry.org/blog/route-rootless-containers/
