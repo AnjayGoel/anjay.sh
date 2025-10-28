@@ -156,7 +156,7 @@ It creates a veth pair, attaches one end to the container's network namespace, a
 default) bridge on the host. The bridge could be further connected to the host's main network interface like we did
 above.
 
-### Docker networking in action
+### Docker's Networking in action
 
 Let's try creating a simple HTTP server container and accessing it from another container using Docker's default
 networking:
