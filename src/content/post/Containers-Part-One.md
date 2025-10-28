@@ -348,7 +348,7 @@ Looking at the output of `ps -e -o pid,user,cmd --forest`, we can find the conta
 The pid `159276` is the actual docker container process. Each docker container also has a shim process (pid `159253`)
 which we will discuss later.
 
-Now using the proc filesystem, we can confirm that this process has a cgroup & different namespace from other processes.
+Now using the `proc` filesystem, we can confirm that this process has a cgroup & different namespace from other processes.
 
 #### Namespaces
 
