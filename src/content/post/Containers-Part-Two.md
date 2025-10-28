@@ -199,6 +199,8 @@ $ ip link show
     link/ether 1a:c9:a7:ef:a0:95 brd ff:ff:ff:ff:ff:ff link-netnsid 1
 ```
 
+Verify bridge, ips, NAT etc
+
 * Rootless: User namespace, user mapping, root & capabilities
 * Restricting syscalls
 
