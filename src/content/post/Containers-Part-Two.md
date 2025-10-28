@@ -173,8 +173,11 @@ docker run -d --name server python:3-slim python -m http.server 5000
 docker run -it --rm busybox sh
 ```
 
-3.Then get the server containers IP using
-```docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' server```
+3. Then get the server containers IP using
+
+```shell
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' server
+```
 
 4. Finally, inside the busybox container, use `wget` to access the server:
 
@@ -186,7 +189,6 @@ wget -qO- http://<ip>:5000
    server & busybox container, like below:
 
 ```shell
-$ ip link show
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
@@ -197,6 +199,14 @@ $ ip link show
     link/ether 36:a6:48:12:2c:b8 brd ff:ff:ff:ff:ff:ff link-netnsid 0
 64: vethf0b5df8@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master docker0 state UP mode DEFAULT group default
     link/ether 1a:c9:a7:ef:a0:95 brd ff:ff:ff:ff:ff:ff link-netnsid 1
+```
+
+6. Run `brctl show docker0` to verify that the veth interfaces are indeed attached to it:
+
+```shell
+bridge name	bridge id		STP enabled	interfaces
+docker0		8000.b6cff2e42f63	no	  vethd615595
+							                     vethf0b5df8
 ```
 
 Verify bridge, ips, NAT etc
