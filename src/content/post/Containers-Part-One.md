@@ -26,8 +26,8 @@ will of course attach resources to dive deeper into specific topics. A lot if no
 free to correct me if I goof something up.
 
 Much of this first blog is borrowed from this highly recommended series
-of [videos by Liz Rice](https://www.youtube.com/watch?v=8fi7uSYlOdc&vl=en). So I won't explain
-these concepts in very detail.
+of [videos by Liz Rice](https://www.youtube.com/watch?v=8fi7uSYlOdc&vl=en). So I won't explain these concepts in very
+detail.
 
 ## The kernal features that allow containerisation
 
@@ -55,7 +55,7 @@ or via the `setns` syscall to join an existing namespace. A few important namesp
   namespace.
 * Network (`net`): Isolates the whole network stack, including interfaces, routing tables, firewall rules etc.
 * User (`user`): Isolates user and group IDs. Inside a user namespace a process can have a different mapped UID/GID
-  than outside. Also allowing unprivileged users on the host to become uid 0 (root) inside this namespace
+  than outside. Also allowing unprivileged users on the host to become uid 0 (root) inside this namespace.
 * UTS (`uts`): Isolates the hostname so that processes in different processes can have different hostnames and NIS
   domain names.
 
@@ -71,31 +71,54 @@ resources this process can use.
 
 ## Building our own container
 
-Now lets try to create our own container and run a shell in it. First we first need a root filesystem. We can
-get this by extracting it from any existing image. The following script extracts it from BusyBox:
+Hopefully, now we have a rough idea of how to create a simple container ourselves. We need to start
+a process with its own namespaces, set up cgroups for resource
+limits, [mount](https://man7.org/linux/man-pages/man2/mount.2.html) a few special filesystems like [
+`proc`](https://docs.kernel.org/filesystems/proc.html),
+`tmp` etc. and finally [`chroot`](https://wiki.archlinux.org/title/Chroot) (change the root dir of the process) to the
+new root filesystem. There is obviously tons of details missing from this sketch like networking, security
+considerations etc., which I hope to cover in the next part.
+
+### Making a root filesystem
+
+First we first need a root filesystem. We can get this by extracting it from any existing image. Lets extracts it
+from BusyBox:
+
+1. Make the `mount` directory to hold the root filesystem.
 
 ```shell
-#!/bin/bash
-set -e
-
-IMAGE="busybox:latest"
-CONTAINER="busybox-temp"
-EXTRACT_DIR="./mount"
-
-mkdir -p "$EXTRACT_DIR"
-
-docker pull "$IMAGE"
-docker create --name "$CONTAINER" "$IMAGE"
-docker export "$CONTAINER" | tar -C "$EXTRACT_DIR" -xvf -
-
-docker rm "$CONTAINER"
+mkdir -p "mount"
 ```
 
-Now let's compile and run a slightly modified code from Liz Rice'
-s [Containers From Scratch](https://github.com/lizrice/containers-from-scratch). Save this as `main.go`,
-compile it using `go build main.go` & then run the binary with sudo, passing the command to run, like following:
-`sudo ./main run /bin/sh`. You should see yourself inside a shell in the container!
+2. Create a temporary container from the BusyBox image, export its filesystem and extract it to the `mount` directory.
 
+```shell
+docker create --name "busybox-temp" "busybox:latest"
+docker export "busybox-temp" | tar -C "mount" -xvf -
+```
+
+3. Remove the temporary container.
+
+```shell
+docker rm "busybox-temp"
+```
+
+### The step-by-step process
+
+Let's first look at what the code given below is going to do:
+
+1. Starts the program, parses the command to run in container, its args etc.
+2. Sets up a new cgroup by writing to `/sys/fs/cgroup/`.
+3. Clones a new child container process from the current process with new namespaces for mount, PID, UTS etc. Note: We
+   will
+   see how user namespace works in part two.
+4. Adds the container process to the cgroup created earlier.
+5. Inside the cloned process, it sets up the new hostname, mounts a few special filesystem like proc, temp etc., while
+   also [bind mounts](https://unix.stackexchange.com/questions/198590/what-is-a-bind-mount) the host dev devices like
+   `/dev/null`, `/dev/zero` to the container.
+6. Finally, it does a `chroot` to the new root filesystem and execs the command passed from the parent process.
+
+### The code
 
 <div style="max-height: min(75vh, 1000px); overflow: scroll;">
 
@@ -277,22 +300,19 @@ func check(err error) {
 
 </div>
 
-The code above does the following:
+### Steps to run
 
-1. Starts the parent process, parses the command to run in container, its args etc.
-2. Sets up a new cgroup limiting the CPU and memory usage for processes in it.
-3. Clones the container process with new namespaces for mount, PID, UTS, and user etc.
-4. Adds the cloned process to the cgroup created earlier.
-5. Inside the cloned process, it sets up the new hostname, mounts a few special filesystem like proc, temp etc., while
-   also bind mounts the host dev devices like /dev/null, /dev/zero to the container.
-6. Finally, it does a `chroot` to the new root filesystem and execs the command passed from the parent process.
+1. Save this as `main.go`,
+2. Compile it using `go build main.go`
+3. Run the binary with sudo, passing the command to run: `sudo ./main run /bin/sh`
+
+Now you should see yourself inside a shell in the container!
 
 And voilà! We have a simple container running a bash shell. You can try exploring the container using commands like
 `ps`, `ip`, `ls` to convince yourself that it is indeed isolated from the host system. Try removing a few
 namespaces to see how isolation is affected. Also on the host, you can try checking the cgroup & ns using the proc
 filesystem (`/proc/<pid>/cgroup` and `/proc/<pid>/ns`). Also try making fork bomb inside the container to see if its
-limit
-to the no of processes we specified in cgroups.
+limit to the no of processes we specified in cgroups.
 
 ## Seeing it in action with docker
 
@@ -328,7 +348,7 @@ Looking at the output of `ps -e -o pid,user,cmd --forest`, we can find the conta
 The pid `159276` is the actual docker container process. Each docker container also has a shim process (pid `159253`)
 which we will discuss later.
 
-Now using the proc filesystem, we can confirm that this process has a cgroup & different namespace from other processes.
+Now using the `proc` filesystem, we can confirm that this process has a cgroup & different namespace from other processes.
 
 #### Namespaces
 
@@ -351,7 +371,8 @@ lrwxrwxrwx 1 root root 0 Oct 21 08:00 uts -> 'uts:[4026532159]'
 ```
 
 You can do the same for normal process to confirm that the namespaces for the container process is indeed different from
-the default namespace used by other processes. We can enter a particular namespace of the process by using the nsenter
+the default namespaces used by other processes. We can enter a particular namespace of the process by using the
+`nsenter`
 utility. Let's enter all its namespaces by doing
 
 ```shell
@@ -379,18 +400,20 @@ limits are enforced using cgroups.
 
 #### Root Filesystem
 
-We can also find the location of root fs using the following command
+Notice, how we had to manually extract the root filesystem from a docker image to use in our container. In practice, the
+root filesystem is composed of multiple layers stacked on top of each other using a special "union mount" filesystem
+called "[OverlayFS](https://docs.kernel.org/filesystems/overlayfs.html)" as we will see later. But for now, we can find
+where the root filesystem of a docker container is on the host using the following command:
 
 ```shell
 docker inspect <container> --format '{{.GraphDriver.Data.MergedDir}}'
 ```
 
-then cd into it using sudo. This is actually a
-"union mount" filesystem called "[OverlayFS](https://docs.kernel.org/filesystems/overlayfs.html)" as we will see later.
+## What next?
 
 So far, we have implemented a basic container ourselves and seen Docker containers in action using the same Linux
-primitives. Kubernetes pods are built on similar concepts. By default, containers in a pod share the ipc, network, and
-uts namespaces. It is also possible
+primitives. Kubernetes pods are built on similar concepts. By default, containers in a pod share the `ipc`, `network`,
+and `uts` namespaces. It is also possible
 to [share the PID namespace](https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/) between
 containers in a pod. Meanwhile, cgroups are applied at the individual container level.
 
