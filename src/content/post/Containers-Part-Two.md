@@ -62,7 +62,7 @@ leaving the shared lower layers untouched.
 
 ## Networking
 
-Now, let's first take a look at how networking works in containers. This is done via a virtual network interface
+Now, let's take a look at how networking works in containers. This is done via a virtual network interface
 called [veth](https://man7.org/linux/man-pages/man4/veth.4.html) (Virtual Ethernet). It's quite similar to an
 ethernet cable joining two devices. Packets going into one end of veth immediately appears on the other. The special
 thing about it though is that ends of the veth pair can be moved to different network namespaces, essentially allowing
