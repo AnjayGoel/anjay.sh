@@ -11,7 +11,7 @@ implemented in practice and try to implement them ourselves wherever possible, c
 handles them.
 
 Before we get started, take a look at the output of `docker inspect <container_id>` to see all the configurations Docker
-does for a container. Notice stuff like `HostConfig`, `Mounts`, `NetworkSettings`, `GraphDriver` (File System) etc.
+does for a container. Notice stuff like `HostConfig`, `Mounts`, `NetworkSettings`, `GraphDriver` etc.
 
 ## Filesystems & Storage
 
@@ -19,7 +19,7 @@ In part one, we saw how mount namespace isolates mounts inside a container, allo
 within the container without affecting the host system. For the root filesystem however, we simply extracted the entire
 base image into a new directory and chroot into it. If we keep doing the same for each and every container, we’ll end up
 with multiple redundant copies of the same base image and also increase the container startup time because of the copy
-overhead. This is where union filesystems like OverlayFS come into play.
+overhead. This is where union filesystems like OverlayFS comes into play.
 
 ### The Overlay Filesystem
 
@@ -28,9 +28,10 @@ top of each other. These are the same layers you see when building or fetching a
 of diffs / changes. These layers are merged into a single view using a union mount filesystem
 like [OverlayFS](https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html).
 
-This enables sharing common layers between multiple containers, saving disk space and improving startup time. When a
-container writes to its filesystem, the changes are recorded in the top writable layer, leaving the underlying read-only
-layers unchanged. When something is changed in the lower read-only layers, it is "copied up" to the top writable layer,
+This enables sharing common layers between multiple containers, saving disk space and improving startup time. When
+something is written to the
+container's filesystem, the changes are recorded in the top writable layer, leaving the underlying read-only
+layers unchanged. If you try to modify parts of the lower read-only layers, changes are "copied up" to the top writable layer,
 this is called the "copy-on-write" strategy.
 
 The overlay filesystem can be setup using the `mount` syscall as shown below:
