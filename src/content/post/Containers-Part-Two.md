@@ -75,9 +75,10 @@ echo "[*] Done! Container should now have internet access."
 
 There is another virtual interface typically used in container networking
 called [bridge](https://wiki.archlinux.org/title/Network_bridge). A bridge is like a virtual
-switch that allows us to connect multiple network interfaces. Docker creates a default bridge network called `docker0`
-on the host machine. When a container is started, Docker creates a veth pair, attaches one end to the container's
-network namespace, and the other end to the `docker0` (by default) bridge on the host.
+switch that allows us to connect multiple network interfaces. This enables communication between containers. Docker
+creates a default bridge network called `docker0` on the host machine. When a container is started, Docker creates a
+veth pair, attaches one end to the container's network namespace, and the other end to the `docker0` (by default) bridge
+on the host.
 
 Try creating a simple HTTP server container and accessing it from another container using Docker's default networking:
 
@@ -145,7 +146,6 @@ untouched.
 https://martinheinz.dev/blog/44
 https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html
 https://wiki.archlinux.org/title/Overlay_filesystem
-
 
 https://kubernetes.io/docs/concepts/workloads/pods/user-namespaces/
 https://kubernetes.io/docs/tutorials/security/seccomp/
