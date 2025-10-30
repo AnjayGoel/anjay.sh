@@ -203,7 +203,7 @@ wget -qO- http://<ip>:5000
     link/ether 1a:c9:a7:ef:a0:95 brd ff:ff:ff:ff:ff:ff link-netnsid 1
 ```
 
-6. Run `brctl show docker0` to verify that the veth interfaces are indeed attached to it:
+6. Run `brctl show docker0` on the host to verify that the veth interfaces are indeed attached to the bridge:
 
 ```shell
 bridge name	bridge id		STP enabled	interfaces

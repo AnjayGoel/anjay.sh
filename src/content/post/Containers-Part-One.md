@@ -66,8 +66,16 @@ Others include IPC (`ipc`), cgroups (`cgroup`) & time (`time`) for (`CLOCK_MONOT
 As mentioned earlier, cgroups allows to restrict the resource usage (CPU, memory, max processes etc.) of a set of
 process. It works via a pseudo-filesystem usually mounted at `/sys/fs/cgroup`. There are two versions of cgroups, we
 will use cgroups v2. To create a cgroup, we have to create a folder with its name in this filesystem, then add
-pid's in a file `cgroup.procs` inside it. Files like `memory.max`, `pu.weight` in this folder describes the amount of
-resources this process can use.
+pid's in a file `cgroup.procs` inside it. Files like `memory.max`, `cpu.max` in this folder describes the max amount of
+resources this process can use. Similarly, the `cpuset.cpus` restricts which cpu core the processes are allowed to run.
+
+One interesting realisation I had from this is the CPU limits specified are shared across the cores of the host. Setting
+a containers CPU limit to 1000m in k8s doesn't mean it will have a whole core available, it simply means that it will
+have one core's worth of CPU time available! So it's possible that your container might actually be running multiple
+parallel threads even with very small low cpu limit, it would simply exhaust the limit quickly. The fact that resource
+limits are set via cgroups is also why programs need to be container-aware. Traditionally, programs use the /proc
+filesystem (e.g., /proc/meminfo or /proc/cpuinfo), which reflects the host's resources rather than the container's
+actual limits.
 
 ## Building our own container
 
@@ -348,7 +356,8 @@ Looking at the output of `ps -e -o pid,user,cmd --forest`, we can find the conta
 The pid `159276` is the actual docker container process. Each docker container also has a shim process (pid `159253`)
 which we will discuss later.
 
-Now using the `proc` filesystem, we can confirm that this process has a cgroup & different namespace from other processes.
+Now using the `proc` filesystem, we can confirm that this process has a cgroup & different namespace from other
+processes.
 
 #### Namespaces
 
