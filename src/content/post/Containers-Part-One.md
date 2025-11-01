@@ -29,24 +29,31 @@ Much of this first blog is borrowed from this highly recommended series
 of [videos by Liz Rice](https://www.youtube.com/watch?v=8fi7uSYlOdc&vl=en). So I won't explain these concepts in very
 detail.
 
-## The kernal features that allow containerisation
+## The kernel features that allow containerisation
 
 At the core of containers are two Linux kernel
 features: "[namespaces](https://man7.org/linux/man-pages/man7/namespaces.7.html)"
 and "[cgroups](https://man7.org/linux/man-pages/man7/cgroups.7.html)".
 
-* **Namespaces** isolate system resources, so processes inside a container see only their own view of things like files,
-  processes, and network interfaces.
+* **Namespaces** isolate system resources, so processes inside a container see only their own view of resources
+  like files, processes, and network interfaces.
 * **Cgroups** (control groups) limit the amount of resources (CPU, memory, disk I/O, network, etc.) that a
   group of processes can use.
 
 Both namespaces & cgroups are inherited by child processes, meaning that when a process spawns another, the child
-process stays in the same namespace and cgroup as the parent unless explicitly changed
+process remain in the same namespace and cgroup as the parent unless explicitly changed. As you’ve probably gathered by
+now, if we use these two features together, we would be able to run and manage isolated processes on the same host
+system. And that's what containers are all about! Let's take a look at both of these concepts in a bit more detail.
 
 ### Namespaces
 
-The way to enter/create a namespace is to pass appropriate flags during process creation using the `clone` syscall
-or via the `setns` syscall to join an existing namespace. A few important namespaces for isolation:
+As discussed, Namespaces allow the processes inside it to have their own private view of certain resources of the system
+such as process IDs, filesystems, network interfaces, and hostnames etc. This is what makes it possible for multiple
+containers to run on the same host without interfering with each other, even though they share the same kernel. The way
+to
+enter/create a namespace is to pass appropriate flags during process creation using the `clone` syscall
+or via the `setns` syscall to join an existing namespace. The namespaces of a process are visible in the `proc` fs as
+symlinks under`/proc/<pid>/ns`. A few important namespaces for isolation:
 
 * Mount (`mnt`): Isolates the set of filesystem mount points. You start off with a copy of the host's mount points, but
   can add, remove, or change mount points without affecting the host or other namespaces.
@@ -59,25 +66,27 @@ or via the `setns` syscall to join an existing namespace. A few important namesp
 * UTS (`uts`): Isolates the hostname so that processes in different processes can have different hostnames and NIS
   domain names.
 
-Others include IPC (`ipc`), cgroups (`cgroup`) & time (`time`) for (`CLOCK_MONOTONIC` and `CLOCK_BOOTTIME`),
+Others include IPC (`ipc`), cgroups (`cgroup`) & time (`time`) for (`CLOCK_MONOTONIC` and `CLOCK_BOOTTIME`) etc.
 
 ### Cgroups
 
 As mentioned earlier, cgroups allows to restrict the resource usage (CPU, memory, max processes etc.) of a set of
-process. It works via a pseudo-filesystem usually mounted at `/sys/fs/cgroup`. There are two versions of cgroups, we
-will use cgroups v2. To create a cgroup, we have to create a folder with its name in this filesystem, then add
-pid's in a file `cgroup.procs` inside it. Files like `memory.max`, `cpu.max` in this folder describes the max amount of
-resources this process can use. Similarly, the `cpuset.cpus` restricts which cpu core the processes are allowed to run.
+process. This is what allows us to set resource limits in k8s & docker. It works via a pseudo-filesystem usually mounted
+at `/sys/fs/cgroup`. Similar to namespaces, the file`/proc/<pid>/cgroup` in the `proc` fs contains the cgroup of a
+process. There are two versions of cgroups, we will use cgroups v2. To create a cgroup, we have to create a folder with
+its name in this filesystem, then add pid's in a file `cgroup.procs` inside it. Files like `memory.max`, `cpu.max` in
+this folder describes the max amount of resources this process can use. Similarly, the `cpuset.cpus` restricts which cpu
+core the processes are allowed to run.
 
 One interesting realisation I had from this is the CPU limits specified are shared across the cores of the host. Setting
 a containers CPU limit to 1000m in k8s doesn't mean it will have a whole core available, it simply means that it will
-have one core's worth of CPU time available! So it's possible that your container might actually be running multiple
-parallel threads even with very small low cpu limit, it would simply exhaust the limit quickly. The fact that resource
-limits are set via cgroups is also why programs need to be container-aware. Traditionally, programs use the /proc
-filesystem (e.g., /proc/meminfo or /proc/cpuinfo), which reflects the host's resources rather than the container's
-actual limits.
+have one core's worth of CPU time available! So it's possible that your container might actually be utilizing multiple
+cores & running parallel threads even with very small low cpu limit, it would simply exhaust the limit quickly. The fact
+that resource limits are set via cgroups is also one of the biggest reasons why programs need to be container-aware.
+Traditionally, programs use the proc filesystem (e.g., `/proc/meminfo` or `/proc/cpuinfo`), which reflects the host's
+resources rather than the container's actual limits.
 
-## Building our own container
+## Building our own simple container
 
 Hopefully, now we have a rough idea of how to create a simple container ourselves. We need to start
 a process with its own namespaces, set up cgroups for resource
@@ -90,7 +99,7 @@ considerations etc., which I hope to cover in the next part.
 ### Making a root filesystem
 
 First we first need a root filesystem. We can get this by extracting it from any existing image. Lets extracts it
-from BusyBox:
+from BusyBox image:
 
 1. Make the `mount` directory to hold the root filesystem.
 
@@ -118,8 +127,7 @@ Let's first look at what the code given below is going to do:
 1. Starts the program, parses the command to run in container, its args etc.
 2. Sets up a new cgroup by writing to `/sys/fs/cgroup/`.
 3. Clones a new child container process from the current process with new namespaces for mount, PID, UTS etc. Note: We
-   will
-   see how user namespace works in part two.
+   will see how user namespace works in part two.
 4. Adds the container process to the cgroup created earlier.
 5. Inside the cloned process, it sets up the new hostname, mounts a few special filesystem like proc, temp etc., while
    also [bind mounts](https://unix.stackexchange.com/questions/198590/what-is-a-bind-mount) the host dev devices like
@@ -308,15 +316,15 @@ func check(err error) {
 
 </div>
 
-### Steps to run
+### Steps to compile & run
 
 1. Save this as `main.go`,
 2. Compile it using `go build main.go`
-3. Run the binary with sudo, passing the command to run: `sudo ./main run /bin/sh`
+3. Run the binary with sudo, passing the command to run in the container, for example the shell:
+   `sudo ./main run /bin/sh`
 
-Now you should see yourself inside a shell in the container!
-
-And voilà! We have a simple container running a bash shell. You can try exploring the container using commands like
+And voilà! Now you should see yourself inside a shell in the container! We have a simple container running a bash shell.
+You can try exploring the container using commands like
 `ps`, `ip`, `ls` to convince yourself that it is indeed isolated from the host system. Try removing a few
 namespaces to see how isolation is affected. Also on the host, you can try checking the cgroup & ns using the proc
 filesystem (`/proc/<pid>/cgroup` and `/proc/<pid>/ns`). Also try making fork bomb inside the container to see if its
@@ -325,7 +333,7 @@ limit to the no of processes we specified in cgroups.
 ## Seeing it in action with docker
 
 Let's run a Docker container with memory and CPU limits to convince ourselves that this is indeed how containers are
-implemented:
+implemented in practice:
 
 ```shell
 docker run -it --rm --memory="128m" --cpus="0.5" busybox sh
@@ -406,17 +414,6 @@ The corresponding cgroups folder can be found under:
 
 Opening files such as `memory.max` and `cpu.max` in that directory confirms that this is where the process's resource
 limits are enforced using cgroups.
-
-#### Root Filesystem
-
-Notice, how we had to manually extract the root filesystem from a docker image to use in our container. In practice, the
-root filesystem is composed of multiple layers stacked on top of each other using a special "union mount" filesystem
-called "[OverlayFS](https://docs.kernel.org/filesystems/overlayfs.html)" as we will see later. But for now, we can find
-where the root filesystem of a docker container is on the host using the following command:
-
-```shell
-docker inspect <container> --format '{{.GraphDriver.Data.MergedDir}}'
-```
 
 ## What next?
 

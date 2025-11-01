@@ -19,7 +19,8 @@ In part one, we saw how mount namespace isolates mounts inside a container, allo
 within the container without affecting the host system. For the root filesystem however, we simply extracted the entire
 base image into a new directory and chroot into it. If we keep doing the same for each and every container, we’ll end up
 with multiple redundant copies of the same base image and also increase the container startup time because of the copy
-overhead. This is where union filesystems like OverlayFS comes into play.
+overhead. This is where union filesystems like [OverlayFS](https://docs.kernel.org/filesystems/overlayfs.html) comes into play.
+
 
 ### The Overlay Filesystem
 
@@ -46,9 +47,10 @@ writable top layer, `/work` is a working directory for OverlayFS, and `/merged` 
 modifying the container code from part one to mount an overlay filesystem for the container's rootfs using the same
 mount syscall.
 
+
 ### Docker's OverlayFS in action
 
-Try running `mount` inside a running docker container. You will see an entry like below:
+Try running `mount` inside a running docker container to list all its mounts. You will see an entry like below:
 
 ```shell
 overlay on / type overlay (rw,relatime,lowerdir=/var/lib/docker/....
