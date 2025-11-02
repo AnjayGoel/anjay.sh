@@ -7,86 +7,24 @@ description: "Yes, containers are, at their core, just processes. Let's dig into
 
 In part one, we built a bare-bones container. To make it more useful, we need to configure quite a few things
 like networking, storage, security, etc. In this post, I want to explore how a few of these are
-implemented in practice and try to implement them ourselves wherever possible, and then validate our approach with how
+implemented in practice and try to do it ourselves wherever possible, and then validate our approach with how
 docker handles them.
 
 Before we get started, take a look at the output of `docker inspect <container_id>` to see all the configurations docker
 does for a container. Notice stuff like `HostConfig`, `Mounts`, `NetworkSettings`, `GraphDriver` etc.
 
-## Filesystems & Storage
-
-Earlier, we saw how we can isolate mounts inside a container using the mount namespace. The mount namespace, however,
-has quite a few quirks about how mounts are shared & propagated between different
-namespaces ([lwn article](https://lwn.net/Articles/689856/), [man page](https://man7.org/linux/man-pages/man8/mount.8.html)).
-Anyway, If you list all the mounts using `mount` command inside a container, you will see quite a few special ones like
-below:
-
-* `overlay on / type overlay (rw...`: The overlay root filesystem, which we will discuss shortly.
-* `/dev/root on /etc/resolv.conf`, and others on `/etc/hostname`, `/etc/hosts`: These are bind mounts from the host to
-  provide DNS resolution, hostname, and hosts file inside the container.
-* `sysfs on /sys type sysfs (ro..`: The sysfs filesystem mounted on `/sys` to expose kernel & device
-  information. Notice the `ro` flag, indicating it's mounted read-only to modifications from within the container.
-
-### Bind Mounts and persistent storage
-
-Persistent storage used by containers, be it in Docker or Kubernetes, is typically implemented using bind mounts.
-A bind mount is essentially a re-mapping of a directory or file from one location to another, achieved with the `mount --bind olddir
-newdir system call`. In containers, this provides persistent storage by bind-mounting a directory on the
-host system into a location inside the container’s filesystem. Docker volumes work the same way internally, they're
-managed bind mounts created and managed by Docker, typically stored under `/var/lib/docker/volumes/` on the host.
-
-### The Overlay Filesystem
-
-In our container implementation from previous blog, we simply extracted the root filesystem from an existing base image
-and chroot into it. If we keep doing the same for each and every container, we'll end up with multiple redundant copies
-of the same base image, consuming space and also increase the container startup time because of this overhead. In
-practice, container's root filesystem consists of multiple read only layers with a finale writable layer stacked on
-top of each other. These are the same layers you see when building or fetching a docker image. Each layer records a set
-of diffs / changes. These layers are merged into a single view using a union mount filesystem
-like [OverlayFS](https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html).
-
-This enables sharing common read-only layers between multiple containers, saving disk space and improving startup time.
-When something is written to the container's filesystem, the changes are recorded in the top writable layer, leaving the
-underlying read-only layers unchanged. If you try to modify parts of the lower read-only layers, changes are "copied up"
-to the top writable layer, this is called the "copy-on-write" strategy.
-
-The overlay filesystem can be setup using the `mount` syscall as shown below:
-
-```shell
-mount -t overlay overlay -o lowerdir=/lower1:/lower2:/lower3,upperdir=/upper,workdir=/work /merged
-```
-
-Here, `/lower1`, `/lower2`, `/lower3` are the read-only layers, topmost on left to bottom on right, `/upper` is the
-writable top layer, `/work` is a working directory for OverlayFS, and `/merged` is the final merged view. You can try
-modifying the container code from part one to mount an overlay filesystem for the container's rootfs using the same
-mount syscall.
-
-### Docker's OverlayFS in action
-
-Try running `mount` inside a running docker container to list all its mounts. You will see an entry like below:
-
-```shell
-overlay on / type overlay (rw,relatime,lowerdir=/var/lib/docker/....
-```
-
-Implying that the container's root filesystem itself is an overlay filesystem as expected. You can also check out the
-lower and upper dirs mentioned in the output. These layers are typically under `/var/lib/docker/overlay2/` on the host.
-If you run two containers from the same image, notice that they share the lower dirs but have different
-upper dirs. Try modifying files inside these containers, the changes will appear only in their respective upper layers,
-leaving the shared lower layers untouched.
-
 ## Networking
 
-Now, let's take a look at how networking works in containers. This is done via a virtual network interface
+Networking works in containers via a virtual network interface
 called [veth](https://man7.org/linux/man-pages/man4/veth.4.html) (Virtual Ethernet). It's quite similar to an
-ethernet cable joining two devices. Packets going into one end of veth immediately appears on the other. The special
+ethernet cable joining two devices. Packets going into one end of veth appears on the other. The special
 thing about it though is that ends of the veth pair can be moved to different network namespaces, essentially allowing
 us to connect the container’s namespace to the host namespace as if they were joined by a physical cable.
 
 ### Setting up a network interface
 
 Using the veth network interface, we can now set up a small subnet containing our host & container, allowing them to
-communicate with each other. This also lets us to configure NAT
+communicate with each other. Then, we can configure NAT
 using [iptables](https://linux.die.net/man/8/iptables), allowing the container to access
 internet through the host’s network interface.
 
@@ -265,8 +203,72 @@ servers to handle name resolution for containers. In Docker's case, it's
 an [embedded DNS server](https://docs.docker.com/engine/network/) that runs on the host. In kubernetes, it's typically
 a dedicated DNS service (like [CoreDNS](https://kubernetes.io/docs/tasks/administer-cluster/coredns/)) running within
 the cluster. This enables features like service discovery when
-orchestrating multiple containers. Take a look at the `/etc/resolv.conf` inside a container, you will see the ip of the
+orchestrating multiple containers. Take a look at the `/etc/resolv.conf` inside a container, you will see the IP of the
 DNS server being used.
+
+## Filesystems & Storage
+
+Earlier, we saw how we can isolate mounts inside a container using the mount namespace. In practice, the mount namespace
+has quite a few quirks about how mounts are shared & propagated between different
+namespaces ([lwn article](https://lwn.net/Articles/689856/), [man page](https://man7.org/linux/man-pages/man8/mount.8.html)).
+Anyway, If you list all the mounts using `mount` command inside a container, you will see a few special ones like
+below:
+
+* `overlay on / type overlay (rw...`: The overlay root filesystem, which we will discuss shortly.
+* `proc on /proc type proc (rw..`: The proc filesystem mounted on `/proc` to provide process & kernel information.
+* `/dev/root on /etc/resolv.conf`, and others on `/etc/hostname`, `/etc/hosts`: These are bind mounts from the host to
+  provide DNS resolution, hostname, and hosts file inside the container.
+* `sysfs on /sys type sysfs (ro..`: The sysfs filesystem mounted on `/sys` to expose kernel & device
+  information. Notice the `ro` flag, indicating it's mounted read-only to modifications from within the container.
+
+### Bind Mounts And Persistent Storage
+
+Persistent storage used by containers, be it in Docker or Kubernetes, is typically implemented using bind mounts.
+A bind mount is essentially a re-mapping of a directory or file from one location to another, achieved with the `mount --bind olddir
+newdir` system call. In containers, this provides persistent storage by bind-mounting a directory on the
+host system into a location inside the container's filesystem. Docker volumes work the same way internally, they're
+managed bind mounts created and managed by Docker, typically stored under `/var/lib/docker/volumes/` on the host
+machine.
+
+### The Overlay Filesystem
+
+In our container implementation from previous blog, we simply extracted the root filesystem from an existing base image
+and chroot into it. If we keep doing the same for each and every container, we'll end up with multiple redundant copies
+of the same base image, consuming space and also increase the container startup time because of this overhead. In
+practice, container's root filesystem consists of multiple read only layers with a finale writable layer stacked on
+top of each other. These are the same layers you see when building or fetching a docker image. Each layer records a set
+of diffs / changes. These layers are merged into a single view using a union mount filesystem
+like [OverlayFS](https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html).
+
+This enables sharing common read-only layers between multiple containers, saving disk space and improving startup time.
+When something is written to the container's filesystem, the changes are recorded in the top writable layer, leaving the
+underlying read-only layers unchanged. If you try to modify parts of the lower read-only layers, changes are "copied up"
+to the top writable layer, this is called the "copy-on-write" strategy.
+
+The overlay filesystem can be setup using the `mount` syscall as shown below:
+
+```shell
+mount -t overlay overlay -o lowerdir=/lower1:/lower2:/lower3,upperdir=/upper,workdir=/work /merged
+```
+
+Here, `/lower1`, `/lower2`, `/lower3` are the read-only layers, topmost on left to bottom on right, `/upper` is the
+writable top layer, `/work` is a working directory for OverlayFS, and `/merged` is the final merged view. You can try
+modifying the container code from part one to mount an overlay filesystem for the container's rootfs using the same
+mount syscall.
+
+### Docker's OverlayFS in action
+
+Try running `mount` inside a running docker container to list all its mounts. You will see an entry like below:
+
+```shell
+overlay on / type overlay (rw,relatime,lowerdir=/var/lib/docker/....
+```
+
+Implying that the container's root filesystem itself is an overlay filesystem as expected. You can also check out the
+lower and upper dirs mentioned in the output. These layers are typically under `/var/lib/docker/overlay2/` on the host.
+If you run two containers from the same image, notice that they share the lower dirs but have different
+upper dirs. Try modifying files inside these containers, the changes will appear only in their respective upper layers,
+leaving the shared lower layers untouched.
 
 ## References
 
