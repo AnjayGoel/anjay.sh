@@ -10,7 +10,7 @@ Indeed, for some reason, if you try to get cpu or memory info from within a cont
 resources. This is probably the one of the few instances where containers behave differently, and I didn't really
 understand why.
 
-Despite relying on k8s almost daily for quite a while now, My understanding of how containers work had been fairly
+Despite relying on k8s almost daily for quite a while now, my understanding of how containers work had been fairly
 limited. Partly because these abstractions work so well and there is so much to learn about simply using k8s itself that
 I never tough of looking beneath the abstraction layers. The broad statements I came across while learning Docker like
 "containers don't do virtualization," "they don't have a hypervisor layer like VMs," and "they sit directly on the host
@@ -18,12 +18,12 @@ OS kernel" didn't offer much real insight either.
 
 So for that reason, the statement "containers are just fancy processes" really put things into perspective for me. As I
 have come to understand, at the risk of over-simplifying, containers essentially pack up the whole application along
-with all its user-space dependencies and run them as isolated processes on the host operating system's kernel.
+with all its user-space dependencies and run them as isolated processes on the host's kernel.
 
-In this series of blogs, I hope to share what I have learnt by tinkering around in the past week. Rather than taking a
-deep dive into specific topics, its meant to provide a bird's eye view of containers and the surrounding ecosystem. I
-will of course attach resources to dive deeper into specific topics. A lot if not all of this was new to me, so feel
-free to correct me if I goof something up.
+In this series of blogs, I hope to share an anatomy of containers that I have learnt by tinkering around in the
+past few weeks. Rather than taking a deep dive into specific topics, its meant to provide a bird's eye view of
+containers and the surrounding ecosystem. I will of course attach resources to dive deeper into specific topics. A lot
+if not all of this was new to me, so feel free to correct me if I goof something up.
 
 Much of this first blog is borrowed from this highly recommended series
 of [videos by Liz Rice](https://www.youtube.com/watch?v=8fi7uSYlOdc&vl=en). So I won't explain these concepts in very
@@ -42,37 +42,48 @@ and "[cgroups](https://man7.org/linux/man-pages/man7/cgroups.7.html)".
 
 Both namespaces & cgroups are inherited by child processes, meaning that when a process spawns another, the child
 process remain in the same namespace and cgroup as the parent unless explicitly changed. As you’ve probably gathered by
-now, if we use these two features together, we would be able to run and manage isolated processes on the same host
+now, if we use these two features together, we should be able to run and manage a set isolated processes on the same
+host
 system. And that's what containers are all about! Let's take a look at both of these concepts in a bit more detail.
 
 ### Namespaces
 
-As discussed, Namespaces allow the processes inside it to have their own private view of certain resources of the system
+Namespaces allow the processes inside it to have their own private view of certain resources of the system
 such as process IDs, filesystems, network interfaces, and hostnames etc. This is what makes it possible for multiple
 containers to run on the same host without interfering with each other, even though they share the same kernel. The way
-to
-enter/create a namespace is to pass appropriate flags during process creation using the `clone` syscall
+to enter/create a namespace is to pass appropriate flags during process creation using the `clone` syscall
 or via the `setns` syscall to join an existing namespace. The namespaces of a process are visible in the `proc` fs as
-symlinks under`/proc/<pid>/ns`. A few important namespaces for isolation:
+symlinks under`/proc/<pid>/ns`. A few important namespaces for isolation are:
+
+* PID (`pid`): Isolates the set of process & PIDs. Process can only see other processes in the same or child namespace.
+  The first process inside this namespace starts with PID 1 in
+  the new namespace and is considered as the [init process](https://en.wikipedia.org/wiki/Init) in this new namespace.
+  All
+  the signals (SIGTERM, SIGINT, SIGQUIT etc.) sent to the container are received by this init process. So its important
+  that this process handles these signals properly to manage the lifecycle of the container.
+
+* UTS (`uts`): Isolates the hostname so that processes in different processes can have different hostnames and NIS
+  domain names. Fun fact: the pod names you set in k8s are actually the hostname inside the pod's UTS namespace!
 
 * Mount (`mnt`): Isolates the set of filesystem mount points. You start off with a copy of the host's mount points, but
-  can add, remove, or change mount points without affecting the host or other namespaces.
-* PID (`pid`): Isolates the set of process & PIDs. The first process starts with PID 1 in the new namespace and is
-  considered the init process in this new namespace. Process can only see other processes in the same or child
-  namespace.
-* Network (`net`): Isolates the whole network stack, including interfaces, routing tables, firewall rules etc.
-* User (`user`): Isolates user and group IDs. Inside a user namespace a process can have a different mapped UID/GID
-  than outside. Also allowing unprivileged users on the host to become uid 0 (root) inside this namespace.
-* UTS (`uts`): Isolates the hostname so that processes in different processes can have different hostnames and NIS
-  domain names.
+  can add, remove, or change mount points without affecting the host or other namespaces. More on filesystems in part
+  two.
 
-Others include IPC (`ipc`), cgroups (`cgroup`) & time (`time`) for (`CLOCK_MONOTONIC` and `CLOCK_BOOTTIME`) etc.
+* Network (`net`): Isolates the whole network stack, including interfaces, routing tables, firewall rules etc. More on
+  this in part two as well.
+
+* User (`user`): Isolates user and group IDs. Inside a user namespace a process can have a different mapped UID/GID
+  than outside. Also allowing unprivileged users on the host to become uid 0 (root) inside this namespace. We
+  will see how user namespace works in part three.
+
+There are few other namespaces like IPC (`ipc`), cgroups (`cgroup`) & time (`time`) for (`CLOCK_MONOTONIC` and
+`CLOCK_BOOTTIME`) etc.
 
 ### Cgroups
 
 As mentioned earlier, cgroups allows to restrict the resource usage (CPU, memory, max processes etc.) of a set of
 process. This is what allows us to set resource limits in k8s & docker. It works via a pseudo-filesystem usually mounted
-at `/sys/fs/cgroup`. Similar to namespaces, the file`/proc/<pid>/cgroup` in the `proc` fs contains the cgroup of a
+at `/sys/fs/cgroup`. Similar to namespaces, the file `/proc/<pid>/cgroup` in the `proc` fs contains the cgroup of a
 process. There are two versions of cgroups, we will use cgroups v2. To create a cgroup, we have to create a folder with
 its name in this filesystem, then add pid's in a file `cgroup.procs` inside it. Files like `memory.max`, `cpu.max` in
 this folder describes the max amount of resources this process can use. Similarly, the `cpuset.cpus` restricts which cpu
@@ -126,8 +137,7 @@ Let's first look at what the code given below is going to do:
 
 1. Starts the program, parses the command to run in container, its args etc.
 2. Sets up a new cgroup by writing to `/sys/fs/cgroup/`.
-3. Clones a new child container process from the current process with new namespaces for mount, PID, UTS etc. Note: We
-   will see how user namespace works in part two.
+3. Clones a new child container process from the current process with new namespaces for mount, PID, UTS etc.
 4. Adds the container process to the cgroup created earlier.
 5. Inside the cloned process, it sets up the new hostname, mounts a few special filesystem like proc, temp etc., while
    also [bind mounts](https://unix.stackexchange.com/questions/198590/what-is-a-bind-mount) the host dev devices like
@@ -169,6 +179,7 @@ func main() {
   pid := os.Getpid()
   fmt.Printf("PID: %d, CMD: %s\n", pid, cmd)
 
+  //Handle setup parent & child process
   switch os.Args[1] {
   case "run":
     run()
@@ -179,29 +190,27 @@ func main() {
   }
 }
 
-// run sets up namespaces and spawns the child
+// run sets up namespaces and re-executes itself as "child"
 func run() {
+  //Find the current executable
   bin, _ := os.Executable()
+
+  //Re-run it with different args
   cmd := exec.Command(bin, append([]string{"child"}, os.Args[2:]...)...)
+
+  //Connect std streams to child to parent process
   cmd.Stdin = os.Stdin
   cmd.Stdout = os.Stdout
   cmd.Stderr = os.Stderr
 
+  //Flags passed to clone syscall to create new namespaces for the process
   cmd.SysProcAttr = &syscall.SysProcAttr{
-    Cloneflags: syscall.CLONE_NEWUSER |
-      syscall.CLONE_NEWNS |
+    Cloneflags: syscall.CLONE_NEWNS |
       syscall.CLONE_NEWUTS |
       syscall.CLONE_NEWPID |
       syscall.CLONE_NEWNET |
       syscall.CLONE_NEWIPC |
       syscall.CLONE_NEWCGROUP,
-    Credential: &syscall.Credential{Uid: 0, Gid: 0},
-    UidMappings: []syscall.SysProcIDMap{
-      {ContainerID: 0, HostID: 1000, Size: 1}, // map container UID 0 -> host UID 1000
-    },
-    GidMappings: []syscall.SysProcIDMap{
-      {ContainerID: 0, HostID: 1000, Size: 1}, //map container GID 0 -> host GID 1000
-    },
   }
 
   // Setup cgroups before starting child process
@@ -255,7 +264,7 @@ func setupMounts() {
   check(syscall.Mount("tmpfs", tmpPath, "tmpfs", 0, ""))
 }
 
-// Bind mounts host character devices like null, zero etc. to container
+// Bind host character devices to container
 func bindDevMounts() {
   devPath := filepath.Join(rootfs, "dev")
   check(os.MkdirAll(devPath, 0755))
@@ -278,7 +287,7 @@ func bindDevMounts() {
   }
 }
 
-// creates a simple v2 cgroup with cpu & memory limits also allowing max 20 processes
+// setupCgroups creates a simple v2 cgroup with limits
 func setupCgroups() {
   fmt.Printf("Setting up cgroup at: %s\n", cgroupPath)
 
@@ -296,12 +305,12 @@ func setupCgroups() {
   check(os.WriteFile(filepath.Join(cgroupPath, "cpu.weight"), []byte("100"), 0644))
 }
 
-// adds a process to the container cgroup
+// addToCgroup adds a process to the container cgroup
 func addToCgroup(pid int) {
   check(os.WriteFile(filepath.Join(cgroupPath, "cgroup.procs"), []byte(strconv.Itoa(pid)), 0644))
 }
 
-// removes the cgroup directory when done
+// cleanupCgroups removes the cgroup directory
 func cleanupCgroups() {
   check(os.RemoveAll(cgroupPath))
 }
@@ -318,8 +327,9 @@ func check(err error) {
 
 ### Steps to compile & run
 
-1. Save this as `main.go`,
-2. Compile it using `go build main.go`
+1. Save this as `main.go`. Note that the work directory should also contain the `mount` directory
+   created earlier with the root filesystem.
+2. Compile it using `go build main.go`.
 3. Run the binary with sudo, passing the command to run in the container, for example the shell:
    `sudo ./main run /bin/sh`
 
@@ -389,8 +399,7 @@ lrwxrwxrwx 1 root root 0 Oct 21 08:00 uts -> 'uts:[4026532159]'
 
 You can do the same for normal process to confirm that the namespaces for the container process is indeed different from
 the default namespaces used by other processes. We can enter a particular namespace of the process by using the
-`nsenter`
-utility. Let's enter all its namespaces by doing
+`nsenter` utility. Let's enter all its namespaces by doing
 
 ```shell
 sudo nsenter -t 137649 -a

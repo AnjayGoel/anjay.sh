@@ -5,22 +5,22 @@ tags: [ containers, docker, kubernetes, til ]
 description: "Yes, containers are, at their core, just processes. Let's dig into Linux primitives that make it possible"
 ---
 
-In part one, we built a plain & bare-bones container. To make it more useful, we need to configure quite a few things
-like networking (obviously), storage, security, etc. In this post, I want to explore how a few of these are
-implemented in practice and try to implement them ourselves wherever possible, comparing our approach with how Docker
-handles them.
+In part one, we built a bare-bones container. To make it more useful, we need to configure quite a few things
+like networking, storage, security, etc. In this post, I want to explore how a few of these are
+implemented in practice and try to implement them ourselves wherever possible, and then validate our approach with how
+docker handles them.
 
-Before we get started, take a look at the output of `docker inspect <container_id>` to see all the configurations Docker
+Before we get started, take a look at the output of `docker inspect <container_id>` to see all the configurations docker
 does for a container. Notice stuff like `HostConfig`, `Mounts`, `NetworkSettings`, `GraphDriver` etc.
 
 ## Filesystems & Storage
 
-In part one, we saw how mount namespace isolates mounts inside a container, allowing us to attach any required storage
-within the container without affecting the host system. For the root filesystem however, we simply extracted the entire
-base image into a new directory and chroot into it. If we keep doing the same for each and every container, we’ll end up
-with multiple redundant copies of the same base image and also increase the container startup time because of the copy
-overhead. This is where union filesystems like [OverlayFS](https://docs.kernel.org/filesystems/overlayfs.html) comes into play.
-
+Earlier, we saw how we can isolate mounts inside a container using the mount namespace, allowing us to attach any
+required storage within the container without affecting the host system. For the root filesystem however, we simply
+extracted the entire base image into a new directory and chroot into it. If we keep doing the same for each and every
+container, we'll end up with multiple redundant copies of the same base image and also increase the container startup
+time because of the copy overhead. This is where union filesystems
+like [OverlayFS](https://docs.kernel.org/filesystems/overlayfs.html) comes into play.
 
 ### The Overlay Filesystem
 
@@ -30,11 +30,9 @@ of diffs / changes. These layers are merged into a single view using a union mou
 like [OverlayFS](https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html).
 
 This enables sharing common layers between multiple containers, saving disk space and improving startup time. When
-something is written to the
-container's filesystem, the changes are recorded in the top writable layer, leaving the underlying read-only
-layers unchanged. If you try to modify parts of the lower read-only layers, changes are "copied up" to the top writable
-layer,
-this is called the "copy-on-write" strategy.
+something is written to the container's filesystem, the changes are recorded in the top writable layer, leaving the
+underlying read-only layers unchanged. If you try to modify parts of the lower read-only layers, changes are "copied up"
+to the top writable layer, this is called the "copy-on-write" strategy.
 
 The overlay filesystem can be setup using the `mount` syscall as shown below:
 
@@ -46,7 +44,6 @@ Here, `/lower1`, `/lower2`, `/lower3` are the read-only layers, topmost on left 
 writable top layer, `/work` is a working directory for OverlayFS, and `/merged` is the final merged view. You can try
 modifying the container code from part one to mount an overlay filesystem for the container's rootfs using the same
 mount syscall.
-
 
 ### Docker's OverlayFS in action
 
@@ -72,9 +69,14 @@ ethernet cable joining two devices. Packets going into one end of veth immediate
 thing about it though is that ends of the veth pair can be moved to different network namespaces, essentially allowing
 us to connect the container’s namespace to the host namespace as if they were joined by a physical cable.
 
-### DIY networking setup
+### Setting up a network interface
 
-Let's see how to set up networking on our container:
+Using the veth network interface, we can now set up a small subnet containing our host & container, allowing them to
+communicate with each other. This also lets us to configure NAT
+using [iptables](https://linux.die.net/man/8/iptables), allowing the container to access
+internet through the host’s network interface.
+
+Let's see how to set it up:
 
 1. First, find the PID of the container process (from part one) and set it as a variable `CONTAINER_PID`.
 2. Define some other variables for interface names, host & container IP, subnet etc.
@@ -150,6 +152,10 @@ sudo sysctl -w net.ipv4.ip_forward=1
 sudo iptables -t nat -A POSTROUTING -s $SUBNET -o $HOST_NET_IF -j MASQUERADE
 ```
 
+We now have a fully functional network interface for our container! You can verify this by pinging the container IP from
+the host
+vice versa, and also by trying accessing the internet from within the container using `curl` or `wget` etc.
+
 ### The Bridge
 
 There is another virtual interface typically used in container networking
@@ -160,15 +166,28 @@ It creates a veth pair, attaches one end to the container's network namespace, a
 default) bridge on the host. The bridge could be further connected to the host's main network interface like we did
 above.
 
+### Mapping a port
+
+Once we have a network interface set up for the container, we can simply do add a DNAT rule in the host's iptables to
+forward traffic from a specific port on the host to the container's IP and port. Extending our previous example, let's
+say we want to map port `8080` of the container to port `80` on the host, All we have to do is add the following
+iptables rule on the host:
+
+```shell
+sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination $CONT_IP:8080
+```
+
+Now, any incoming traffic to port `80` on the host will be forwarded to port `8080` on the container.
+
 ### Docker's Networking in action
 
-Let's try creating a simple HTTP server container and accessing it from another container using Docker's default
-networking:
+Now lets validate that this is indeed what Docker does under the hood. For this, we will start a simple HTTP server
+container and access it from another container using docker's default bridge network:
 
 1. Start a simple HTTP server container in detached mode:
 
 ```shell
-docker run -d --name server python:3-slim python -m http.server 5000
+docker run -d --name server -p 80:8080 python:3-slim python -m http.server 8080
 ```
 
 2. Start a busybox container to access the server:
@@ -177,7 +196,7 @@ docker run -d --name server python:3-slim python -m http.server 5000
 docker run -it --rm busybox sh
 ```
 
-3. Then get the server containers IP using
+3. Get the server container's IP using
 
 ```shell
 docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' server
@@ -214,6 +233,16 @@ docker0		8000.b6cff2e42f63	no	  vethd615595
 ```
 
 7. Also run `ip addr show` on both containers & host, you will are part of the same subnet.
+8. Running `sudo  iptables -t nat -L` on the host will also show the all the NAT rules docker has set up. Notice how the
+   port we mapped earlier shows up as a DNAT rule:
+
+  ```shell
+
+Chain DOCKER (2 references)
+target     prot opt source               destination
+RETURN     all  --  anywhere             anywhere
+DNAT       tcp  --  anywhere             anywhere             tcp dpt:http to:172.17.0.2:8080
+```
 
 ## References
 
