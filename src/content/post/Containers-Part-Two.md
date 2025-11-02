@@ -279,10 +279,10 @@ understand how containers leverage these mechanisms to enhance security and isol
 
 ## References
 
-- [Deep Dive into Docker Internals - Union Filesystem](https://martinheinz.dev/blog/44)
-- [Overlay Filesystem - The Linux Kernel documentation](https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html)
-- [Overlay filesystem - ArchWiki](https://wiki.archlinux.org/title/Overlay_filesystem)
 - [Introduction to Linux interfaces for virtual networking](https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking)
 - [ Container Networking From Scratch - Kristen Jacobs, Oracle](https://www.youtube.com/watch?v=jeTKgAEyhsA)
 - [Understanding Kubernetes Networking: Pods](https://medium.com/google-cloud/understanding-kubernetes-networking-pods-7117dd28727)
+- [Deep Dive into Docker Internals - Union Filesystem](https://martinheinz.dev/blog/44)
+- [Overlay Filesystem - The Linux Kernel documentation](https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html)
+- [Overlay filesystem - ArchWiki](https://wiki.archlinux.org/title/Overlay_filesystem)
 - [Mount namespaces and shared subtrees](https://lwn.net/Articles/689856/)
