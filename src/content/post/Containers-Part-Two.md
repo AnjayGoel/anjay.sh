@@ -210,7 +210,8 @@ DNS server being used.
 
 Earlier, we saw how we can isolate mounts inside a container using the mount namespace. In practice, the mount namespace
 has quite a few quirks about how mounts are shared & propagated between different
-namespaces ([lwn article](https://lwn.net/Articles/689856/), [man page](https://man7.org/linux/man-pages/man8/mount.8.html)).
+namespaces (
+see [lwn article](https://lwn.net/Articles/689856/), [man page](https://man7.org/linux/man-pages/man8/mount.8.html)).
 Anyway, If you list all the mounts using `mount` command inside a container, you will see a few special ones like
 below:
 
@@ -224,8 +225,8 @@ below:
 ### Bind Mounts And Persistent Storage
 
 Persistent storage used by containers, be it in Docker or Kubernetes, is typically implemented using bind mounts.
-A bind mount is essentially a re-mapping of a directory or file from one location to another, achieved with the `mount --bind olddir
-newdir` system call. In containers, this provides persistent storage by bind-mounting a directory on the
+A bind mount is essentially a re-mapping of a directory or file from one location to another, achieved with the
+`mount --bind` syscall. In containers, this provides persistent storage by bind-mounting a directory on the
 host system into a location inside the container's filesystem. Docker volumes work the same way internally, they're
 managed bind mounts created and managed by Docker, typically stored under `/var/lib/docker/volumes/` on the host
 machine.
@@ -245,7 +246,7 @@ When something is written to the container's filesystem, the changes are recorde
 underlying read-only layers unchanged. If you try to modify parts of the lower read-only layers, changes are "copied up"
 to the top writable layer, this is called the "copy-on-write" strategy.
 
-The overlay filesystem can be setup using the `mount` syscall as shown below:
+The overlay filesystem can be setup using the `mount` syscall as well:
 
 ```shell
 mount -t overlay overlay -o lowerdir=/lower1:/lower2:/lower3,upperdir=/upper,workdir=/work /merged
@@ -258,7 +259,7 @@ mount syscall.
 
 ### Docker's OverlayFS in action
 
-Try running `mount` inside a running docker container to list all its mounts. You will see an entry like below:
+The entries listed by `mount` command earlier had a line like this:
 
 ```shell
 overlay on / type overlay (rw,relatime,lowerdir=/var/lib/docker/....
@@ -269,6 +270,12 @@ lower and upper dirs mentioned in the output. These layers are typically under `
 If you run two containers from the same image, notice that they share the lower dirs but have different
 upper dirs. Try modifying files inside these containers, the changes will appear only in their respective upper layers,
 leaving the shared lower layers untouched.
+
+## What’s Next?
+
+In the next post, I want to explore one final piece of the puzzle: security. We'll look at how root privileges work in
+Linux, dive into concepts like Linux capabilities, syscall filtering, user namespaces, and rootless containers, and
+understand how containers leverage these mechanisms to enhance security and isolation.
 
 ## References
 
