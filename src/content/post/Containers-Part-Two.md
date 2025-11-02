@@ -15,22 +15,38 @@ does for a container. Notice stuff like `HostConfig`, `Mounts`, `NetworkSettings
 
 ## Filesystems & Storage
 
-Earlier, we saw how we can isolate mounts inside a container using the mount namespace, allowing us to attach any
-required storage within the container without affecting the host system. For the root filesystem however, we simply
-extracted the entire base image into a new directory and chroot into it. If we keep doing the same for each and every
-container, we'll end up with multiple redundant copies of the same base image and also increase the container startup
-time because of the copy overhead. This is where union filesystems
-like [OverlayFS](https://docs.kernel.org/filesystems/overlayfs.html) comes into play.
+Earlier, we saw how we can isolate mounts inside a container using the mount namespace. The mount namespace, however,
+has quite a few quirks about how mounts are shared & propagated between different
+namespaces ([lwn article](https://lwn.net/Articles/689856/), [man page](https://man7.org/linux/man-pages/man8/mount.8.html)).
+Anyway, If you list all the mounts using `mount` command inside a container, you will see quite a few special ones like
+below:
+
+* `overlay on / type overlay (rw...`: The overlay root filesystem, which we will discuss shortly.
+* `/dev/root on /etc/resolv.conf`, and others on `/etc/hostname`, `/etc/hosts`: These are bind mounts from the host to
+  provide DNS resolution, hostname, and hosts file inside the container.
+* `sysfs on /sys type sysfs (ro..`: The sysfs filesystem mounted on `/sys` to expose kernel & device
+  information. Notice the `ro` flag, indicating it's mounted read-only to modifications from within the container.
+
+### Bind Mounts and persistent storage
+
+Persistent storage used by containers, be it in Docker or Kubernetes, is typically implemented using bind mounts.
+A bind mount is essentially a re-mapping of a directory or file from one location to another, achieved with the `mount --bind olddir
+newdir system call`. In containers, this provides persistent storage by bind-mounting a directory on the
+host system into a location inside the container’s filesystem. Docker volumes work the same way internally, they're
+managed bind mounts created and managed by Docker, typically stored under `/var/lib/docker/volumes/` on the host.
 
 ### The Overlay Filesystem
 
-In practice, container's root filesystem consists of multiple read only layers with a finale writable layer stacked on
+In our container implementation from previous blog, we simply extracted the root filesystem from an existing base image
+and chroot into it. If we keep doing the same for each and every container, we'll end up with multiple redundant copies
+of the same base image, consuming space and also increase the container startup time because of this overhead. In
+practice, container's root filesystem consists of multiple read only layers with a finale writable layer stacked on
 top of each other. These are the same layers you see when building or fetching a docker image. Each layer records a set
 of diffs / changes. These layers are merged into a single view using a union mount filesystem
 like [OverlayFS](https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html).
 
-This enables sharing common layers between multiple containers, saving disk space and improving startup time. When
-something is written to the container's filesystem, the changes are recorded in the top writable layer, leaving the
+This enables sharing common read-only layers between multiple containers, saving disk space and improving startup time.
+When something is written to the container's filesystem, the changes are recorded in the top writable layer, leaving the
 underlying read-only layers unchanged. If you try to modify parts of the lower read-only layers, changes are "copied up"
 to the top writable layer, this is called the "copy-on-write" strategy.
 
@@ -54,9 +70,7 @@ overlay on / type overlay (rw,relatime,lowerdir=/var/lib/docker/....
 ```
 
 Implying that the container's root filesystem itself is an overlay filesystem as expected. You can also check out the
-lower
-and upper dirs mentioned in the output. These layers are typically under `/var/lib/docker/overlay2/` on the host.
-
+lower and upper dirs mentioned in the output. These layers are typically under `/var/lib/docker/overlay2/` on the host.
 If you run two containers from the same image, notice that they share the lower dirs but have different
 upper dirs. Try modifying files inside these containers, the changes will appear only in their respective upper layers,
 leaving the shared lower layers untouched.
@@ -181,7 +195,7 @@ Now, any incoming traffic to port `80` on the host will be forwarded to port `80
 
 ### Docker's Networking in action
 
-Now lets validate that this is indeed what Docker does under the hood. For this, we will start a simple HTTP server
+Now let's validate that this is indeed what Docker does under the hood. For this, we will start a simple HTTP server
 container and access it from another container using docker's default bridge network:
 
 1. Start a simple HTTP server container in detached mode:
@@ -232,7 +246,7 @@ docker0		8000.b6cff2e42f63	no	  vethd615595
 							                     vethf0b5df8
 ```
 
-7. Also run `ip addr show` on both containers & host, you will are part of the same subnet.
+7. Also run `ip addr show` on both containers & the host, you will are part of the same subnet.
 8. Running `sudo  iptables -t nat -L` on the host will also show the all the NAT rules docker has set up. Notice how the
    port we mapped earlier shows up as a DNAT rule:
 
@@ -244,6 +258,16 @@ RETURN     all  --  anywhere             anywhere
 DNAT       tcp  --  anywhere             anywhere             tcp dpt:http to:172.17.0.2:8080
 ```
 
+### DNS Resolution
+
+DNS resolution is another piece of the puzzle. Docker, Kubernetes, and other platforms usually have their own DNS
+servers to handle name resolution for containers. In Docker's case, it's
+an [embedded DNS server](https://docs.docker.com/engine/network/) that runs on the host. In kubernetes, it's typically
+a dedicated DNS service (like [CoreDNS](https://kubernetes.io/docs/tasks/administer-cluster/coredns/)) running within
+the cluster. This enables features like service discovery when
+orchestrating multiple containers. Take a look at the `/etc/resolv.conf` inside a container, you will see the ip of the
+DNS server being used.
+
 ## References
 
 - [Deep Dive into Docker Internals - Union Filesystem](https://martinheinz.dev/blog/44)
@@ -252,3 +276,4 @@ DNAT       tcp  --  anywhere             anywhere             tcp dpt:http to:17
 - [Introduction to Linux interfaces for virtual networking](https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking)
 - [ Container Networking From Scratch - Kristen Jacobs, Oracle](https://www.youtube.com/watch?v=jeTKgAEyhsA)
 - [Understanding Kubernetes Networking: Pods](https://medium.com/google-cloud/understanding-kubernetes-networking-pods-7117dd28727)
+- [Mount namespaces and shared subtrees](https://lwn.net/Articles/689856/)
