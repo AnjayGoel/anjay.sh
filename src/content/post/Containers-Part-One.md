@@ -7,12 +7,12 @@ description: "Containers are, at their core, just processes. Let's deep dive int
 
 A while ago, I stumbled upon some LinkedIn copy-pasta about Go 1.25 finally making `GOMAXPROCS` 'container-aware'.
 Indeed, for some reason, if you try to get cpu or memory info from within a container, you get the host's total
-resources. This is probably the one of the few instances where containers behave differently, and I didn't really
+resources. This is probably one of the few instances where containers behave differently, and I didn't really
 understand why.
 
 Despite relying on k8s almost daily for quite a while now, my understanding of how containers work had been fairly
 limited. Partly because these abstractions work so well and there is so much to learn about simply using k8s itself that
-I never tough of looking beneath the abstraction layers. The broad statements I came across while learning Docker like
+I never thought of looking beneath the abstraction layers. The broad statements I came across while learning Docker like
 "containers don't do virtualization," "they don't have a hypervisor layer like VMs," and "they sit directly on the host
 OS kernel" didn't offer much real insight either.
 
@@ -21,15 +21,15 @@ have come to understand, at the risk of over-simplifying, containers essentially
 with all its user-space dependencies and run them as isolated processes on the host's kernel.
 
 In this series of blogs, I hope to share an anatomy of containers that I have learnt by tinkering around in the
-past few weeks. Rather than taking a deep dive into specific topics, its meant to provide a bird's eye view of
+past few weeks. Rather than taking a deep dive into specific topics, it's meant to provide a bird's eye view of
 containers and the surrounding ecosystem. I will of course attach resources to dive deeper into specific topics. A lot
 if not all of this was new to me, so feel free to correct me if I goof something up.
 
 Much of this first blog is borrowed from this highly recommended series
-of [videos by Liz Rice](https://www.youtube.com/watch?v=8fi7uSYlOdc&vl=en). So I won't explain these concepts in very
+of [videos by Liz Rice](https://www.youtube.com/watch?v=8fi7uSYlOdc&vl=en). So I won't explain these concepts in great
 detail.
 
-## The kernel features that allow containerisation
+## The Kernel Features That Allow Containerisation
 
 At the core of containers are two Linux kernel
 features: "[namespaces](https://man7.org/linux/man-pages/man7/namespaces.7.html)"
@@ -41,7 +41,7 @@ and "[cgroups](https://man7.org/linux/man-pages/man7/cgroups.7.html)".
   group of processes can use.
 
 Both namespaces & cgroups are inherited by child processes, meaning that when a process spawns another, the child
-process remain in the same namespace and cgroup as the parent unless explicitly changed. As you’ve probably gathered by
+processes remain in the same namespace and cgroup as the parent unless explicitly changed. As you’ve probably gathered by
 now, if we use these two features together, we should be able to run and manage a set isolated processes on the same
 host
 system. And that's what containers are all about! Let's take a look at both of these concepts in a bit more detail.
@@ -53,16 +53,16 @@ such as process IDs, filesystems, network interfaces, and hostnames etc. This is
 containers to run on the same host without interfering with each other, even though they share the same kernel. The way
 to enter/create a namespace is to pass appropriate flags during process creation using the `clone` syscall
 or via the `setns` syscall to join an existing namespace. The namespaces of a process are visible in the `proc` fs as
-symlinks under`/proc/<pid>/ns`. A few important namespaces for isolation are:
+symlinks under `/proc/<pid>/ns`. A few important namespaces for isolation are:
 
-* PID (`pid`): Isolates the set of process & PIDs. Process can only see other processes in the same or child namespace.
+* PID (`pid`): Isolates the set of processes & PIDs. Processes can only see other processes in the same or child namespace.
   The first process inside this namespace starts with PID 1 in
   the new namespace and is considered as the [init process](https://en.wikipedia.org/wiki/Init) in this new namespace.
   All
-  the signals (SIGTERM, SIGINT, SIGQUIT etc.) sent to the container are received by this init process. So its important
+  the signals (SIGTERM, SIGINT, SIGQUIT etc.) sent to the container are received by this init process. So it's important
   that this process handles these signals properly to manage the lifecycle of the container.
 
-* UTS (`uts`): Isolates the hostname so that processes in different processes can have different hostnames and NIS
+* UTS (`uts`): Isolates the hostname so that processes in different namespaces can have different hostnames and NIS
   domain names. Fun fact: the pod names you set in k8s are actually the hostname inside the pod's UTS namespace!
 
 * Mount (`mnt`): Isolates the set of filesystem mount points. You start off with a copy of the host's mount points, but
@@ -76,28 +76,28 @@ symlinks under`/proc/<pid>/ns`. A few important namespaces for isolation are:
   than outside. Also allowing unprivileged users on the host to become uid 0 (root) inside this namespace. We
   will see how user namespace works in part three.
 
-There are few other namespaces like IPC (`ipc`), cgroups (`cgroup`) & time (`time`) for (`CLOCK_MONOTONIC` and
+There are a few other namespaces like IPC (`ipc`), cgroups (`cgroup`) & time (`time`) for (`CLOCK_MONOTONIC` and
 `CLOCK_BOOTTIME`) etc.
 
 ### Cgroups
 
-As mentioned earlier, cgroups allows to restrict the resource usage (CPU, memory, max processes etc.) of a set of
-process. This is what allows us to set resource limits in k8s & docker. It works via a pseudo-filesystem usually mounted
+As mentioned earlier, cgroups allow us to restrict the resource usage (CPU, memory, max processes etc.) of a set of
+processes. This is what allows us to set resource limits in k8s & docker. It works via a pseudo-filesystem usually mounted
 at `/sys/fs/cgroup`. Similar to namespaces, the file `/proc/<pid>/cgroup` in the `proc` fs contains the cgroup of a
 process. There are two versions of cgroups, we will use cgroups v2. To create a cgroup, we have to create a folder with
-its name in this filesystem, then add pid's in a file `cgroup.procs` inside it. Files like `memory.max`, `cpu.max` in
-this folder describes the max amount of resources this process can use. Similarly, the `cpuset.cpus` restricts which cpu
+its name in this filesystem, then add PIDs in a file `cgroup.procs` inside it. Files like `memory.max`, `cpu.max` in
+this folder describe the max amount of resources this process can use. Similarly, the `cpuset.cpus` restricts which cpu
 core the processes are allowed to run.
 
-One interesting realisation I had from this is the CPU limits specified are shared across the cores of the host. Setting
-a containers CPU limit to 1000m in k8s doesn't mean it will have a whole core available, it simply means that it will
+One interesting realization I had from this is the CPU limits specified are shared across the cores of the host. Setting
+a container's CPU limit to 1000m in k8s doesn't mean it will have a whole core available, it simply means that it will
 have one core's worth of CPU time available! So it's possible that your container might actually be utilizing multiple
-cores & running parallel threads even with very small low cpu limit, it would simply exhaust the limit quickly. The fact
+cores & running parallel threads even with a very low cpu limit, it would simply exhaust the limit quickly. The fact
 that resource limits are set via cgroups is also one of the biggest reasons why programs need to be container-aware.
 Traditionally, programs use the proc filesystem (e.g., `/proc/meminfo` or `/proc/cpuinfo`), which reflects the host's
 resources rather than the container's actual limits.
 
-## Building our own simple container
+## Building Our Own Simple Container
 
 Hopefully, now we have a rough idea of how to create a simple container ourselves. We need to start
 a process with its own namespaces, set up cgroups for resource
@@ -107,10 +107,10 @@ limits, [mount](https://man7.org/linux/man-pages/man2/mount.2.html) a few specia
 new root filesystem. There is obviously tons of details missing from this sketch like networking, security
 considerations etc., which I hope to cover in the next part.
 
-### Making a root filesystem
+### Making a Root Filesystem
 
-First we first need a root filesystem. We can get this by extracting it from any existing image. Lets extracts it
-from BusyBox image:
+First we need a root filesystem. We can get this by extracting it from any existing image. Let's extract it
+from the BusyBox image:
 
 1. Make the `mount` directory to hold the root filesystem.
 
@@ -131,20 +131,20 @@ docker export "busybox-temp" | tar -C "mount" -xvf -
 docker rm "busybox-temp"
 ```
 
-### The step-by-step process
+### The Step-by-Step Process
 
 Let's first look at what the code given below is going to do:
 
-1. Starts the program, parses the command to run in container, its args etc.
+1. Starts the program, parses the command to run in the container, its arguments, etc.
 2. Sets up a new cgroup by writing to `/sys/fs/cgroup/`.
 3. Clones a new child container process from the current process with new namespaces for mount, PID, UTS etc.
 4. Adds the container process to the cgroup created earlier.
-5. Inside the cloned process, it sets up the new hostname, mounts a few special filesystem like proc, temp etc., while
+5. Inside the cloned process, it sets up the new hostname, mounts a few special filesystems like proc, temp etc., while
    also [bind mounts](https://unix.stackexchange.com/questions/198590/what-is-a-bind-mount) the host dev devices like
    `/dev/null`, `/dev/zero` to the container.
 6. Finally, it does a `chroot` to the new root filesystem and execs the command passed from the parent process.
 
-### The code
+### The Code
 
 <div style="max-height: min(75vh, 1000px); overflow: scroll;">
 
@@ -325,7 +325,7 @@ func check(err error) {
 
 </div>
 
-### Steps to compile & run
+### Steps to Compile & Run
 
 1. Save this as `main.go`. Note that the work directory should also contain the `mount` directory
    created earlier with the root filesystem.
@@ -333,14 +333,14 @@ func check(err error) {
 3. Run the binary with sudo, passing the command to run in the container, for example the shell:
    `sudo ./main run /bin/sh`
 
-And voilà! Now you should see yourself inside a shell in the container! We have a simple container running a bash shell.
+And voilà! Now you should see yourself inside a shell in the container! We have a simple container running a shell.
 You can try exploring the container using commands like
 `ps`, `ip`, `ls` to convince yourself that it is indeed isolated from the host system. Try removing a few
 namespaces to see how isolation is affected. Also on the host, you can try checking the cgroup & ns using the proc
-filesystem (`/proc/<pid>/cgroup` and `/proc/<pid>/ns`). Also try making fork bomb inside the container to see if its
-limit to the no of processes we specified in cgroups.
+filesystem (`/proc/<pid>/cgroup` and `/proc/<pid>/ns`). Also try making a fork bomb inside the container to see if it's
+limited to the number of processes we specified in cgroups.
 
-## Seeing it in action with docker
+## Seeing It in Action with Docker
 
 Let's run a Docker container with memory and CPU limits to convince ourselves that this is indeed how containers are
 implemented in practice:
@@ -397,7 +397,7 @@ lrwxrwxrwx 1 root root 0 Oct 21 08:00 user -> 'user:[4026531837]'
 lrwxrwxrwx 1 root root 0 Oct 21 08:00 uts -> 'uts:[4026532159]'
 ```
 
-You can do the same for normal process to confirm that the namespaces for the container process is indeed different from
+You can do the same for a normal process to confirm that the namespaces for the container process is indeed different from
 the default namespaces used by other processes. We can enter a particular namespace of the process by using the
 `nsenter` utility. Let's enter all its namespaces by doing
 
@@ -405,7 +405,7 @@ the default namespaces used by other processes. We can enter a particular namesp
 sudo nsenter -t 137649 -a
 ```
 
-Explore using `ls`, `ip` etc., we are indeed inside the docker container!.
+Exploring around using `ls`, `ip` etc., we are indeed inside the docker container!
 
 #### Cgroups
 
@@ -424,7 +424,7 @@ The corresponding cgroups folder can be found under:
 Opening files such as `memory.max` and `cpu.max` in that directory confirms that this is where the process's resource
 limits are enforced using cgroups.
 
-## What next?
+## What Next?
 
 So far, we have implemented a basic container ourselves and seen Docker containers in action using the same Linux
 primitives. Kubernetes pods are built on similar concepts. By default, containers in a pod share the `ipc`, `network`,

@@ -17,16 +17,16 @@ does for a container. Notice stuff like `HostConfig`, `Mounts`, `NetworkSettings
 
 Networking works in containers via a virtual network interface
 called [veth](https://man7.org/linux/man-pages/man4/veth.4.html) (Virtual Ethernet). It's quite similar to an
-ethernet cable joining two devices. Packets going into one end of veth appears on the other. The special
-thing about it though is that ends of the veth pair can be moved to different network namespaces, essentially allowing
-us to connect the container’s namespace to the host namespace as if they were joined by a physical cable.
+ethernet cable joining two devices. Packets going into one end of veth appear on the other. The special
+thing about it though is that the ends of the veth pair can be moved to different network namespaces, essentially allowing
+us to connect the container's namespace to the host namespace as if they were joined by a physical cable.
 
-### Setting up a network interface
+### Setting Up a Network Interface
 
 Using the veth network interface, we can now set up a small subnet containing our host & container, allowing them to
 communicate with each other. Then, we can configure NAT
 using [iptables](https://linux.die.net/man/8/iptables), allowing the container to access
-internet through the host’s network interface.
+the internet through the host's network interface.
 
 Let's see how to set it up:
 
@@ -105,24 +105,23 @@ sudo iptables -t nat -A POSTROUTING -s $SUBNET -o $HOST_NET_IF -j MASQUERADE
 ```
 
 We now have a fully functional network interface for our container! You can verify this by pinging the container IP from
-the host
-vice versa, and also by trying accessing the internet from within the container using `curl` or `wget` etc.
+the host and vice versa, and also by trying to access the internet from within the container using `curl` or `wget` etc.
 
 ### The Bridge
 
 There is another virtual interface typically used in container networking
 called [bridge](https://wiki.archlinux.org/title/Network_bridge). A bridge is like a virtual
-switch that allows us to connect multiple network interfaces togather. This enables communication between containers.
+switch that allows us to connect multiple network interfaces together. This enables communication between containers.
 Docker for example, creates a default bridge network called `docker0` on the host machine. When a container is started,
-It creates a veth pair, attaches one end to the container's network namespace, and the other end to the `docker0` (by
+it creates a veth pair, attaches one end to the container's network namespace, and the other end to the `docker0` (by
 default) bridge on the host. The bridge could be further connected to the host's main network interface like we did
 above.
 
-### Mapping a port
+### Mapping a Port
 
-Once we have a network interface set up for the container, we can simply do add a DNAT rule in the host's iptables to
+Once we have a network interface set up for the container, we can simply add a DNAT rule in the host's iptables to
 forward traffic from a specific port on the host to the container's IP and port. Extending our previous example, let's
-say we want to map port `8080` of the container to port `80` on the host, All we have to do is add the following
+say we want to map port `8080` of the container to port `80` on the host. All we have to do is add the following
 iptables rule on the host:
 
 ```shell
@@ -131,7 +130,7 @@ sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination $C
 
 Now, any incoming traffic to port `80` on the host will be forwarded to port `8080` on the container.
 
-### Docker's Networking in action
+### Docker's Networking in Action
 
 Now let's validate that this is indeed what Docker does under the hood. For this, we will start a simple HTTP server
 container and access it from another container using docker's default bridge network:
@@ -184,7 +183,7 @@ docker0		8000.b6cff2e42f63	no	  vethd615595
 							                     vethf0b5df8
 ```
 
-7. Also run `ip addr show` on both containers & the host, you will are part of the same subnet.
+7. Also run `ip addr show` on both containers & the host, you will see they are part of the same subnet.
 8. Running `sudo  iptables -t nat -L` on the host will also show the all the NAT rules docker has set up. Notice how the
    port we mapped earlier shows up as a DNAT rule:
 
@@ -212,7 +211,7 @@ Earlier, we saw how we can isolate mounts inside a container using the mount nam
 has quite a few quirks about how mounts are shared & propagated between different
 namespaces (
 see [lwn article](https://lwn.net/Articles/689856/), [man page](https://man7.org/linux/man-pages/man8/mount.8.html)).
-Anyway, If you list all the mounts using `mount` command inside a container, you will see a few special ones like
+Anyway, if you list all the mounts using `mount` command inside a container, you will see a few special ones like
 below:
 
 * `overlay on / type overlay (rw...`: The overlay root filesystem, which we will discuss shortly.
@@ -220,7 +219,7 @@ below:
 * `/dev/root on /etc/resolv.conf`, and others on `/etc/hostname`, `/etc/hosts`: These are bind mounts from the host to
   provide DNS resolution, hostname, and hosts file inside the container.
 * `sysfs on /sys type sysfs (ro..`: The sysfs filesystem mounted on `/sys` to expose kernel & device
-  information. Notice the `ro` flag, indicating it's mounted read-only to modifications from within the container.
+  information. Notice the `ro` flag, indicating it's mounted read-only to prevent modifications from within the container.
 
 ### Bind Mounts And Persistent Storage
 
@@ -236,7 +235,7 @@ machine.
 In our container implementation from previous blog, we simply extracted the root filesystem from an existing base image
 and chroot into it. If we keep doing the same for each and every container, we'll end up with multiple redundant copies
 of the same base image, consuming space and also increase the container startup time because of this overhead. In
-practice, container's root filesystem consists of multiple read only layers with a finale writable layer stacked on
+practice, container's root filesystem consists of multiple read only layers with a final writable layer stacked on
 top of each other. These are the same layers you see when building or fetching a docker image. Each layer records a set
 of diffs / changes. These layers are merged into a single view using a union mount filesystem
 like [OverlayFS](https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html).
@@ -257,7 +256,7 @@ writable top layer, `/work` is a working directory for OverlayFS, and `/merged` 
 modifying the container code from part one to mount an overlay filesystem for the container's rootfs using the same
 mount syscall.
 
-### Docker's OverlayFS in action
+### Docker's OverlayFS in Action
 
 The entries listed by `mount` command earlier had a line like this:
 
