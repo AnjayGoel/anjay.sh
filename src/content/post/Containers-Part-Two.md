@@ -271,10 +271,10 @@ If you run two containers from the same image, notice that they share the lower 
 upper dirs. Try modifying files inside these containers, the changes will appear only in their respective upper layers,
 leaving the shared lower layers untouched.
 
-## What’s Next?
+## What's Next?
 
-In the next post, I want to explore one final piece of the puzzle: security. We'll look at how root privileges work in
-Linux, dive into concepts like Linux capabilities, syscall filtering, user namespaces, and rootless containers, and
+In the next post, I want to explore one final big piece of the puzzle: security. We'll look at how root privileges work
+in Linux, dive into concepts like Linux capabilities, syscall filtering, user namespaces, and rootless containers, and
 understand how containers leverage these mechanisms to enhance security and isolation.
 
 ## References
