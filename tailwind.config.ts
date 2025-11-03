@@ -30,10 +30,10 @@ export default {
 					":before": { content: "''" },
 				},
 				".cactus-link": {
+					"@apply underline underline-offset-2 decoration-accent": {},
 					"&:hover": {
-						"@apply decoration-link decoration-2": {},
+						"@apply decoration-2": {},
 					},
-					"@apply underline underline-offset-2": {},
 				},
 				".title": {
 					"@apply text-2xl font-semibold text-accent-2": {},

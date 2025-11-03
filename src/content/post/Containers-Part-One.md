@@ -60,7 +60,7 @@ symlinks under `/proc/<pid>/ns`. A few important namespaces for isolation are:
   these signals properly to manage the lifecycle of the container.
 
 * UTS (`uts`): Isolates the hostname so that processes in different namespaces can have different hostnames and NIS
-  domain names. Fun fact: the pod names you set in k8s are actually the hostname inside the pod's UTS namespace!
+  domain names. Fun fact: the pod names you see in k8s are actually the hostname inside the pod's UTS namespace!
 
 * Mount (`mnt`): Isolates the set of filesystem mount points. You start off with a copy of the calling process's mount
   points, but can add, remove, or change mount points without affecting the host or other namespaces. We'll explore
