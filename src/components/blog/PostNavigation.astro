@@ -1,0 +1,45 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+	prevPost?: CollectionEntry<"post">;
+	nextPost?: CollectionEntry<"post">;
+}
+
+const { prevPost, nextPost } = Astro.props;
+---
+
+{
+	(prevPost || nextPost) && (
+		<nav class="mt-6 border-t border-dashed border-gray-300 pt-12 dark:border-gray-700">
+			<div class="flex flex-row justify-start gap-4">
+				{prevPost ? (
+					<a
+						href={`/posts/${prevPost.slug}`}
+						class="group flex flex-col rounded border border-gray-200 p-3 text-right no-underline transition-colors hover:border-accent dark:border-gray-700 dark:hover:border-accent sm:items-end"
+					>
+						<span class="mb-1 whitespace-nowrap text-xs text-accent">← Previous</span>
+						<span class="w-[28ch] text-sm font-medium text-accent-2 group-hover:text-accent">
+							{prevPost.data.title}
+						</span>
+					</a>
+				) : (
+					<div />
+				)}
+				{nextPost ? (
+					<a
+						href={`/posts/${nextPost.slug}`}
+						class="group flex flex-col rounded border border-gray-200 p-3 no-underline transition-colors hover:border-accent dark:border-gray-700 dark:hover:border-accent"
+					>
+						<span class="mb-1 whitespace-nowrap text-xs text-accent">Next →</span>
+						<span class="w-[28ch] text-sm font-medium text-accent-2 group-hover:text-accent">
+							{nextPost.data.title}
+						</span>
+					</a>
+				) : (
+					<div />
+				)}
+			</div>
+		</nav>
+	)
+}

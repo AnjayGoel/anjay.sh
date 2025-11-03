@@ -2,7 +2,7 @@
 title: "How Does Async / Non-Blocking IO Actually Work?"
 publishDate: 2025-05-24 01:50:00 +0530
 tags: [ til, programming,linux ]
-description: "Deep dive into the OS internals to understand how async/non-blocking IO actually works."
+description: "Deep dive into the OS internals to understand how async/non-blocking IO actually works"
 ---
 
 

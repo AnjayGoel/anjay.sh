@@ -4,14 +4,17 @@ import type { CollectionEntry } from "astro:content";
 import Masthead from "@/components/blog/Masthead.astro";
 import TOC from "@/components/blog/TOC.astro";
 import WebMentions from "@/components/blog/webmentions/index.astro";
+import PostNavigation from "@/components/blog/PostNavigation.astro";
 
 import BaseLayout from "./Base.astro";
 
 interface Props {
 	post: CollectionEntry<"post">;
+	prevPost?: CollectionEntry<"post">;
+	nextPost?: CollectionEntry<"post">;
 }
 
-const { post } = Astro.props;
+const { post, prevPost, nextPost } = Astro.props;
 const {
 	data: { description, ogImage, publishDate, title, updatedDate },
 	slug,
@@ -47,10 +50,11 @@ import { Schema } from "astro-seo-schema";
 				<Masthead content={post} />
 			</div>
 			<div
-				class="prose prose-sm text-[0.9375rem] prose-cactus mt-12 prose-headings:font-semibold prose-headings:text-accent-2 prose-headings:before:absolute prose-headings:before:-ms-4 prose-headings:before:text-accent sm:prose-headings:before:content-['#'] sm:prose-th:before:content-none prose-p:indent-6"
+				class="prose prose-sm text-[0.9375rem] prose-cactus mt-12 prose-headings:font-semibold prose-headings:text-accent-2 prose-headings:before:absolute prose-headings:before:-ms-4 prose-headings:before:text-accent sm:prose-headings:before:content-['#'] sm:prose-th:before:content-none prose-p:indent-6  [&_li>p]:indent-0 [&_li>p]:my-0 [&_li>p]:inline"
 			>
 				<slot />
 				<WebMentions />
+				<PostNavigation prevPost={prevPost} nextPost={nextPost} />
 			</div>
 		</article>
 	</div>
