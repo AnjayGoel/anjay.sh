@@ -21,8 +21,8 @@ At the risk of over-simplifying, they essentially package the whole application 
 dependencies and run them as isolated processes on the host's kernel.
 
 In this series of blogs, I hope to share an anatomy of containers that I have learnt by tinkering around in the
-past few weeks. Rather than taking a deep dive into specific topics, it's meant to provide a bird's eye view of
-containers and the surrounding ecosystem. I will of course attach resources to dive deeper into specific topics. A lot
+past few weeks. Rather than diving deep into a specific topic, it's meant to provide a bird's eye view of
+containers and the surrounding ecosystem. I'll include resources to explore particular areas in more detail. A lot
 if not all of this was new to me, so feel free to correct me if I goof something up.
 
 PS: Much of this first blog is borrowed from this highly recommended series
