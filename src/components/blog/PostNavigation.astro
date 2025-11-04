@@ -11,33 +11,29 @@ const { prevPost, nextPost } = Astro.props;
 
 {
 	(prevPost || nextPost) && (
-		<nav class="mt-6 border-t border-dashed border-gray-300 pt-12 dark:border-gray-700">
-			<div class="flex flex-row justify-start gap-4">
-				{prevPost ? (
+		<nav class="mt-6 border-t border-dashed border-gray-300 pt-10 dark:border-gray-700">
+			<div class:list={["gap-2", prevPost && nextPost ? "grid grid-cols-2 before:content-none after:content-none" : "flex justify-center sm:justify-start"]}>
+				{prevPost && (
 					<a
 						href={`/posts/${prevPost.slug}`}
-						class="group flex flex-col rounded border border-gray-200 p-3 text-right no-underline transition-colors hover:border-accent dark:border-gray-700 dark:hover:border-accent sm:items-end"
+						class="group flex max-w-[32ch] flex-col rounded border border-gray-200 p-3 text-right no-underline transition-colors hover:border-accent dark:border-gray-700 dark:hover:border-accent sm:items-end"
 					>
 						<span class="mb-1 whitespace-nowrap text-xs text-accent">← Previous</span>
-						<span class="w-[28ch] text-sm font-medium text-accent-2 group-hover:text-accent">
+						<span class="break-words text-sm font-medium text-accent-2 group-hover:text-accent">
 							{prevPost.data.title}
 						</span>
 					</a>
-				) : (
-					<div />
 				)}
-				{nextPost ? (
+				{nextPost && (
 					<a
 						href={`/posts/${nextPost.slug}`}
-						class="group flex flex-col rounded border border-gray-200 p-3 no-underline transition-colors hover:border-accent dark:border-gray-700 dark:hover:border-accent"
+						class="group flex max-w-[32ch] flex-col rounded border border-gray-200 p-3 no-underline transition-colors hover:border-accent dark:border-gray-700 dark:hover:border-accent"
 					>
 						<span class="mb-1 whitespace-nowrap text-xs text-accent">Next →</span>
-						<span class="w-[28ch] text-sm font-medium text-accent-2 group-hover:text-accent">
+						<span class="break-words text-sm font-medium text-accent-2 group-hover:text-accent">
 							{nextPost.data.title}
 						</span>
 					</a>
-				) : (
-					<div />
 				)}
 			</div>
 		</nav>
