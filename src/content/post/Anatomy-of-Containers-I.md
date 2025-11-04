@@ -1,7 +1,7 @@
 ---
 title: "Anatomy of Containers, Part I: They Are Just Fancy Processes!"
 publishDate: 2025-11-04 01:05:00 +0530
-tags: [ containers, docker, kubernetes, til ]
+tags: [ containers, docker, linux, kubernetes, til ]
 description: "Containers are, at their core, just processes. Let's take a look at the Linux primitives that make it possible"
 ---
 

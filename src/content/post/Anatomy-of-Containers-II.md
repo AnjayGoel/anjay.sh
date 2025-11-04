@@ -1,7 +1,7 @@
 ---
 title: "Anatomy of Containers, Part II: The Fancy Stuff"
 publishDate: 2025-11-04 01:10:00 +0530
-tags: [ containers, docker, kubernetes, til ]
+tags: [ containers, docker, linux, kubernetes, til ]
 description: "Taking a peek at how networking & filesystems are wired in containers with some hands-on examples."
 ---
 
