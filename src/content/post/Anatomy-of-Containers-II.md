@@ -5,7 +5,7 @@ tags: [ containers, docker, linux, kubernetes, til ]
 description: "Taking a peek at how networking & filesystems are wired in containers with some hands-on examples."
 ---
 
-In part one, we built a bare-bones container. To make it truly useful, we must handle a few essential components like
+In [part one](https://anjay.sh/posts/anatomy-of-containers-i/), we built a bare-bones container. To make it truly useful, we must handle a few essential components like
 networking, storage, and security. In this post, I'll explore how some of these are implemented in practice, attempt to
 recreate them ourselves, and finally compare our approach with Docker, like we did in part one.
 
