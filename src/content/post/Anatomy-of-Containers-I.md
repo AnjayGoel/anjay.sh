@@ -64,10 +64,10 @@ symlinks under `/proc/<pid>/ns`. A few important namespaces for isolation are:
 
 * Mount (`mnt`): Isolates the set of filesystem mount points. You start off with a copy of the calling process's mount
   points, but can add, remove, or change mount points without affecting the host or other namespaces. We'll explore
-  filesystems further in [part two](https://anjay.sh/posts/containers-part-two/).
+  filesystems further in [part two](https://anjay.sh/posts/anatomy-of-containers-ii/).
 
 * Network (`net`): Isolates the whole network stack, including interfaces, routing tables, firewall rules, etc.
-  Networking is covered in detail in [part two](https://anjay.sh/posts/containers-part-two/).
+  Networking is covered in detail in [part two](https://anjay.sh/posts/anatomy-of-containers-ii/).
 
 * User (`user`): Isolates user and group IDs. Inside a user namespace a process can have a different mapped UID/GID
   than outside. This also allows unprivileged users on the host to become UID 0 (root) inside this namespace. We
