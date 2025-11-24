@@ -222,8 +222,7 @@ func run() {
   addToCgroup(cmd.Process.Pid)
 
   // Wait for child to complete
-  err := cmd.Wait()
-  check(err)
+  _ = cmd.Wait()
 }
 
 // child executes inside the containerized namespaces
@@ -249,11 +248,6 @@ func child() {
   cmd.Stdin = os.Stdin
   cmd.Stdout = os.Stdout
   cmd.Stderr = os.Stderr
-
-  cmd.SysProcAttr = &syscall.SysProcAttr{
-    Setsid:  true,
-    Setctty: true,
-  }
 
   _ = cmd.Run()
 }
