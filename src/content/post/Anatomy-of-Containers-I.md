@@ -71,7 +71,7 @@ symlinks under `/proc/<pid>/ns`. A few important namespaces for isolation are:
 
 * User (`user`): Isolates user and group IDs. Inside a user namespace a process can have a different mapped UID/GID
   than outside. This also allows unprivileged users on the host to become UID 0 (root) inside this namespace. We
-  will see how the user namespace works in part three (Coming Soon).
+  will see how the user namespace works in [part three](https://anjay.sh/posts/anatomy-of-containers-iii/).
 
 There are a few other namespaces like IPC (`ipc`), cgroups (`cgroup`) & time (`time` for `CLOCK_MONOTONIC` and
 `CLOCK_BOOTTIME`).
@@ -222,8 +222,7 @@ func run() {
   addToCgroup(cmd.Process.Pid)
 
   // Wait for child to complete
-  err := cmd.Wait()
-  check(err)
+  _ = cmd.Wait()
 }
 
 // child executes inside the containerized namespaces
@@ -249,11 +248,6 @@ func child() {
   cmd.Stdin = os.Stdin
   cmd.Stdout = os.Stdout
   cmd.Stderr = os.Stderr
-
-  cmd.SysProcAttr = &syscall.SysProcAttr{
-    Setsid:  true,
-    Setctty: true,
-  }
 
   _ = cmd.Run()
 }
