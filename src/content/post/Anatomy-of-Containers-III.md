@@ -17,7 +17,7 @@ processes.
 To handle this, We have a few tools at our disposal, thanks to Linux. Let's start with understanding what root access
 really means.
 
-### Capabilities
+## Capabilities
 
 I always assumed root as being a binary state, either you are root, or you are not. However, Linux breaks down the
 privileges of root into smaller sets called capabilities. Each capability allows a process to perform some specific
@@ -38,7 +38,7 @@ are divided into four sets:
 - **Inheritable**: The capabilities that can be inherited by child processes.
 - **Bounding**: The maximum set of capabilities that the process and its children can have.
 
-Lets try this ourself.
+Let's try this ourselves.
 
 1. First, run the container from the part one & two. Inside the shell, try changing the system time
    using `date -s "2025-12-01 10:00:00"`. You should see that the command executes successfully and the time changes
@@ -79,6 +79,77 @@ func child() {
 
 3. Now, try changing the system time again. You should see a `Operation not permitted` error, indicating that despite
    being root, we cannot change the time!.
+
+Docker by default,
+only [grants a minimal set of capabilities](https://dockerlabs.collabnix.com/advanced/security/capabilities/) to
+containers, but you can customize this using the
+`--cap-add` and `--cap-drop` flags when running a container. You can use the `pscap` tool to list all the processes and
+their capabilities on the host. K8S inherits the same defaults from the underlying container runtime, but drops a few
+more. This is configurable using the [
+`securityContext`](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) in the pod spec.
+
+## Seccomp
+
+To have more fine-grained control over what a process can do, containers also use seccomp. Seccomp (short for secure
+computing mode) is a Linux kernel feature that allows to restrict the syscalls a process can
+make. Seccomp works by attaching a Berkeley Packet Filter (BPF) to the process. It runs inside the kernel every time the
+process makes a syscall. The filter can match on the syscall and its arguments, and then decide whether to allow
+the syscall, block it with an errno, or kill the process entirely. Once a seccomp filter is installed, it cannot be
+removed or relaxed, only tightened. Similar to capabilities, it is also inherited by child processes.
+
+To see this in action, let's use the same example of changing the system time. This time, instead of dropping the
+`CAP_SYS_TIME` capability, we will use seccomp to block the `clock_settime` syscall.
+
+1. You might need to install the seccomp package on the host first:
+
+```shell
+sudo apt-get update
+sudo apt-get install -y libseccomp-dev pkg-config
+```
+
+2. Add the following code to the container implementation:
+
+```go
+package main
+
+import (
+  seccomp "github.com/seccomp/libseccomp-golang"
+)
+
+func installSeccomp(syscalls []string) error {
+  // Default action: allow everything
+  filter, err := seccomp.NewFilter(seccomp.ActAllow)
+  if err != nil {
+    return err
+  }
+
+  // deny dangerous time syscalls by returning EPERM
+  deny := seccomp.ActErrno.SetReturnCode(int16(syscall.EPERM))
+
+  for _, name := range syscalls {
+    sc, err := seccomp.GetSyscallFromName(name)
+    if err != nil {
+      log.Printf("seccomp: syscall %s not found: %v", name, err)
+      continue
+    }
+    check(filter.AddRule(sc, deny))
+  }
+
+  //Load the filter into the kernel
+  err = filter.Load()
+  return err
+}
+
+func child() {
+  // Child process code
+
+  //Disallow changing system time
+  check(installSeccomp([]string{
+    "clock_settime",
+  }))
+  //Now exec the desired command
+}
+```
 
 ```c
 
@@ -122,11 +193,6 @@ int main() {
 ```
 
 ### Seccomp
-
-```
-sudo apt-get update
-sudo apt-get install -y libseccomp-dev pkg-config
-```
 
 ### User namespaces
 
