@@ -9,8 +9,8 @@ In [part one](https://anjay.sh/posts/anatomy-of-containers-i/)
 and [part two](https://anjay.sh/posts/anatomy-of-containers-ii/), we ran our implementation of containers
 using root privileges. Despite all the isolation provided by namespaces and cgroups, the process is still running as
 root on the host. This is an issue because something's by their very nature cannot be isolated by namespaces or cgroups.
-This
-includes stuff like kernel configurations, loading / unloading kernel modules, and even the clock (`CLOCK_REALTIME`). A
+This includes stuff like kernel configurations, loading / unloading kernel modules, and even the clock (
+`CLOCK_REALTIME`). A
 containerized process running as root can modify these settings, affecting the host and all other containers and
 processes.
 
@@ -151,49 +151,7 @@ func child() {
 }
 ```
 
-```c
-
-```shell
-# 1. Create & run container and install packages (container stays after exit)
-docker run --name ubuntu-temp -it mcr.microsoft.com/devcontainers/base:ubuntu bash -c "\
-  apt-get update && \
-  DEBIAN_FRONTEND=noninteractive apt-get install -y kmod iproute2 net-tools procps curl wget git vim && \
-  apt-get clean && rm -rf /var/lib/apt/lists/* && \
-  exit"
-
-# 2. Export the container filesystem and extract into ./mount
-mkdir -p mount
-docker export ubuntu-temp | tar -C mount -xvf -
-
-```
-
-```shell
-/proc/sys/vm/* & /proc/sys/fs/*
-fs.file-max vm.swappiness
-```
-
-```echo c > /proc/sysrq-trigger```
-
-```grep Cap /proc/3401/status```
-```sudo apt install libcap-ng-utils```  ```pscap```
-`getcap`
-`capsh`
-
-	err := dropCapabilities([]cap.Value{
-		cap.SYS_TIME,
-	})
-
-```c
-#include <sys/reboot.h>
-#include <linux/reboot.h>
-
-int main() {
-    return reboot(LINUX_REBOOT_CMD_RESTART);
-}
-```
-
-### Seccomp
-
-### User namespaces
+3. Now, try changing the system time again. You should see the same `Operation not permitted` error, indicating that the
+   syscall was blocked by seccomp.
 
 ### Rootless containers
