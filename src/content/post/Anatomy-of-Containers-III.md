@@ -168,3 +168,32 @@ concept called "rootless containers". Rootless containers allow you to run conta
 possible by using the user namespace. A user namespace isolates the user/group ids and capabilities! So a process inside the user
 namespace can be root (UID 0) and have all capabilities, but on the host, it is mapped to an unprivileged user and has
 no capabilities.
+
+```go
+cmd.SysProcAttr = &syscall.SysProcAttr{
+		Cloneflags: syscall.CLONE_NEWUSER |
+			syscall.CLONE_NEWNS |
+			syscall.CLONE_NEWUTS |
+			syscall.CLONE_NEWPID |
+			syscall.CLONE_NEWNET |
+			syscall.CLONE_NEWIPC |
+			syscall.CLONE_NEWCGROUP,
+		Credential: &syscall.Credential{Uid: 0, Gid: 0}, // run as root inside the container
+		UidMappings: []syscall.SysProcIDMap{
+			{ContainerID: 0, HostID: 1000, Size: 1}, // map container's root (UID 0) -> host UID 1000 (first non-root user)
+		},
+		GidMappings: []syscall.SysProcIDMap{
+			{ContainerID: 0, HostID: 1000, Size: 1}, //map container GID 0 -> host GID 1000 (first non-root user's primary group)
+		},
+	}
+```
+
+
+```shell
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root       21445  0.0  0.1  17140  6888 pts/3    S+   22:23   0:00              \_ sudo ./main run /bin/bash
+root       21446  0.0  0.0  17140  2604 pts/4    Ss   22:23   0:00                  \_ sudo ./main run /bin/bash
+root       21447  0.0  0.0 1225536 3812 pts/4    Sl   22:23   0:00                      \_ ./main run /bin/bash
+silverb+   21452  0.0  0.0 1225792 3812 pts/4    Sl   22:23   0:00                          \_ /home/silverbug/containers/main child /bin/bash
+silverb+   21457  0.0  0.1   8004  4108 pts/4    S+   22:23   0:00                              \_ /bin/bash
+```
