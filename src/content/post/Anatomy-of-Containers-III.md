@@ -154,4 +154,11 @@ func child() {
 3. Now, try changing the system time again. You should see the same `Operation not permitted` error, indicating that the
    syscall was blocked by seccomp.
 
+You can some information about the running
+process's seccomp by looking at the `Seccomp` field in `/proc/[pid]/status` (0 means no seccomp, 1 means strict mode, 2
+means filter mode) and the number of filters attached using the `Seccomp_filters` field. More details on Docker's
+seccomp profile can be found [here](https://docs.docker.com/engine/security/seccomp/).
+Similarly, K8S also allows you to fine-tune the seccomp profile using the securityContext's `seccompProfile` field
+as [given here](https://kubernetes.io/docs/tutorials/security/seccomp/).
+
 ### Rootless containers
