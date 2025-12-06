@@ -1,5 +1,5 @@
 ---
-title: "Anatomy of Containers, Part III: What's root access, really?"
+title: "Anatomy of Containers, Part III: What's root, really?"
 publishDate: 2025-11-25 01:10:00 +0530
 tags: [ containers, docker, linux, kubernetes, til ]
 description: "Understanding how root works in linux and what it means for containers."
@@ -162,3 +162,9 @@ Similarly, K8S also allows you to fine-tune the seccomp profile using the securi
 as [given here](https://kubernetes.io/docs/tutorials/security/seccomp/).
 
 ### Rootless containers
+
+So far, we have been focused on reducing the privileges of root inside the container. However, there is a relatively new
+concept called "rootless containers". Rootless containers allow you to run container as unprivileged users! This is made
+possible by using the user namespace. A user namespace isolates the user/group ids and capabilities! So a process inside the user
+namespace can be root (UID 0) and have all capabilities, but on the host, it is mapped to an unprivileged user and has
+no capabilities.
