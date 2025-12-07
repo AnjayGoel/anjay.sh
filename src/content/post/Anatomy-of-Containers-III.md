@@ -219,15 +219,18 @@ This does a couple of things:
 
 Note that you will still need to run the binary itself with `sudo`, as we need root privileges for operations such as
 setting up cgroups in the parent process/namespace. However, when you run `ps aux --forest` on the host, you will see
-that the actual containerized process is running as the unprivileged user, as shown below:
+that the actual containerized process is running as the unprivileged user, as shown below (pid: 60270):
 
-```shell
-USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
-root       21445  0.0  0.1  17140  6888 pts/3    S+   22:23   0:00              \_ sudo ./main run /bin/bash
-root       21446  0.0  0.0  17140  2604 pts/4    Ss   22:23   0:00                  \_ sudo ./main run /bin/bash
-root       21447  0.0  0.0 1225536 3812 pts/4    Sl   22:23   0:00                      \_ ./main run /bin/bash
-silverb+   21452  0.0  0.0 1225792 3812 pts/4    Sl   22:23   0:00                          \_ /home/silverbug/containers/main child /bin/bash
-silverb+   21457  0.0  0.1   8004  4108 pts/4    S+   22:23   0:00                              \_ /bin/bash
+```text
+USER         PID CMD
+root       60179  \_ sshd: silverbug [priv]
+silverb+   60227  |   \_ sshd: silverbug@pts/1
+silverb+   60228  |       \_ -bash
+root       60263  |           \_ sudo ./main run /bin/bash
+root       60264  |               \_ sudo ./main run /bin/bash
+root       60265  |                   \_ ./main run /bin/bash
+silverb+   60270  |                       \_ /home/silverbug/containers/main child /bin/bash
+silverb+   60275  |                           \_ /bin/bash
 ```
 
 More info on Docker's rootless mode can be found [here](https://docs.docker.com/engine/security/rootless/), and for
@@ -246,4 +249,4 @@ images) which describe how to build container images, the
 low-level ([runc](https://github.com/opencontainers/runc), crun) and high-level runtimes (containerd, CRI-O) which
 actually run the containers from the images and manage their lifecycle, and then there is K8S which delegates these
 responsibilities via standardized interfaces like the CRI for container runtimes, CNI for networking, and CSI for
-storage.
+storage, etc.
