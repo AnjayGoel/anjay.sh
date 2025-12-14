@@ -3,6 +3,9 @@ title: "Anatomy of Containers, Part I: They Are Just Fancy Processes!"
 publishDate: 2025-11-04 01:05:00 +0530
 tags: [ containers, docker, linux, kubernetes, til ]
 description: "Containers are, at their core, just processes. Let's take a look at the Linux primitives that make it possible"
+coverImage:
+  src: '../../assets/images/anatomy-of-containers/cover.png'
+  alt: 'Containers'
 ---
 
 A while ago, I stumbled upon some LinkedIn copy-pasta about Go 1.25 finally making `GOMAXPROCS` 'container-aware'.

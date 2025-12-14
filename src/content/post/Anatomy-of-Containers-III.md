@@ -3,6 +3,9 @@ title: "Anatomy of Containers, Part III: What's root, really?"
 publishDate: 2025-12-08 01:10:00 +0530
 tags: [ containers, docker, linux, kubernetes, til ]
 description: "Understanding how root privileges works in Linux and what it means for containers."
+coverImage:
+  src: '../../assets/images/anatomy-of-containers/cover.png'
+  alt: 'Containers'
 ---
 
 In [part one](https://anjay.sh/posts/anatomy-of-containers-i/)

@@ -3,6 +3,9 @@ title: "Anatomy of Containers, Part II: The Fancy Stuff"
 publishDate: 2025-11-04 01:10:00 +0530
 tags: [ containers, docker, linux, kubernetes, til ]
 description: "Taking a peek at how networking & filesystems are wired in containers with some hands-on examples."
+coverImage:
+  src: '../../assets/images/anatomy-of-containers/cover.png'
+  alt: 'Containers'
 ---
 
 In [part one](https://anjay.sh/posts/anatomy-of-containers-i/), we built a bare-bones container. To make it truly useful, we must handle a few essential components like
