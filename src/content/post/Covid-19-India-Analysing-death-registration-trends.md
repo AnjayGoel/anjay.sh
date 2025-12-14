@@ -4,7 +4,7 @@ publishDate: 2021-06-14 20:50:00 +0530
 tags: [ covid ]
 description: "How Reliable Are Official Figures? You must have asked this to yourself at some point. Well, this post might give you some answers."
 coverImage:
-  src: '../../assets/images/covid_19_india/header.png'
+  src: '../../assets/images/covid-19-india/cover.png'
   alt: 'covid-19-india'
 ---
 
@@ -91,13 +91,13 @@ Fun fact, its the second oldest city civic body in the world after the City of L
     * **Our Data (2018):** ~162, Can chalk it up to various factors, but pretty close, so it doesn't really matter.
       Implying the data is exhaustive.
 
-![Chennai Death Registrations 2016-Present](../../assets/images/covid_19_india/chennai_16_21.png)
+![Chennai Death Registrations 2016-Present](../../assets/images/covid-19-india/chennai_16_21.png)
 
 * Data appears to be a bit irregular pre May 2018, put smoothed out later. Nevertheless, We have already tallied with
   census data, so this is not a matter of concern.
 * Visualisation doesn't suggest any significant seasonal component. Series normally oscillates around 170-200 range.
 
-![Chennai Death Registrations 2020-2021](../../assets/images/covid_19_india/chennai_20_21.png)
+![Chennai Death Registrations 2020-2021](../../assets/images/covid-19-india/chennai_20_21.png)
 
 * The surge around the first Covid wave is very apparent. Interestingly a slight dip can be observed post national
   lockdown and pre first wave. Probably because lockdown reduced transmission of other deceased, prevented more
@@ -105,13 +105,13 @@ Fun fact, its the second oldest city civic body in the world after the City of L
 * Daily deaths reached a peak of around 300 per day in first wave, and continued above 200 there after, until march
   2021, when unfortunately second wave stricked.
 
-![Chennai Death Registrations 2021](../../assets/images/covid_19_india/chennai_21.png)
+![Chennai Death Registrations 2021](../../assets/images/covid-19-india/chennai_21.png)
 
 * Daily deaths reached a peak of ~600 mark during the second wave, decreasing then onward.
 
 **Comparing to reported Covid death tolls:**
 
-![Chennai Death Registrations Comparison with Covid Death Tolls](../../assets/images/covid_19_india/chennai_cmp.png)
+![Chennai Death Registrations Comparison with Covid Death Tolls](../../assets/images/covid-19-india/chennai_cmp.png)
 
 * The sudden spike in Jul-20 may be due to sudden accounting of Covid death tolls.
 
@@ -120,7 +120,7 @@ Fun fact, its the second oldest city civic body in the world after the City of L
 
 Lets add whole of Tamil Nadu for comparison:
 
-![Chennai Death Registrations Comparison with Covid Death Tolls](../../assets/images/covid_19_india/chennai_cmp_2.png)
+![Chennai Death Registrations Comparison with Covid Death Tolls](../../assets/images/covid-19-india/chennai_cmp_2.png)
 
 ### Kolkata
 
@@ -137,7 +137,7 @@ are comparing stats for same geography.
     * **Census data (2018):** 68090/365 ~ 186
     * **Our Data (2018):** ~190, pretty close
 
-![Kolkata Death Registrations 2016-Present](../../assets/images/covid_19_india/kolkata_16_21.png)
+![Kolkata Death Registrations 2016-Present](../../assets/images/covid-19-india/kolkata_16_21.png)
 
 * Clear and strong seasonal trends can be observed for Kolkata death registrations, i.e. the spikes around start of the
   years. Again maybe due to winters.
@@ -145,18 +145,18 @@ are comparing stats for same geography.
 * An increase in death registrations in July 2020 can be observed, followed by a few ups and downs before the final
   spike of April-May this year.
 
-![Kolkata Death Registrations 2016-Present](../../assets/images/covid_19_india/kolkata_20_21.png)
+![Kolkata Death Registrations 2016-Present](../../assets/images/covid-19-india/kolkata_20_21.png)
 
 * Death registrations remained above 200 per day flowing July 2020, before dropping down to ~150 in March 2021,
   following which the second wave hit.
 
-![Kolkata Death Registrations 2016-Present](../../assets/images/covid_19_india/kolkata_21.png)
+![Kolkata Death Registrations 2016-Present](../../assets/images/covid-19-india/kolkata_21.png)
 
 * During the second wave, the daily death registrations hit a peak of about 500 mark, decreasing then onward.
 
 **Comparing it to reported Covid death tolls:**
 
-![Kolkata Death Registrations Comparison](../../assets/images/covid_19_india/kolkata_cmp.png)
+![Kolkata Death Registrations Comparison](../../assets/images/covid-19-india/kolkata_cmp.png)
 
 * The sudden spike in April-20 may be due to sudden accounting of Covid death tolls.
 * While the death registrations remained well above 200 per day for most of the 2020, reported Covid death tolls rarely
@@ -167,7 +167,7 @@ are comparing stats for same geography.
 
 Lets add whole of West Bengal for comparison, just for fun:
 
-![Kolkata Death Registrations Comparison](../../assets/images/covid_19_india/kolkata_cmp_2.png)
+![Kolkata Death Registrations Comparison](../../assets/images/covid-19-india/kolkata_cmp_2.png)
 
 ### Delhi
 
@@ -188,22 +188,22 @@ It encompasses whole of Delhi. So again no worries here, we are indeed comparing
       areas covered, website not updated regularly etc (In fact the municipal corporation websites changed around may
       2020). The argument that we are undercounting at best still remains.
 
-![Delhi Death Registrations 2016-Present](../../assets/images/covid_19_india/delhi_16_21.png)
+![Delhi Death Registrations 2016-Present](../../assets/images/covid-19-india/delhi_16_21.png)
 
 * Some seasonal components can be noticed. Minor spikes around start of the every year. Due to winter maybe.
 * Series normally oscillates around 300-400 mark. Touching 500 around start of the years.
 * Three spikes in 2020-2021 are clearly visible (Mid July 2020, Mid November 2020 and the mayhem of mid May 2021) .
 * Here too a slight dip can be observed post national lockdown and pre first wave.
 
-![Delhi Death Registrations 2020-2021](../../assets/images/covid_19_india/delhi_20_21.png)
+![Delhi Death Registrations 2020-2021](../../assets/images/covid-19-india/delhi_20_21.png)
 
-![Delhi Death Registrations 2021-Present](../../assets/images/covid_19_india/delhi_21.png)
+![Delhi Death Registrations 2021-Present](../../assets/images/covid-19-india/delhi_21.png)
 
 * Daily deaths reached a peak of around 2000 per day in May 2021.
 
 **Comparing it to reported Covid death tolls:**
 
-![Delhi Death Registrations Comparison](../../assets/images/covid_19_india/delhi_cmp.png)
+![Delhi Death Registrations Comparison](../../assets/images/covid-19-india/delhi_cmp.png)
 
 * The sudden spike in late may might be due to sudden accounting of Covid death tolls.
 * The first spike of late may, death registrations nearly double, crossing the 500 mark. Official toll kept reporting a
@@ -220,22 +220,22 @@ It encompasses whole of Delhi. So again no worries here, we are indeed comparing
 
 Pre Covid Age Distribution (2016-2020) of Deceased.
 
-![Delhi Death Registrations Breakdown By Age](../../assets/images/covid_19_india/hist_delhi_16_20.png)
+![Delhi Death Registrations Breakdown By Age](../../assets/images/covid-19-india/hist_delhi_16_20.png)
 
 * The histogram has some irregular spikes, may be due to binning the data, or perhaps how age of deceased is reported,
   Anyway a spike on zero indicates infant moralities. Quite disheartening to see it surpass every age group.
 
 * Now lets see the distribution overtime.
 
-![Delhi Death Registrations Breakdown By Age](../../assets/images/covid_19_india/hist_delhi_20_21.png)
+![Delhi Death Registrations Breakdown By Age](../../assets/images/covid-19-india/hist_delhi_20_21.png)
 
-![Delhi Death Registrations Breakdown By Age](../../assets/images/covid_19_india/hist_delhi_21_present.png)
+![Delhi Death Registrations Breakdown By Age](../../assets/images/covid-19-india/hist_delhi_21_present.png)
 
 * A significant shift towards older age group can be observed.
 
 ###### Another Bonus - Composition Of Place Of Death
 
-![Delhi Death Registrations - Place of Death](../../assets/images/covid_19_india/delhi_place_of_death.png)
+![Delhi Death Registrations - Place of Death](../../assets/images/covid-19-india/delhi_place_of_death.png)
 
 ## Conclusion
 

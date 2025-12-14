@@ -4,6 +4,9 @@ publishDate: 2024-05-12 00:00:00 +0530
 tags: [ flutter,programming ]
 description: "Issue with the way flutter handles federated plugins"
 slug: Flutters-Cross-Platform-Dependency-Hell-Part-I
+coverImage:
+  src: '../../assets/images/flutter-dependency/flutter.png'
+  alt: 'Flutter'
 ---
 
 ```

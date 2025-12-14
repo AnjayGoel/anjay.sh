@@ -3,6 +3,9 @@ title: "A Developer's Guide to Domains and DNS"
 publishDate: 2024-10-20 17:30:00 +0530
 tags: [ til, dns ]
 description: "Deep dive into how domains and DNS work with some hands-on examples using dig"
+coverImage:
+  src: '../../assets/images/dns/cover.png'
+  alt: 'DNS'
 ---
 
 I recently moved this blog from GitHub to its own domain, and I was surprised to see how streamlined and fast the whole

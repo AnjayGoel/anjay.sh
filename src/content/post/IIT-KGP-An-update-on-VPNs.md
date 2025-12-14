@@ -31,6 +31,6 @@ PS: You can set up the black-list / white-list in the [official WireGuard androi
 
 WireGuard speed test on LAN:
 
-![Speed Test](../../assets/images/iit_kgp_vpn_update/speed_test.png)
+![Speed Test](../../assets/images/iit-kgp-vpn-update/speed_test.png)
 
 Now that we have figured out how to run WireGuard, I suspect there is a way to pass one WireGuard tunnel over the other. Thus removing the need to use a hotspot. If someone figures it out, please comment below.

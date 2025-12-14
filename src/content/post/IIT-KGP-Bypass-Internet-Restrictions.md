@@ -4,7 +4,7 @@ publishDate:   2021-11-16 01:20:00 +0530
 tags: [how-to,iit-kgp]
 description: "Bypassing Network Restrictions Via A Self Hosted VPN Server"
 coverImage:
-  src: "../../assets/images/iit_kgp_vpn/header.jpg"
+  src: "../../assets/images/iit-kgp-vpn/cover.jpg"
   alt: "IIT KGP VPN"
 slug: "IIT-KGP-Bypass-Internet-Restrictions"
 ---
@@ -104,13 +104,13 @@ slug: "IIT-KGP-Bypass-Internet-Restrictions"
 
 Speed test results for Central India based server:
 
-![Speed Test Results](../../assets/images/iit_kgp_vpn/speed_test_2.png)
+![Speed Test Results](../../assets/images/iit-kgp-vpn/speed_test_2.png)
 
 
 
 Speed test results for South-East Asia.
 
-![Speed Test Results](../../assets/images/iit_kgp_vpn/speed_test.png)
+![Speed Test Results](../../assets/images/iit-kgp-vpn/speed_test.png)
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The speed is more than enough for most people. I have used it to browse the web, stream content in full HD, and download torrents without any issues so far. And remember, you can choose to only use VPN on selected apps such as messaging apps, browsers, etc., and still enjoy full speeds on other apps.
 

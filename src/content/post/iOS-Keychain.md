@@ -3,6 +3,9 @@ title: "iOS Keychain: It's Not a Bug It's a Feature"
 publishDate: 2024-09-07 19:30:00 +0530
 tags: [ til, iOS, programming ]
 description: "Unintended behavior of iOS keychain that lets apps persist data even after uninstallation"
+coverImage:
+  src: '../../assets/images/ios-keychain/cover.png'
+  alt: 'iOS Keychain'
 ---
 
 A while ago at work, I ran into a situation where we had to disable backup & restore for our app. We had to make

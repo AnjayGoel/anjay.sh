@@ -4,6 +4,9 @@ publishDate: 2024-05-12 00:00:01 +0530
 tags: [ flutter,programming ]
 description: "Flutter pub doesn't play well with CocoaPods"
 slug: Flutters-Cross-Platform-Dependency-Hell-Part-II
+coverImage:
+  src: '../../assets/images/flutter-dependency/flutter.png'
+  alt: 'Flutter'
 ---
 
 In the last blog post, I wrote about how flutter includes all the platform-specific implementations in the dependency
