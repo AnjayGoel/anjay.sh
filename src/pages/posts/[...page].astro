@@ -7,7 +7,7 @@ import PageLayout from "@/layouts/Base.astro";
 import type { GetStaticPaths, Page } from "astro";
 
 export const getStaticPaths = (async ({ paginate }) => {
-	const MAX_POSTS_PER_PAGE = 8;
+	const MAX_POSTS_PER_PAGE = 1000;
 	const allPosts = await getAllPosts();
 	const allPostsByDate = sortMDByDate(allPosts);
 	const uniqueTags = getUniqueTags(allPosts);
