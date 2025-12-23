@@ -22,7 +22,7 @@ end up taking us several days to figure out and resolve.
 
 ### The Issue We Couldn't Just See
 
-See, There was no trace of the issue. Nothing popped up in Crashlytics, nothing in our backend logs. And given the
+See, there was no trace of the issue. Nothing popped up in Crashlytics, nothing in our backend logs. And given the
 volume of
 tickets we were getting, it should have had an impact on some of our product metrics as well, but nothing there either.
 Even the CDN showed no drop in traffic! It was as if the issue didn't exist, except for the flood of support tickets we
@@ -61,7 +61,7 @@ As a final Hail Mary, we decided to push an app release adding some instrumentat
 hostnames were resolving to on the user's devices. And that's when we found it. For some small single-digit percentage
 of our users in India, the CDN host was resolving to an IP address that didn't look very familiar. It was located in the
 US and WHOIS records showed that it didn't belong to our CDN provider. Not only that, the resolved IP was not even
-reachable on the user's network. Further, mixpanel was also resolving to 0.0.0.0 for these users.
+reachable on the user's network. Further, Mixpanel was also resolving to 0.0.0.0 for these users.
 
 After some back-and-forth with our CDN provider, we found out that the IP did indeed belong to one of their edge nodes
 in the US, but the DNS was not supposed to resolve to that node for Indian users. They couldn't replicate the DNS
@@ -82,11 +82,11 @@ Point of Presence (PoPs, the servers closest to the user):
 2. **Anycast**: Multiple servers advertise the same IP address and routing magic delivers the traffic to the
    nearest one
 
-Upon thinking carefully about the first approach, you would realize something I only learned after this incident: How
-does the authoritative DNS server know where the client is? Does the DNS resolver pass the client IP to the
-authoritative DNS server? Well, it doesn't in most cases, except when you are using EDNS (Extended DNS), which allows
-the DNS resolver to pass a client subnet to the DNS server. Because of privacy concerns, most public DNS servers don't
-pass this info to the resolvers (except Google's DNS, of course).
+There is something you would realize only upon thinking carefully about the first approach, something I only learned
+after this incident: How does the authoritative DNS server know where the client is? Does the DNS resolver pass the
+client IP to the authoritative DNS server? Well, it doesn't in most cases, except when you are using EDNS (Extended
+DNS), which allows the DNS resolver to pass a client subnet to the DNS server. Because of privacy concerns, most public
+DNS servers don't pass this info to the resolvers (except Google's DNS, of course).
 
 So how does GeoDNS work then? It relies on the IP of the DNS resolver itself, that is, your DNS resolver being close to
 you geographically! But what if it's not? Is this what happened here? I don't know. Is it possible? Yes.
