@@ -16,17 +16,16 @@ show up in any of your logs, crashes, or analytics, and has no visible impact on
 ## The Problem
 
 This happened a couple of weeks ago. Out of nowhere, we started getting a lot of complaints from users about videos not
-loading at all. One, two, three, and soon we had a flood of support tickets. Usually when something like this happens,
+loading at all. One, two, three, and soon we had a flood of support tickets. Usually, when something like this happens,
 it's our own mess-up, most often in the latest app release. But this particular instance was different, and it would
 end up taking us several days to figure out and resolve.
 
 ### The Issue We Couldn't Just See
 
 See, there was no trace of the issue. Nothing popped up in Crashlytics, nothing in our backend logs. And given the
-volume of
-tickets we were getting, it should have had an impact on some of our product metrics as well, but nothing there either.
-Even the CDN showed no drop in traffic! It was as if the issue didn't exist, except for the flood of support tickets we
-were getting.
+volume of tickets we were getting, it should have had an impact on some of our product metrics as well, but nothing
+there either. Even the CDN showed no drop in traffic! It was as if the issue didn't exist, except for the flood of
+support tickets we were getting.
 
 The only thing we could figure out was that none of the users who raised a support ticket had any events in Mixpanel!
 This was too big a coincidence to ignore.
@@ -39,14 +38,14 @@ confidence about this being an ISP-specific issue. We had a hunch, but no way to
 
 ## Days of Debugging
 
-With nothing else to go on, we decided to revert the latest release, even though tickets from older app versions were
+With nothing else to go on, we decided to revert the last release, even though tickets from older app versions were
 starting to pop up as well. In the meantime, we checked every PR, every small change, either in the app or the backend
 that could have caused this, but found nothing.
 
 After two days of debugging, we were back to square one, completely blind. Not only did we not know why this was
-happening, we also had no idea about the scale of the issue. We would eventually start seeing some tickets where this
-would happen intermittently for the users. Again, the same pattern emerging. It would work when the user switched to a
-different network from Jio, and we would start getting their Mixpanel events as well.
+happening, but we also had no idea about the scale of the issue. We would eventually start seeing some tickets where
+this would happen intermittently for the users. Again, the same pattern was emerging. It would work when the user
+switched to a different network from Jio, and we would start getting their Mixpanel events again as well.
 
 With nothing else to go on, we decided to call some of the impacted users and ask them a set of questions, going as far
 as giving them raw video links to see if it worked for them, ruling out any app or backend issues. This had mixed
@@ -57,7 +56,7 @@ cannot just ring the ISP and ask them to fix their own stuff, right?
 
 ## The Breakthrough
 
-As a final Hail Mary, we decided to push an app release adding some instrumentation around what IPs our critical
+As a final Hail Mary, we decided to push an app release, adding some instrumentation around what IPs our critical
 hostnames were resolving to on the user's devices. And that's when we found it. For some small single-digit percentage
 of our users in India, the CDN host was resolving to an IP address that didn't look very familiar. It was located in the
 US and WHOIS records showed that it didn't belong to our CDN provider. Not only that, the resolved IP was not even
@@ -70,8 +69,8 @@ remove the US node from the DNS itself. And that seemed to do the trick.
 
 As for why it happened in the first place, we still don't know. The fact that the host unreachability error never
 surfaced anywhere in the app is surely an oversight on our part. But nevertheless, I finally understand when people joke
-and say "It's always the DNS." It's ubiquitous, sneaky, and not something you would think of adding instrumentation for,
-until it breaks, that is.
+and say, "It's always the DNS." It's ubiquitous, sneaky, and not something you'd think to add instrumentation for, until
+it breaks, that is.
 
 ### Who Was The Culprit?
 
