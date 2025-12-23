@@ -78,7 +78,7 @@ I do have a few hunches about how this could have happened. There are two popula
 Point of Presence (PoPs, the servers closest to the user):
 
 1. **GeoDNS**: The DNS server itself resolves the hostname to an IP address of servers closest to the client
-2. **Anycast**: Multiple servers advertise the same IP address and routing magic delivers the traffic to the
+2. **Anycast**: Multiple servers advertise the same IP address, and routing magic delivers the traffic to the
    nearest one
 
 There is something you would realize only upon thinking carefully about the first approach, something I only learned
