@@ -1,10 +1,8 @@
 ---
 title: "Debugging In The Dark"
-publishDate: 2025-12-20 01:10:00 +0530
+publishDate: 2025-12-24 11:24:00 +0530
 tags: [ dns, networking ]
 description: "TL;DR: It was the DNS, it's always the DNS."
-src: '../../assets/images/anatomy-of-containers/cover.png'
-alt: 'DNS'
 ---
 
 
@@ -22,33 +20,33 @@ end up taking us several days to figure out and resolve.
 
 ## The Issue We Couldn't Just See
 
-See, there was no trace of the issue. Nothing popped up in Crashlytics, nothing in our backend logs. And given the
-volume of tickets we were getting, it should have had an impact on some of our product metrics as well, but nothing
-there either. Even the CDN showed no drop in traffic! It was as if the issue didn't exist, except for the flood of
-support tickets we were getting.
+See, there was no trace of the issue. Nothing out of the ordinary popped up in Crashlytics, nor in our backend logs. And
+given the volume of tickets we were getting, it should have had an impact on some of our product metrics as well, but
+nope, it didn't. Even the CDN showed no drop in traffic! It was as if the issue didn't exist, except for the flood of
+support tickets we were getting. We tried to replicate the issue across different devices, OS versions, and
+networks. Not a single failure. Everything worked fine.
 
 The only thing we could figure out was that none of the users who raised a support ticket had any events in Mixpanel! It
-was too big a coincidence to ignore.
+was too big a coincidence to ignore. It also further complicated things, as we had no way to figure out the user journey
+that could have helped in replicating the issue.
 
-We tried to replicate the issue across different devices, OS versions, and networks. Nothing. Everything worked fine.
+## Days Of Debugging
 
-However, another common pattern was emerging: most, if not all, of the impacted users were on the Jio network. We tried
-to replicate it on quite a few devices on Jio networks. Nothing again! The fact that we couldn't replicate it shook our
-confidence about this being an ISP-specific issue. We had a hunch, but no way to prove it.
+Eventually, we also observed another common pattern: Almost all of the users who raised a support ticket were using Jio
+as their ISP! We attempted to replicate it on several devices using Jio, but still no luck! The fact that we couldn't
+replicate it shook our confidence about this being an ISP-specific issue. We had a hunch, but no way to prove it.
 
-## Days of Debugging
-
-With nothing else to go on, we decided to roll back the last release, even though tickets from older app versions were
-starting to pop up as well. In the meantime, we checked every PR, every small change, either in the app or the backend
-that could have caused this, but found nothing.
+Out of options, we decided to roll back the last release, even though tickets from older app versions were starting to
+pop up as well. In the meantime, we checked every PR, every small change, either in the app or the backend that could
+have caused this, but came up empty.
 
 After two days of debugging, we were back to square one, completely at a loss. Not only did we not know why this was
-happening, but we also had no idea about the scale of the issue. Eventually, We would start seeing some tickets where
-this would happen intermittently for the users. Again, the same pattern was emerging. It would work when the user
+happening, but we also had no idea about the scale of the issue. Eventually, we would start seeing some tickets where
+this would happen intermittently for the users. Again, the same pattern. It would work when the user
 switched to a different network from Jio, and we would start getting their Mixpanel events again as well.
 
-With nothing else to go on, we decided to call some of the impacted users and ask them a set of questions, going as far
-as giving them raw video links to see if it worked for them, ruling out any app or backend issues. This had mixed
+Desperate for some clues, we decided to call some of the impacted users and ask them a set of questions, going as far as
+giving them raw video links to see if it worked for them, ruling out any app or backend issues. This had mixed
 results, but was strong enough to reinforce our hunch that this was indeed an ISP-specific issue.
 
 But we didn't have any concrete proof yet. And even if we did, what next? Can we even do anything? You cannot just ring
@@ -56,8 +54,8 @@ the ISP and ask them to fix their own stuff.
 
 ## The Breakthrough
 
-As a final Hail Mary, we decided to push an app release, adding some instrumentation around what IPs our critical
-hostnames were resolving to on the user's devices. And that's when we found it. For some small single-digit percentage
+As a final Hail Mary, we decided to push an app release with some instrumentation to track what IPs our critical
+hostnames were resolving to on user devices. And that's when we found it. For some small single-digit percentage
 of our users in India, the CDN host was resolving to an IP address that didn't look very familiar. It was located in the
 US and WHOIS records showed that it didn't belong to our CDN provider. Not only that, the resolved IP was not even
 reachable on the user's network. Further, Mixpanel was also resolving to 0.0.0.0 for these users.
@@ -68,8 +66,8 @@ resolution issue using a few public DNS servers either. But they were kind enoug
 remove the US node from the DNS itself. And that did the trick.
 
 As for why it happened in the first place, we still don't know. The fact that the host unreachability error never
-surfaced anywhere in the app is surely an oversight on our part. But nevertheless, I finally understand when people joke
-and say, "It's always the DNS." It's ubiquitous, sneaky, and not something you'd think to add instrumentation for, until
+surfaced anywhere in the app is surely an oversight on our part. Nevertheless, I finally understand why people joke
+that "It's always the DNS." It's ubiquitous, sneaky, and not something you'd think to add instrumentation for, until
 it breaks, that is.
 
 ## Who Was The Culprit?
@@ -83,18 +81,16 @@ Point of Presence (PoPs, i.e., edge location closest to the user):
    routing magic delivers the traffic to the
    nearest one
 
-There's something subtle about this first approach that only becomes obvious when you think about it carefully,
-something I learned only after this incident.
-
-How does the authoritative DNS server know where the client is? Does the DNS resolver pass the client IP to the
-authoritative DNS server?
+There's something subtle about this first approach that's not very obvious, something I learned only after this
+incident. How does the authoritative DNS server know where the client is? Does the DNS resolver pass the client IP to
+the authoritative DNS server?
 
 In most cases, it doesn't. The only exception is
 when [EDNS Client Subnet (ECS)](https://en.wikipedia.org/wiki/EDNS_Client_Subnet) is used, which allows the resolver to
 include a truncated client subnet in the DNS
 query [for better routing](https://engineering.salesforce.com/why-is-edns-important-for-content-delivery-85f5690744ba/).
-Because of privacy concerns, most public DNS servers don't use it (except Google's DNS, of course).
+Due to privacy concerns, many DNS servers, particularly those owned by ISPs, don't use it.
 
 So how does GeoDNS work then? It relies on the IP address of the DNS resolver itself; in other words, it assumes that
 your DNS resolver is geographically close to you! But what if it's not? Is this what happened here? I don't know, but
-it's the best possible explanation I can come up with.
+it's the best possible explanation I could come up with.
