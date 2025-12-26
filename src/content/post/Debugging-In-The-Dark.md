@@ -59,7 +59,9 @@ As the final Hail Mary, we pushed an app release with instrumentation to track t
 our critical services on user devices. And that's when we found it. For some small single-digit percentage
 of our users in India, the CDN host was resolving to an IP address that didn't look very familiar. It was located in the
 US and WHOIS records showed that it didn't belong to our CDN provider. Not only that, the resolved IP was not even
-reachable on the user's network. Further, Mixpanel was also resolving to 0.0.0.0 for these users.
+reachable on the user's network. Further, Mixpanel was also resolving to 0.0.0.0 for these users. Unfortunately,
+both our video player implementation and Mixpanel integration silently swallowed these host reachability failures, so
+the issue never surfaced anywhere.
 
 After some back-and-forth with our CDN provider, we found out that the IP did indeed belong to one of their edge nodes
 in the US. Still, the DNS was not supposed to resolve to that node for Indian users. They couldn't replicate the DNS
