@@ -92,7 +92,8 @@ query [for better routing](https://engineering.salesforce.com/why-is-edns-import
 Due to privacy concerns, many DNS servers, particularly those owned by ISPs, don't use it.
 
 So how does GeoDNS work then? It relies on the IP address of the DNS resolver itself; in other words, it assumes that
-your DNS resolver is geographically close to you! But what if it's not? Is this what happened here? I don't know, but
-it's the best possible explanation I could come up with. Nevertheless, I finally understand why people joke
-that "It's always the DNS." It's ubiquitous, sneaky, and not something you'd think to add instrumentation for, until_
-it breaks, that is.
+your DNS resolver is geographically close to you! But what if it's not?
+
+Is this what happened here? I don't know. But it's the best possible explanation I could come up with. Nevertheless, I
+finally understand why people joke that "It's always the DNS." It's ubiquitous, sneaky, and not something you'd think to
+add instrumentation for, until it breaks, that is.
