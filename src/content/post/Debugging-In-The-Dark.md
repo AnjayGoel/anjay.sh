@@ -20,7 +20,8 @@ end up taking us several days to figure out and resolve.
 
 ## The Issue We Couldn't Just See
 
-See, there was no trace of the issue. Nothing out of the ordinary popped up in Crashlytics, nor in our backend logs. And
+You see, there was no trace of the issue. Nothing out of the ordinary popped up in Crashlytics, nor in our backend logs.
+And
 given the volume of tickets we were getting, it should have had an impact on some of our product metrics as well, but
 nope, it didn't. Even the CDN showed no drop in traffic! It was as if the issue didn't exist, except for the flood of
 support tickets we were getting. We tried to replicate the issue across different devices, OS versions, and
@@ -54,8 +55,8 @@ the ISP and ask them to fix their own stuff.
 
 ## The Breakthrough
 
-As a final Hail Mary, we decided to push an app release with some instrumentation to track what IPs our critical
-hostnames were resolving to on user devices. And that's when we found it. For some small single-digit percentage
+As the final Hail Mary, we pushed an app release with instrumentation to track the DNS resolutions for the hostnames of
+our critical services on user devices. And that's when we found it. For some small single-digit percentage
 of our users in India, the CDN host was resolving to an IP address that didn't look very familiar. It was located in the
 US and WHOIS records showed that it didn't belong to our CDN provider. Not only that, the resolved IP was not even
 reachable on the user's network. Further, Mixpanel was also resolving to 0.0.0.0 for these users.
@@ -63,17 +64,14 @@ reachable on the user's network. Further, Mixpanel was also resolving to 0.0.0.0
 After some back-and-forth with our CDN provider, we found out that the IP did indeed belong to one of their edge nodes
 in the US. Still, the DNS was not supposed to resolve to that node for Indian users. They couldn't replicate the DNS
 resolution issue using a few public DNS servers either. But they were kind enough to change the routing configuration to
-remove the US node from the DNS itself. And that did the trick.
-
-As for why it happened in the first place, we still don't know. The fact that the host unreachability error never
-surfaced anywhere in the app is surely an oversight on our part. Nevertheless, I finally understand why people joke
-that "It's always the DNS." It's ubiquitous, sneaky, and not something you'd think to add instrumentation for, until
-it breaks, that is.
+remove the US node from the DNS itself. And that did the trick. The faulty resolutions dropped soon, support
+tickets stopped coming in and things went back to normal again.
 
 ## Who Was The Culprit?
 
-I do have a few hunches about how this could have happened. There are two popular ways CDNs route traffic to the nearest
-Point of Presence (PoPs, i.e., edge location closest to the user):
+As for why it happened in the first place, we still don't know. But, I do have a few hunches about how it though. For a
+bit of context, there are two popular ways CDNs route traffic to the nearest Point of Presence (PoPs, i.e., edge
+location closest to the user):
 
 1. **[GeoDNS](https://en.wikipedia.org/wiki/GeoDNS)**: The DNS server itself resolves the hostname to an IP address of
    servers closest to the client
@@ -93,4 +91,6 @@ Due to privacy concerns, many DNS servers, particularly those owned by ISPs, don
 
 So how does GeoDNS work then? It relies on the IP address of the DNS resolver itself; in other words, it assumes that
 your DNS resolver is geographically close to you! But what if it's not? Is this what happened here? I don't know, but
-it's the best possible explanation I could come up with.
+it's the best possible explanation I could come up with. Nevertheless, I finally understand why people joke
+that "It's always the DNS." It's ubiquitous, sneaky, and not something you'd think to add instrumentation for, until_
+it breaks, that is.
