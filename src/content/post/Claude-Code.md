@@ -1,48 +1,95 @@
 ---
-title: "I Left Claude Code Run Wild For A Few Days"
+title: "Letting Claude Code Run Wild For A Few Days"
 publishDate: 2026-04-28 01:50:00 +0530
 tags: [ programming ]
 description: "Long running agents are powerful"
 ---
 
+Late on last Sunday night, I'd just wrapped up some work, and in my half-sleepy state I got an itch to do something "fun".
+While it's not unusual to feel so from time to time, what's changed is that code is cheap now. Putting together a
+shabby piece of code that just works is one prompt away. So I decided to do something I'd been wanting to do for a
+while: porting our entire app from Flutter to KMP.
 
-Late night last sunday, I just wrapped up some work, And in my half sleepy state, I get an itch to do something "fun"
-While it's not unusual to feel so from time to time, what's changed is that code is cheap now, putting togather a shabby
-piece of code that just works is one prompt away. So I decided to do something, that I have been wanting to do for a
-while: Porting our entire app from Flutter to KMP.
+To give a bit of context, when we started three years ago Flutter fit our use-case very well. Over time, our
+requirements & constraints changed, and Flutter didn't feel like the best fit anymore, but it stuck. The expertise we
+had built & the time & bandwidth it would take to learn a new framework & build an entire app from scratch with a
+tight deadline made it infeasible to switch.
 
-To give a bit of context, When we started three years ago, we had different
-requirements & constrains, and flutter fit well into the picture. Over time, those requirements & constrained
-changed, and now flutter didn't feel like the best fit, but it stuck. The expertise we had built &
-the time & bandwidth it would take to learn a new framework & build an entire app from scratch with a tight deadline
-made it infeasible to switch.
+So in my sleep-induced creativity, I prompted claude code to make a KMP app, cloning the very basic functionalities:
+the home screen & the video player screen (reels screen, as we call it). I gave it access to the original codebase,
+seeded it with some screenshots of the app, spawned up an emulator & let it do its thing. And in 10 mins, it got back
+to me with a working clone, obviously with very limited functionality, but it worked. The home screen populated via
+the API calls, the reels screen working with basic player controls. And it performed better than our Flutter app!
 
-So in my sleep induced creativity, I prompted claude code to make a KMP app, clone the very basic functionalities: The
-home screen & the video player screen (reels screen, as we call it). I gave it access to the original codebase & seeded
-it with some screenshots of the app, spawned up an emulator & let it do its thing. And in 10 mins, it got back to me
-with a working clone. obviously with very limited functionality, but it worked, the homescreen populated via the API
-calls, the reels screen working with basic player controls. And it performed better than our flutter app!
+I spent the next half an hour or so adding more features, prompting it, giving it references, etc. It was making real
+progress. By this time, I was fully convinced it would be able to port the whole thing. But telling claude how to
+align a button gets boring quickly & I was sleepy. The progress it had made in that 30-40 mins was crazy, not
+something I'd have imagined three years ago. So I said f**k it, let me automate myself away as well. I spawned up
+another emulator, started the original app on it, asked claude to port everything, maintain a todo list, go feature
+by feature, take screenshots of the original app, port them & verify they work on the new app. After a few iterations
+of trial and error, I ended up with the setup described below, with claude obviously writing most of it.
 
-I spent the next half an hour or so, adding more features, prompting it, giving it references, etc. While it was making
-real progress, but telling claude how to align a button gets boring quickly & I was sleepy. But I had seen the progress
-it made in that 30-40 mins or so, it was crazy to say in the least, not something I would have imaging three years ago.
-So I said f**k it, let me automate myself away as well. I spawned up another emulator, started the original app on it,
-asked claude to port everything, maintain a todo list, go feature by feature & port everything.
+## The Long Running Agent Setup
 
-The Long Running Agent Setup:
-Claude code has recently introduced a loop feature to schedule automated tasks. I combined it with a loop.md file with
-detailed instructions about what to do in each iteration & a todo.md tracking the progress of the port. I also explained
-the basic structure of the original flutter app. Using these two + a claude md file ensured that the entire state of the
-jobs live in markdown fine and subsequent runs can easily pick it up.
+Claude Code recently introduced a `loop` feature to schedule automated tasks. I combined it with `caffeinate`, the
+`remote-control` Claude Code feature & `pmset displaysleepnow` (to turn off my Mac's display), making Claude Code a
+perfect long-running agent, doing stuff while I slept. The whole setup was a few markdown files that became the entire
+state of the run. Since the state lives in files, it survives a multi-day run, and the next iteration picks up exactly
+where the last one stopped.
 
-The loop.md file had several instructions:
+### `CLAUDE.md`
 
-* Covering breadth first, ensuring all user facing features are ported.
-* Port the logics, completely ignoring flutter implementation, adapting to KMP best practices.
-* Spawn subagents to do the multiple tasks in each run.
-* Every 10 commits or so, dispatch a code-review subagent & a UI-verification subagent
-* Never break the loop on transient errors, rate limits, 5xx.
-* Parking features that require human assistance & moving forward
+It tells claude about how the new codebase is laid out, the tech stack, its coding conventions. It also included
+details of the original Flutter project, its structure, features, the APIs, conventions etc.
 
-What's interesting is that overtime, claude code observed & improved the loop.md itself, adding more instructions, refining logics as
-well.
+### `TODO.md`
+
+The progress tracker for the port. Claude would spawn subagents to discover features, break them down into smaller
+tasks & add them to the TODO. Every finding, every subagent report, every blocker logged here before the next
+dispatch. A `## Requires human assistance` section for things genuinely outside the agent's reach. By the end it was
+~1200 lines long.
+
+### `LOOP.md`
+
+This is the heart of the whole execution: a ~200 line recurring prompt that claude re-read on every fire. It had the
+following structure:
+
+* Mission: a short one-paragraph statement of what we are doing, the north star, etc.
+* The iteration recipe: pick a task → port → verify on emulator side-by-side → tick todo → commit → schedule.
+* Standing directives: a huge list of rules like:
+    * Cover breadth over depth.
+    * Don't simply copy the code; adapt to KMP/Compose.
+    * Dispatch multiple subagents each working on different tasks.
+    * Original codebase is messy, think like a senior engineer would 😄
+    * Keep the loop alive.
+    * State lives in markdown entirely.
+* The guardrails: every ~20 commits, dispatch a code-review subagent + UI-verification subagent.
+* The "what if X happens" branches: explicit rules for handling things that could derail the loop, like transient
+  errors, rate limits, stuck subagents etc.
+* Codebase hygiene: basic sections on how to maintain code quality, what patterns to follow, etc.
+* The re-audit step: walk the original repo for anything missed, log it in `TODO.md` and continue.
+
+After a few iterations of finetuning the loop, the todo etc. (which BTW claude did itself with some prompting), I
+went to sleep. When I woke up, claude was still working! It had almost ported 40-50% of the entire app! I left it
+running for the next day, until it decided it was done. By the time it was, the codebase had ~40K lines of code
+spread across ~500 files, and the TODO file was ~1200 lines long. None of it written by hand.
+
+And the result? I'll let you decide. One of the videos below is the original & the other is the port done by claude.
+Can you tell which is which?
+
+I have been using it for the past week. The UI is pretty much identical. All the user-facing features are fully
+functional, and owing to it being "native", the app is substantially smoother. It's almost there! Now, I am not
+saying the codebase is perfect, or that the app is ready to ship to production. It's not. It couldn't get quite a
+few things to work correctly, but more often than not it was a tech-debt-ridden piece of code in the original
+codebase, with various nuances that were not documented properly. I also have no working knowledge of KMP. The
+instructions I gave were pretty much just "follow the best practices". Had someone with experience in KMP and a
+fairly opinionated idea of how the codebase should look prompted claude, I'm pretty sure it would have done an even
+better job. And honestly, most of it is better than what I would have written if I were given a short deadline to do
+the same.
+
+This is a far, far better starting point for when we actually decide to do it. And it took a single Claude Code
+instance two days! A small traditional engineering team working on it full-time would have easily taken a month or
+two. And I didn't even hit my weekly usage limits! Granted, this is somewhat an "easy task" for Claude. LLMs are good
+at following instructions, and taking one codebase & copying it over to another is a fairly structured task, with
+less ambiguity and decision-making involved. But it should still force us to take a hard look at how software
+engineering works. Adding LLMs into the equation breaks down a lot of it.
