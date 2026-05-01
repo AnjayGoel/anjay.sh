@@ -7,19 +7,19 @@ description: "I left Claude Code on autopilot for two days. It migrated our whol
 
 Late last Sunday night, I'd just wrapped up some work, and in my half-sleepy state I got an itch to do something "fun".
 While it's not unusual to feel that way from time to time, what's changed is that putting together a shabby piece of code that
-just works is one prompt away now. So I decided to do something I'd been wanting to do for a while: migrating our entire
+just works is a single prompt away now. So I decided to do something I'd been wanting to do for a while: migrating our entire
 app from Flutter to KMP.
 
 To give a bit of context, when we started three years ago, Flutter fit our use case very well. Over time, we launched
 a few more apps. Our requirements & constraints changed and Flutter didn't feel like the best fit anymore, but it stuck.
-Switching would have meant learning a framework and rebuilding an app under a short deadline, which was too expensive
+Switching would have meant learning a framework and rebuilding an entire app under a short deadline, which was too expensive
 to justify.
 
 So in my sleep-induced creativity, I prompted claude code to make a KMP app, cloning the most basic functionality:
 the home screen & the video player screen (reels screen, as we call it). I gave it access to the original codebase,
 seeded it with some screenshots of the app, spun up an emulator & let it do its thing. And in 10 mins, it got back
 to me with a working clone, obviously with very limited functionality, but it worked. The home screen populated via
-API calls; the reels screen worked with basic player controls. And it performed better than our Flutter app!
+API calls; the reels screen worked with basic player controls. And the video playback felt smoother than in our Flutter app!
 
 I spent the next half an hour or so adding more features, prompting it, giving it references, etc. It was making real
 progress. By this time, I was fully convinced it would be able to migrate the whole thing. But telling claude how to
