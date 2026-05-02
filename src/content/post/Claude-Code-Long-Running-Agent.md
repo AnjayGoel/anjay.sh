@@ -2,24 +2,26 @@
 title: "Letting Claude Code Run Wild For A Few Days"
 publishDate: 2026-05-02 03:20:00 +0530
 tags: [ programming,opinion ]
-description: "I left Claude Code on autopilot for two days. It migrated our whole app from Flutter to KMP"
+description: "A Claude Code long-running agent migrated our entire app from Flutter to KMP in two days"
 ---
 
 Late last Sunday night, I'd just wrapped up some work, and in my half-sleepy state I got an itch to do something "fun".
-While it's not unusual to feel that way from time to time, what's changed is that putting together a shabby piece of code that
-just works is a single prompt away now. So I decided to do something I'd been wanting to do for a while: migrating our entire
-app from Flutter to KMP.
+While it's not unusual to feel that way from time to time, what's changed is that putting together a shabby piece of
+code that just works is a single prompt away now. So I decided to do something I'd been wanting to do for a while:
+migrating our entire [app](https://play.google.com/store/apps/details?id=com.dashtoon.video.shortfree&hl=en_IN) from
+Flutter to KMP.
 
 To give a bit of context, when we started three years ago, Flutter fit our use case very well. Over time, we launched
 a few more apps. Our requirements & constraints changed and Flutter didn't feel like the best fit anymore, but it stuck.
-Switching would have meant learning a framework and rebuilding an entire app under a short deadline, which was too expensive
-to justify.
+Switching would have meant learning a framework and rebuilding an entire app under a short deadline, which was too
+expensive to justify.
 
 So in my sleep-induced creativity, I prompted claude code to make a KMP app, cloning the most basic functionality:
 the home screen & the video player screen (reels screen, as we call it). I gave it access to the original codebase,
-seeded it with some screenshots of the app, spun up an emulator & let it do its thing. And in 10 mins, it got back
+seeded it with some screenshots of the app, spun up an emulator & let it do its thing. And in ten minutes, it got back
 to me with a working clone, obviously with very limited functionality, but it worked. The home screen populated via
-API calls; the reels screen worked with basic player controls. And the video playback felt smoother than in our Flutter app!
+API calls; the reels screen worked with basic player controls. And the video playback felt smoother than in our Flutter
+app!
 
 I spent the next half an hour or so adding more features, prompting it, giving it references, etc. It was making real
 progress. By this time, I was fully convinced it would be able to migrate the whole thing. But telling claude how to
@@ -33,11 +35,11 @@ obviously writing most of it.
 
 ## The Long-Running Agent Setup
 
-Claude Code recently introduced a `loop` feature to schedule automated tasks. I combined it with `caffeinate`, the
-`remote-control` Claude Code feature & `pmset displaysleepnow` (to turn off my Mac's display), making Claude Code a
-perfect long-running agent, doing stuff while I slept. The setup had a few markdown files that became the entire
-state of the run. Since the state lives in files, it survives a multi-day run, and the next iteration picks up exactly
-where the last one stopped.
+Claude Code recently introduced a `loop` feature to schedule automated tasks. I combined it with Claude Code's
+`remote-control`, `caffeinate` (keeps the Mac awake) & `pmset displaysleepnow` (to turn off my Mac's
+display), making Claude Code a perfect long-running agent, doing stuff while I slept. The setup had a few markdown files
+that became the entire state of the run. Since the state lives in files, it survives a multi-day run, and the next
+iteration picks up exactly where the last one stopped.
 
 ### `CLAUDE.md`
 
@@ -92,18 +94,18 @@ functional, and owing to it being "native", the app is substantially smoother. I
 
 Now, I am not saying the codebase is perfect, or that the app is ready to ship to production. It's not. It couldn't
 get quite a few things to work correctly. But more often than not, the parts it had trouble migrating were heavily
-tech debt ridden with various nuances that were not documented properly in the original codebase. I also have no working knowledge
-of KMP either. The instructions I gave were pretty much just "follow the best practices". I'm pretty sure it would have done an
-even better job if someone with experience in KMP and a fairly opinionated idea of how the codebase should look prompted
-it. Still, most of the generated codebase is better than what I would have written if I were given a short deadline to
-do the same.
+tech debt ridden with various nuances that were not documented properly in the original codebase. I also have no working
+knowledge of KMP either. The instructions I gave were pretty much just "follow the best practices". I'm pretty sure it
+would have done an even better job if someone with experience in KMP and a fairly opinionated idea of how the codebase
+should look prompted it. Still, most of the generated codebase is better than what I would have written if I were given
+a short deadline to do the same.
 
-This is a far, far better starting point for when we actually decide to do it. And a single Claude Code instance did
-it in two days! A small traditional engineering team working on it full-time would have easily taken a month or two.
+This is a far, far better starting point for when we actually decide to do it. A small traditional engineering team
+working on it full-time would have easily taken a month to get here. A single Claude Code instance did it in two days!
 And I didn't even hit my weekly usage limits! Granted, this is somewhat of an "easy task" for claude. LLMs are, after
 all, good at following instructions, and taking one codebase & copying it over to another language is a fairly
 structured task, with comparatively less ambiguity and decision-making involved.
 
-But it should still force us to take a hard look at how engineering decisions get made and executed. The whole reason we
-stuck with Flutter is that switching was too expensive to justify. Once you factor in LLMs/Coding Assistants, calls like that don't look
-the same anymore, and most of the processes built around the old answers don't either.
+But it should still force us to take a hard look at how engineering decisions are made and executed. The whole reason we
+stuck with Flutter is that switching was too expensive to justify. Once you factor in LLMs/Coding Assistants, calls like
+that don't look the same anymore, and most of the processes built around the old answers don't either.
