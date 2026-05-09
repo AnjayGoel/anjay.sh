@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Anjay Goel — Software Engineer</title>
+<script>(()=>{try{const s=localStorage.getItem("anjay-theme");const d=window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=s||(d?"dark":"light");}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sans: 'General Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --sidebar-w: 240px;
+  --content-max: 640px;
+}
+:root[data-theme="light"] {
+  --bg: #fafafa; --panel: #ffffff; --ink: #18181b; --ink-2: #45464d;
+  --muted: #71717a; --faint: #c4c5cb; --hairline: #e8e8eb;
+  --accent: #4a6c8c; --accent-soft: rgba(74, 108, 140, 0.08);
+}
+:root[data-theme="dark"] {
+  --bg: #0c0d0f; --panel: #131518; --ink: #e8e9eb; --ink-2: #b3b5bc;
+  --muted: #797d85; --faint: #4a4d54; --hairline: #1f2225;
+  --accent: #87a8c8; --accent-soft: rgba(135, 168, 200, 0.10);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--sans); background-color: var(--bg); color: var(--ink);
+  font-size: 15px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'ss01', 'cv11';
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+}
+a { color: inherit; text-decoration: none; }
+
+.layout { display: grid; grid-template-columns: var(--sidebar-w) 1fr; min-height: 100vh; }
+
+.sidebar {
+  position: sticky; top: 0; height: 100vh;
+  border-right: 1px solid var(--hairline); padding: 32px 28px;
+  display: flex; flex-direction: column; gap: 28px;
+  background-color: var(--bg);
+  transition: background-color 0.35s ease, border-color 0.35s ease;
+}
+.brand { display: flex; flex-direction: column; gap: 12px; }
+.monogram {
+  width: 36px; height: 36px; border-radius: 7px;
+  background: var(--ink); color: var(--bg);
+  display: grid; place-items: center;
+  font-weight: 600; font-size: 14px; letter-spacing: 0.5px;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+.brand .name { font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+.brand .role { font-size: 13px; color: var(--muted); margin-top: -2px; }
+
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav a {
+  font-size: 14px; color: var(--ink-2); padding: 4px 0;
+  display: flex; align-items: center; gap: 10px;
+  transition: color 0.2s ease;
+}
+.nav a:hover, .nav a.active { color: var(--accent); }
+.nav a .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--faint); transition: background 0.2s ease; }
+.nav a:hover .dot, .nav a.active .dot { background: var(--accent); }
+
+.section-label {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+}
+
+.social { display: flex; flex-direction: column; gap: 4px; }
+.social a {
+  font-size: 13px; color: var(--ink-2); padding: 3px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  transition: color 0.2s ease;
+}
+.social a:hover { color: var(--accent); }
+.social .arr { font-family: var(--mono); font-size: 11px; color: var(--faint); transition: color 0.2s ease, transform 0.2s ease; }
+.social a:hover .arr { color: var(--accent); transform: translateX(2px); }
+
+.sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 14px; }
+.theme-toggle {
+  display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
+  background: transparent; border: 1px solid var(--hairline); border-radius: 999px;
+  padding: 4px 10px; font-family: var(--mono); font-size: 11px; color: var(--muted);
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+}
+.theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+.theme-toggle .icon { font-size: 11px; line-height: 1; }
+
+.meta-block { font-family: var(--mono); font-size: 10.5px; color: var(--muted); line-height: 1.7; display: flex; flex-direction: column; gap: 2px; }
+.meta-block .loc::before {
+  content: ""; display: inline-block; width: 5px; height: 5px;
+  border-radius: 50%; background: #5b7a5e;
+  margin-right: 6px; vertical-align: middle;
+}
+
+.content { padding: 88px 64px 80px; max-width: calc(var(--content-max) + 128px); }
+.content-inner { max-width: var(--content-max); }
+
+.hero { margin-bottom: 72px; }
+.hero h1 { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 18px; line-height: 1.25; }
+.hero p { font-size: 16px; color: var(--ink-2); line-height: 1.65; max-width: 580px; }
+.hero a.inline { color: var(--accent); border-bottom: 1px solid var(--accent-soft); padding-bottom: 1px; transition: border-color 0.2s ease; }
+.hero a.inline:hover { border-bottom-color: var(--accent); }
+
+.section { margin-bottom: 64px; }
+.section-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 24px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--hairline);
+  transition: border-color 0.35s ease;
+}
+.section-head h2 { font-size: 13px; font-weight: 500; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink); }
+.section-head .count { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+.featured { padding: 4px 0 22px; margin-bottom: 18px; border-bottom: 1px dashed var(--hairline); transition: border-color 0.35s ease; display: block; }
+.featured .meta { font-family: var(--mono); font-size: 11px; color: var(--muted); display: flex; gap: 10px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+.featured .meta .tag { color: var(--accent); }
+.featured .meta .pin {
+  font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+  background: var(--accent-soft); color: var(--accent); padding: 2px 7px; border-radius: 3px;
+}
+.featured h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); line-height: 1.35; margin-bottom: 8px; transition: color 0.2s ease; }
+.featured:hover h3 { color: var(--accent); }
+.featured .excerpt { font-size: 14.5px; color: var(--ink-2); line-height: 1.6; }
+
+.post-list { display: flex; flex-direction: column; }
+.post-row { display: grid; grid-template-columns: 92px 1fr; gap: 20px; padding: 9px 0; align-items: baseline; }
+.post-row .date { font-family: var(--mono); font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+.post-row .title { font-size: 14.5px; color: var(--ink-2); transition: color 0.2s ease; }
+.post-row:hover .title { color: var(--accent); }
+
+.view-all { display: inline-block; margin-top: 18px; font-family: var(--mono); font-size: 12px; color: var(--muted); transition: color 0.2s ease; }
+.view-all:hover { color: var(--accent); }
+
+.projects { display: flex; flex-direction: column; }
+.project { display: block; padding: 16px 0; border-bottom: 1px solid var(--hairline); transition: border-color 0.35s ease; }
+.project:last-child { border-bottom: none; }
+.project-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 5px; }
+.project-name { font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.005em; transition: color 0.2s ease; }
+.project:hover .project-name { color: var(--accent); }
+.project-stack { font-family: var(--mono); font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.project-desc { font-size: 13.5px; color: var(--ink-2); line-height: 1.55; }
+.project .ext { font-family: var(--mono); font-size: 11px; color: var(--faint); margin-left: 6px; transition: color 0.2s ease, transform 0.2s ease; display: inline-block; }
+.project:hover .ext { color: var(--accent); transform: translate(2px, -2px); }
+
+.topics { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  display: inline-block; font-family: var(--mono); font-size: 11px;
+  color: var(--ink-2); background: var(--panel);
+  border: 1px solid var(--hairline); border-radius: 4px; padding: 3px 9px;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+.chip:hover { color: var(--accent); border-color: var(--accent); }
+
+.footer {
+  margin-top: 72px; padding-top: 22px; border-top: 1px solid var(--hairline);
+  font-family: var(--mono); font-size: 11px; color: var(--muted);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  transition: border-color 0.35s ease;
+}
+
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar {
+    position: static; height: auto; border-right: none;
+    border-bottom: 1px solid var(--hairline);
+    padding: 22px 22px 18px;
+    flex-direction: row; flex-wrap: wrap; gap: 18px; align-items: center;
+  }
+  .brand { flex-direction: row; align-items: center; gap: 12px; flex: 1 1 auto; }
+  .nav { flex-direction: row; flex-wrap: wrap; gap: 14px; width: 100%; border-top: 1px solid var(--hairline); padding-top: 14px; }
+  .nav a { padding: 0; }
+  .nav a .dot { display: none; }
+  .nav-section { display: contents; }
+  .nav-section .section-label, .social-section { display: none; }
+  .sidebar-bottom { margin-top: 0; flex-direction: row; align-items: center; gap: 14px; width: 100%; justify-content: space-between; }
+  .meta-block { flex-direction: row; gap: 12px; }
+  .content { padding: 36px 22px 60px; }
+  .hero { margin-bottom: 48px; }
+  .hero h1 { font-size: 22px; }
+  .section { margin-bottom: 48px; }
+  .post-row { grid-template-columns: 84px 1fr; gap: 14px; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="monogram">AG</div>
+      <div class="name-block">
+        <div class="name">Anjay Goel</div>
+        <div class="role">Software Engineer</div>
+      </div>
+    </div>
+
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" style="margin-bottom: 8px;">
+      <span class="icon" aria-hidden="true">☾</span>
+      <span class="label">dark</span>
+    </button>
+
+    <div class="nav-section">
+      <div class="section-label">Menu</div>
+      <nav class="nav">
+        <a href="/" class="active"><span class="dot"></span>Home</a>
+        <a href="/posts/"><span class="dot"></span>Writing</a>
+        <a href="/work/"><span class="dot"></span>Work</a>
+        <a href="/about/"><span class="dot"></span>About</a>
+        <a href="/rss.xml"><span class="dot"></span>RSS</a>
+      </nav>
+    </div>
+
+    <div class="social-section">
+      <div class="section-label">Elsewhere</div>
+      <div class="social">
+        <a href="https://github.com/AnjayGoel">GitHub <span class="arr">↗</span></a>
+        <a href="#">LinkedIn <span class="arr">↗</span></a>
+        <a href="mailto:hi@anjay.sh">Email <span class="arr">↗</span></a>
+        <a href="/rss.xml">RSS <span class="arr">↗</span></a>
+      </div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="meta-block">
+        <span class="loc">Based in India</span>
+        <span>© 2026 Anjay Goel</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content">
+    <div class="content-inner">
+
+      <section class="hero">
+        <h1>Hi, I'm Anjay.</h1>
+        <p>Software engineer based in India. I work on backend &amp; mobile systems and write notes on software internals — containers, async I/O, debugging — with the occasional detour into <a class="inline" href="/topics/economics/">economics &amp; finance</a>.</p>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Writing</h2><span class="count">22 posts</span></div>
+
+        <a href="/preview-6-post.html" class="featured">
+          <div class="meta">
+            <span class="pin">Latest</span>
+            <span>2026-05-02</span>
+            <span>· 9 min read</span>
+            <span class="tag">claude · agents · mobile</span>
+          </div>
+          <h3>Letting Claude Code Run Wild For A Few Days</h3>
+          <p class="excerpt">A Claude Code loop running an agent migrated our entire app from Flutter to KMP in two days — what worked, what didn't, and what surprised me about hands-off agent coding.</p>
+        </a>
+
+        <div class="post-list">
+          <a class="post-row" href="/posts/debugging-in-the-dark/"><span class="date">2025-12-26</span><span class="title">Debugging In The Dark</span></a>
+          <a class="post-row" href="/posts/anatomy-of-containers-3/"><span class="date">2025-12-08</span><span class="title">Anatomy of Containers, Part III: What's real, really?</span></a>
+          <a class="post-row" href="/posts/anatomy-of-containers-2/"><span class="date">2025-11-04</span><span class="title">Anatomy of Containers, Part II: Too Far</span></a>
+          <a class="post-row" href="/posts/anatomy-of-containers-1/"><span class="date">2025-11-04</span><span class="title">Anatomy of Containers, Part I: They're Just Fancy Processes</span></a>
+          <a class="post-row" href="/posts/async-io/"><span class="date">2025-05-24</span><span class="title">How Does Async / Non-Blocking IO Actually Work?</span></a>
+          <a class="post-row" href="/posts/concurrent-users-bug/"><span class="date">2025-01-30</span><span class="title">A Bug That Drove a 10× Surge in Concurrent Users</span></a>
+          <a class="post-row" href="/posts/myth-of-market-timing/"><span class="date">2024-12-26</span><span class="title">The Myth of Market Timing</span></a>
+        </div>
+
+        <a href="/posts/" class="view-all">View all 22 posts →</a>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Selected Work</h2><span class="count">4 projects</span></div>
+        <div class="projects">
+          <a href="https://github.com/AnjayGoel/RedScout" class="project" target="_blank" rel="noopener">
+            <div class="project-head"><span class="project-name">RedScout <span class="ext">↗</span></span><span class="project-stack">OSS · Go · Redis · CLI</span></div>
+            <p class="project-desc">Namespace-level Redis monitoring — breaks memory, TTLs, and ops/sec down by logical key prefix instead of server-wide aggregates.</p>
+          </a>
+          <a href="https://play.google.com/store/apps/details?id=com.dashtoon.video.reels" class="project" target="_blank" rel="noopener">
+            <div class="project-head"><span class="project-name">DashReels <span class="ext">↗</span></span><span class="project-stack">1M+ installs · Android · Kotlin</span></div>
+            <p class="project-desc">Short-form video Android app — low-latency playback over a flaky last mile.</p>
+          </a>
+          <a href="https://play.google.com/store/apps/details?id=com.dashtoon.app" class="project" target="_blank" rel="noopener">
+            <div class="project-head"><span class="project-name">DashToon <span class="ext">↗</span></span><span class="project-stack">Live · Android · Kotlin</span></div>
+            <p class="project-desc">Comics &amp; webtoons reader app — fluid panel-by-panel reading experience.</p>
+          </a>
+          <a href="https://github.com/AnjayGoel/stable-roommate-generalised" class="project" target="_blank" rel="noopener">
+            <div class="project-head"><span class="project-name">Stable Roommate (Generalised) <span class="ext">↗</span></span><span class="project-stack">OSS · Python · Algorithms</span></div>
+            <p class="project-desc">Generalises Irving's stable roommate matching to k-sized groups.</p>
+          </a>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Topics</h2><span class="count">12</span></div>
+        <div class="topics">
+          <a class="chip" href="/topics/android/">android</a>
+          <a class="chip" href="/topics/backend/">backend</a>
+          <a class="chip" href="/topics/debugging/">debugging</a>
+          <a class="chip" href="/topics/distributed-systems/">distributed-systems</a>
+          <a class="chip" href="/topics/economics/">economics</a>
+          <a class="chip" href="/topics/finance/">finance</a>
+          <a class="chip" href="/topics/go/">go</a>
+          <a class="chip" href="/topics/ios/">ios</a>
+          <a class="chip" href="/topics/kotlin/">kotlin</a>
+          <a class="chip" href="/topics/linux/">linux</a>
+          <a class="chip" href="/topics/networking/">networking</a>
+          <a class="chip" href="/topics/python/">python</a>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span>anjay.sh</span>
+        <span>last updated 2026-05-10</span>
+      </footer>
+
+    </div>
+  </main>
+
+</div>
+
+<script>(()=>{const r=document.documentElement;const btn=document.getElementById("theme-toggle");const upd=()=>{btn.querySelector(".label").textContent=r.dataset.theme==="dark"?"light":"dark";btn.querySelector(".icon").textContent=r.dataset.theme==="dark"?"☀":"☾";};upd();btn.addEventListener("click",()=>{r.dataset.theme=r.dataset.theme==="dark"?"light":"dark";localStorage.setItem("anjay-theme",r.dataset.theme);upd();});})();</script>
+</body>
+</html>

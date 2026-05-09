@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Anjay Goel — preview / quiet modern</title>
+    <script>
+      (() => {
+        try {
+          const s = localStorage.getItem("anjay-theme");
+          const d = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.dataset.theme = s || (d ? "dark" : "light");
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --sans: "General Sans", -apple-system, system-ui, sans-serif;
+        --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+      }
+      :root[data-theme="light"] {
+        --bg: #fbfaf7;
+        --panel: #ffffff;
+        --ink: #14161a;
+        --ink-2: #3a3d44;
+        --muted: #6b6f78;
+        --faint: #afb3bb;
+        --hairline: #e5e3dc;
+        --hairline-strong: #d6d3ca;
+        --accent: #1f4d4d;
+        --accent-tint: rgba(31, 77, 77, 0.07);
+        --featured-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+        --posts-hover-bg: rgba(20, 22, 26, 0.035);
+      }
+      :root[data-theme="dark"] {
+        --bg: #0d0f10;
+        --panel: #15181a;
+        --ink: #ebeced;
+        --ink-2: #b6b9be;
+        --muted: #797d83;
+        --faint: #4a4d54;
+        --hairline: #1f2225;
+        --hairline-strong: #2a2d31;
+        --accent: #6ab3a8;
+        --accent-tint: rgba(106, 179, 168, 0.10);
+        --featured-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        --posts-hover-bg: rgba(235, 236, 237, 0.04);
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 15.5px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        transition: background-color 0.35s ease, color 0.35s ease;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 32px 96px;
+      }
+
+      /* header — bordered grid */
+      header.site {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        gap: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--hairline-strong);
+        margin-bottom: 56px;
+        transition: border-color 0.35s ease;
+      }
+      .brand {
+        font-family: var(--sans);
+        font-weight: 600;
+        font-size: 15px;
+        letter-spacing: -0.01em;
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .brand .role {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        font-weight: 400;
+        color: var(--muted);
+        margin-left: 10px;
+        padding-left: 10px;
+        border-left: 1px solid var(--hairline-strong);
+      }
+      nav.top {
+        display: flex;
+        gap: 24px;
+        justify-content: flex-end;
+        font-size: 14px;
+      }
+      nav.top a {
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.15s ease;
+      }
+      nav.top a:hover { color: var(--ink); }
+      nav.top a.active { color: var(--ink); }
+
+      /* hero */
+      .hero {
+        margin-bottom: 72px;
+      }
+      .hero .eyebrow {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 18px;
+      }
+      .hero h1 {
+        font-family: var(--sans);
+        font-weight: 500;
+        font-size: clamp(28px, 4.6vw, 38px);
+        line-height: 1.18;
+        letter-spacing: -0.022em;
+        margin: 0 0 22px;
+        max-width: 22ch;
+      }
+      .hero h1 .accent {
+        color: var(--accent);
+      }
+      .hero p {
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--ink-2);
+        margin: 0 0 28px;
+        max-width: 56ch;
+      }
+      .hero .cta {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .hero .cta a {
+        font-size: 13.5px;
+        text-decoration: none;
+        color: var(--ink);
+        padding: 8px 14px;
+        border: 1px solid var(--hairline-strong);
+        border-radius: 6px;
+        background: var(--panel);
+        transition: background-color 0.35s ease, color 0.35s ease, border-color 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .hero .cta a:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .hero .cta a.primary {
+        background: var(--ink);
+        color: var(--bg);
+        border-color: var(--ink);
+      }
+      .hero .cta a.primary:hover {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--bg);
+      }
+      .hero .cta .arr { color: var(--muted); transition: color 0.15s ease; }
+      .hero .cta a:hover .arr { color: inherit; }
+
+      /* section */
+      section.block {
+        margin-bottom: 64px;
+      }
+      .block-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 22px;
+      }
+      .block-head h2 {
+        font-family: var(--sans);
+        font-size: 13.5px;
+        font-weight: 500;
+        letter-spacing: -0.005em;
+        margin: 0;
+        color: var(--ink);
+      }
+      .block-head h2 .num {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 400;
+        margin-left: 6px;
+      }
+      .block-head .more {
+        font-size: 13px;
+        color: var(--muted);
+        text-decoration: none;
+      }
+      .block-head .more:hover { color: var(--accent); }
+
+      /* featured card */
+      .featured {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        background: var(--panel);
+        border: 1px solid var(--hairline);
+        border-radius: 10px;
+        padding: 22px 24px;
+        margin-bottom: 8px;
+        transition: background-color 0.35s ease, color 0.35s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .featured:hover {
+        border-color: var(--hairline-strong);
+        transform: translateY(-1px);
+        box-shadow: var(--featured-shadow);
+      }
+      .featured .row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 10px;
+      }
+      .featured .row .dot {
+        width: 6px; height: 6px;
+        background: var(--accent);
+        border-radius: 50%;
+      }
+      .featured h3 {
+        font-family: var(--sans);
+        font-size: 19px;
+        font-weight: 500;
+        letter-spacing: -0.012em;
+        line-height: 1.32;
+        margin: 0 0 8px;
+        color: var(--ink);
+      }
+      .featured p {
+        font-size: 14.5px;
+        color: var(--ink-2);
+        line-height: 1.55;
+        margin: 0;
+        max-width: 56ch;
+      }
+
+      /* posts list */
+      ul.posts {
+        list-style: none;
+        padding: 0;
+        margin: 16px 0 0;
+      }
+      ul.posts li + li { border-top: 1px solid var(--hairline); }
+      ul.posts a {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: baseline;
+        gap: 16px;
+        padding: 13px 8px;
+        text-decoration: none;
+        color: inherit;
+        border-radius: 4px;
+        margin: 0 -8px;
+        transition: background-color 0.2s ease, color 0.35s ease;
+      }
+      ul.posts a:hover { background: var(--posts-hover-bg); }
+      ul.posts a:hover .post-title { color: var(--accent); }
+      ul.posts .post-title {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--ink);
+        line-height: 1.4;
+        transition: color 0.2s ease;
+      }
+      ul.posts .post-date {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .all-link {
+        display: inline-block;
+        margin-top: 18px;
+        font-size: 13.5px;
+        color: var(--muted);
+        text-decoration: none;
+      }
+      .all-link::after { content: " →"; color: var(--accent); }
+      .all-link:hover { color: var(--ink); }
+
+      /* work grid */
+      ul.work {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      ul.work a {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        background: var(--panel);
+        border: 1px solid var(--hairline);
+        border-radius: 8px;
+        padding: 16px 18px;
+        transition: background-color 0.35s ease, color 0.35s ease, border-color 0.2s ease, transform 0.2s ease;
+        height: 100%;
+      }
+      ul.work a:hover {
+        border-color: var(--accent);
+        transform: translateY(-1px);
+      }
+      ul.work .head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 6px;
+      }
+      ul.work .name {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: -0.005em;
+        color: var(--ink);
+      }
+      ul.work .badge {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--accent);
+        background: var(--accent-tint);
+        padding: 2px 6px;
+        border-radius: 3px;
+        white-space: nowrap;
+        transition: background-color 0.35s ease, color 0.35s ease;
+      }
+      ul.work .stack {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+      ul.work p {
+        font-size: 13.5px;
+        color: var(--ink-2);
+        line-height: 1.5;
+        margin: 0;
+      }
+      ul.work .arr {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--muted);
+        transition: color 0.2s ease;
+      }
+      ul.work a:hover .arr { color: var(--accent); }
+
+      /* topics */
+      .topics {
+        margin-top: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .topics a {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 4px 10px;
+        border: 1px solid var(--hairline);
+        border-radius: 999px;
+        background: var(--panel);
+        transition: background-color 0.35s ease, color 0.2s ease, border-color 0.2s ease;
+      }
+      .topics a:hover { color: var(--accent); border-color: var(--accent); }
+
+      /* footer */
+      footer.site {
+        margin-top: 64px;
+        padding-top: 18px;
+        border-top: 1px solid var(--hairline);
+        font-size: 12.5px;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      footer.site .right { display: flex; gap: 16px; }
+      footer.site a { color: var(--muted); text-decoration: none; }
+      footer.site a:hover { color: var(--accent); }
+
+      .theme-toggle {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        background: transparent;
+        border: 1px solid var(--hairline);
+        border-radius: 999px;
+        padding: 4px 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        line-height: 1;
+        transition: color 0.2s ease, border-color 0.2s ease, background-color 0.35s ease;
+      }
+      .theme-toggle:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .theme-toggle .icon { font-size: 12px; line-height: 1; }
+
+      @media (max-width: 600px) {
+        .container { padding: 28px 22px 64px; }
+        header.site { grid-template-columns: 1fr; gap: 12px; }
+        nav.top { justify-content: flex-start; gap: 18px; }
+        ul.work { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="site">
+        <a class="brand" href="/">Anjay Goel<span class="role">Software Engineer</span></a>
+        <nav class="top">
+          <a class="active" href="/">Home</a>
+          <a href="/posts/">Writing</a>
+          <a href="/showcase/">Work</a>
+          <a href="/about/">About</a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+            <span class="icon" aria-hidden="true">☾</span>
+            <span class="label">dark</span>
+          </button>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <div class="eyebrow">Engineer · Writer · Based in India</div>
+        <h1>Notes on software, written one <span class="accent">post</span> at a time.</h1>
+        <p>
+          I work on backend &amp; mobile systems and write about software
+          internals — containers, async I/O, debugging stories — with the
+          occasional detour into economics &amp; finance. Currently shipping
+          mobile + backend at a stealth startup.
+        </p>
+        <div class="cta">
+          <a class="primary" href="/posts/">Read the writing <span class="arr">→</span></a>
+          <a href="/showcase/">See work</a>
+          <a href="mailto:hi@anjay.sh">Get in touch</a>
+        </div>
+      </section>
+
+      <section class="block">
+        <div class="block-head">
+          <h2>Latest writing<span class="num">22 posts</span></h2>
+          <a class="more" href="/posts/">All posts →</a>
+        </div>
+
+        <a class="featured" href="/preview-3-post.html">
+          <div class="row"><span class="dot"></span><span>New · May 2026 · 9 min</span></div>
+          <h3>Letting Claude Code Run Wild For A Few Days</h3>
+          <p>A Claude Code loop running an agent migrated our entire app from Flutter to KMP in two days — what worked, what didn't, and what surprised me about hands-off agent coding.</p>
+        </a>
+
+        <ul class="posts">
+          <li><a href="#"><span class="post-title">Debugging In The Dark</span><span class="post-date">Dec 26, 2025</span></a></li>
+          <li><a href="#"><span class="post-title">Anatomy of Containers, Part III: What's real, really?</span><span class="post-date">Dec 8, 2025</span></a></li>
+          <li><a href="#"><span class="post-title">Anatomy of Containers, Part II: Too Far</span><span class="post-date">Nov 4, 2025</span></a></li>
+          <li><a href="#"><span class="post-title">Anatomy of Containers, Part I: They're Just Fancy Processes</span><span class="post-date">Nov 4, 2025</span></a></li>
+          <li><a href="#"><span class="post-title">How Does Async / Non-Blocking IO Actually Work?</span><span class="post-date">May 24, 2025</span></a></li>
+          <li><a href="#"><span class="post-title">A Bug That Drove a 10× Surge in Concurrent Users</span><span class="post-date">Jan 30, 2025</span></a></li>
+          <li><a href="#"><span class="post-title">The Myth of Market Timing</span><span class="post-date">Dec 26, 2024</span></a></li>
+        </ul>
+        <a class="all-link" href="/posts/">View all 22 posts</a>
+      </section>
+
+      <section class="block">
+        <div class="block-head">
+          <h2>Selected work<span class="num">4 projects</span></h2>
+          <a class="more" href="/showcase/">All projects →</a>
+        </div>
+        <ul class="work">
+          <li>
+            <a href="https://github.com/AnjayGoel/RedScout">
+              <div class="head"><span class="name">RedScout <span class="arr">↗</span></span><span class="badge">OSS</span></div>
+              <div class="stack">Go · Redis · CLI</div>
+              <p>Namespace-level Redis monitoring — memory, TTLs &amp; ops/sec by logical key prefix.</p>
+            </a>
+          </li>
+          <li>
+            <a href="https://play.google.com/store/apps/details?id=com.dashtoon.video.reels">
+              <div class="head"><span class="name">DashReels <span class="arr">↗</span></span><span class="badge">1M+</span></div>
+              <div class="stack">Android · Kotlin</div>
+              <p>Short-form video Android app — low-latency playback over a flaky last mile.</p>
+            </a>
+          </li>
+          <li>
+            <a href="https://play.google.com/store/apps/details?id=com.dashtoon.app">
+              <div class="head"><span class="name">DashToon <span class="arr">↗</span></span></div>
+              <div class="stack">Android · Kotlin</div>
+              <p>Comics &amp; webtoons reader — fluid panel-by-panel reading experience.</p>
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/AnjayGoel/stable-roommate-generalised">
+              <div class="head"><span class="name">Stable Roommate <span class="arr">↗</span></span><span class="badge">OSS</span></div>
+              <div class="stack">Python · Algorithms</div>
+              <p>Generalises Irving's stable roommate matching to k-sized groups.</p>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section class="block">
+        <div class="block-head">
+          <h2>Topics</h2>
+        </div>
+        <div class="topics">
+          <a href="#">android</a><a href="#">backend</a><a href="#">debugging</a><a href="#">distributed-systems</a><a href="#">economics</a><a href="#">finance</a><a href="#">go</a><a href="#">ios</a><a href="#">kotlin</a><a href="#">linux</a><a href="#">networking</a><a href="#">python</a>
+        </div>
+      </section>
+
+      <footer class="site">
+        <span>© 2026 Anjay Goel</span>
+        <span class="right">
+          <a href="/rss.xml">RSS</a>
+        </span>
+      </footer>
+    </div>
+    <script>
+      (() => {
+        const r = document.documentElement;
+        const stored = localStorage.getItem("anjay-theme");
+        const sysDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        r.dataset.theme = stored || (sysDark ? "dark" : "light");
+        const btn = document.getElementById("theme-toggle");
+        const upd = () => {
+          btn.querySelector(".label").textContent = r.dataset.theme === "dark" ? "light" : "dark";
+          btn.querySelector(".icon").textContent = r.dataset.theme === "dark" ? "☀" : "☾";
+        };
+        upd();
+        btn.addEventListener("click", () => {
+          r.dataset.theme = r.dataset.theme === "dark" ? "light" : "dark";
+          localStorage.setItem("anjay-theme", r.dataset.theme);
+          upd();
+        });
+      })();
+    </script>
+  </body>
+</html>

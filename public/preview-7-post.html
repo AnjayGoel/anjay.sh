@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Letting Claude Code Run Wild For A Few Days — Anjay Goel</title>
+<script>(()=>{try{const s=localStorage.getItem("anjay-theme");const d=window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=s||(d?"dark":"light");}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400;1,6..72,500&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --serif: "Newsreader", "Source Serif 4", Georgia, serif;
+    --sans: "Inter Tight", -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    --maxw: 880px;
+    --readw: 720px;
+  }
+  :root[data-theme="light"] { --bg:#f6f3ec; --ink:#1c1814; --ink-2:#4a4239; --muted:#807769; --faint:#b8ad9b; --hairline:#d8d0bd; --accent:#8b3a3a; --code-bg:#ece6d4; }
+  :root[data-theme="dark"] { --bg:#14110d; --ink:#e8e1d2; --ink-2:#b1a994; --muted:#807665; --faint:#4a4438; --hairline:#2a2519; --accent:#c46a6a; --code-bg:#1f1b15; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg); color: var(--ink);
+    font-family: var(--serif); font-size: 17px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.35s ease, color 0.35s ease;
+  }
+  a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--hairline); transition: border-color 0.35s ease, color 0.2s ease; }
+  a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 56px 32px 80px; }
+  .reading { max-width: var(--readw); margin: 0 auto; }
+
+  /* Masthead — identical to homepage */
+  .masthead { text-align: center; padding-bottom: 28px; border-bottom: 1px solid var(--ink); transition: border-color 0.35s ease; }
+  .masthead .top-rule {
+    border-top: 3px double var(--ink); border-bottom: 1px solid var(--ink);
+    transition: border-color 0.35s ease; padding: 6px 0;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--ink-2);
+    display: flex; justify-content: space-between; margin-bottom: 22px;
+  }
+  .masthead .top-rule span { padding: 0 4px; }
+  .masthead h1.brand {
+    font-family: var(--serif); font-weight: 800;
+    font-size: clamp(48px, 9vw, 84px); line-height: 0.95; letter-spacing: -0.02em;
+    margin: 8px 0 14px; color: var(--ink);
+  }
+  .masthead h1.brand a { color: inherit; border-bottom: none; }
+  .masthead h1.brand a:hover { color: var(--accent); }
+  .masthead h1.brand em { font-style: italic; font-weight: 500; color: var(--ink-2); }
+  .masthead .edition {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--muted);
+    padding-top: 14px; border-top: 1px solid var(--hairline);
+    transition: border-color 0.35s ease;
+    display: flex; justify-content: center; gap: 18px; flex-wrap: wrap;
+  }
+  .masthead .edition .sep { color: var(--faint); }
+
+  nav.primary { padding: 14px 0 0; font-family: var(--serif); font-style: italic; font-size: 14.5px; letter-spacing: 0.04em; display: flex; justify-content: center; align-items: baseline; position: relative; }
+  nav.primary .nav-links { text-align: center; }
+  nav.primary a { margin: 0 14px; border-bottom: none; color: var(--ink-2); }
+  nav.primary a:hover { color: var(--accent); }
+  nav.primary .theme-toggle { position: absolute; right: 0; top: 14px; }
+
+  .theme-toggle { background: transparent; border: none; font-family: var(--serif); font-style: italic; font-size: 14.5px; letter-spacing: 0.04em; color: var(--ink-2); cursor: pointer; padding: 0; display: inline-flex; align-items: baseline; gap: 6px; transition: color 0.2s ease; }
+  .theme-toggle:hover { color: var(--accent); }
+  .theme-toggle .icon { font-style: normal; font-size: 13px; }
+
+  /* Article header */
+  article.post-article { margin-top: 56px; }
+  .article-head .eyebrow {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--muted);
+    padding-bottom: 10px; border-bottom: 1px solid var(--hairline);
+    margin-bottom: 32px;
+    transition: border-color 0.35s ease;
+    display: flex; justify-content: space-between; align-items: baseline; gap: 14px; flex-wrap: wrap;
+  }
+  .article-head .eyebrow .right { font-family: var(--serif); font-style: italic; font-size: 13px; letter-spacing: 0.02em; text-transform: none; color: var(--ink-2); }
+
+  .article-head h1.title {
+    font-family: var(--serif); font-weight: 600;
+    font-size: clamp(40px, 6vw, 56px); line-height: 1.05; letter-spacing: -0.018em;
+    margin: 0 0 22px; color: var(--ink);
+  }
+  .article-head h1.title em { font-style: italic; font-weight: 500; color: var(--accent); }
+
+  .article-head .byline {
+    font-family: var(--serif); font-style: italic; font-size: 15.5px;
+    color: var(--ink-2); margin-bottom: 12px;
+  }
+  .article-head .byline em { color: var(--ink); font-weight: 500; }
+  .article-head .byline .dot { color: var(--faint); padding: 0 8px; font-style: normal; }
+
+  .article-head .filed {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 22px;
+  }
+  .article-head .filed .accent { color: var(--accent); }
+
+  .article-head .head-rule { border: none; border-top: 1px solid var(--hairline); margin: 0 0 36px; transition: border-color 0.35s ease; }
+
+  /* Article body */
+  .article-body { font-family: var(--serif); font-size: 18px; line-height: 1.65; color: var(--ink); }
+  .article-body p { margin: 0 0 1.15em; }
+  .article-body > p:first-of-type::first-letter {
+    font-family: var(--serif); font-weight: 600; font-size: 56px;
+    float: left; line-height: 0.9; padding: 4px 8px 0 0;
+    color: var(--accent);
+  }
+
+  /* Newspaper-style multi-column body on desktop */
+  @media (min-width: 900px) {
+    .article-body .columns {
+      column-count: 2;
+      column-gap: 36px;
+      column-rule: 1px solid var(--hairline);
+    }
+    .article-body .columns > h2,
+    .article-body .columns > figure.fig {
+      column-span: all;
+    }
+    .article-body .columns > p,
+    .article-body .columns > h3,
+    .article-body .columns > ul {
+      break-inside: avoid-column;
+    }
+    .article-body .columns > h2,
+    .article-body .columns > h3 {
+      break-after: avoid-column;
+    }
+  }
+  .article-body a { color: var(--ink); border-bottom: 1px solid var(--hairline); }
+  .article-body a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .article-body h2 {
+    font-family: var(--serif); font-weight: 500;
+    font-size: 30px; line-height: 1.2; letter-spacing: -0.012em;
+    margin: 1.8em 0 0.5em; color: var(--ink);
+    padding-top: 0.4em;
+  }
+  .article-body h3 {
+    font-family: var(--serif); font-style: italic; font-weight: 500;
+    font-size: 21px; line-height: 1.3; letter-spacing: -0.005em;
+    margin: 1.6em 0 0.35em; color: var(--ink);
+  }
+  .article-body h3 code { font-style: normal; font-size: 0.92em; }
+
+  .article-body code {
+    font-family: var(--mono); font-size: 0.86em;
+    background: var(--code-bg); color: var(--ink);
+    padding: 2px 6px; border-radius: 2px;
+    border: 1px solid var(--hairline);
+    transition: background-color 0.35s ease, border-color 0.35s ease;
+  }
+  .article-body em { font-style: italic; }
+  .article-body strong { font-weight: 600; }
+
+  .article-body ul {
+    margin: 0.4em 0 1.2em; padding-left: 1.4em;
+  }
+  .article-body ul li {
+    margin-bottom: 0.4em; padding-left: 0.3em;
+  }
+  .article-body ul li::marker { color: var(--accent); font-size: 0.85em; }
+  .article-body ul ul { margin: 0.4em 0 0.4em; }
+
+  /* Video / figure */
+  figure.fig {
+    margin: 2em 0 2em; padding: 0;
+  }
+  figure.fig video {
+    width: 100%; display: block;
+    border: 1px solid var(--hairline);
+    transition: border-color 0.35s ease;
+    background: #000;
+  }
+  figure.fig figcaption {
+    margin-top: 10px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted);
+    font-style: normal;
+  }
+  figure.fig figcaption em {
+    font-family: var(--serif); font-style: italic;
+    font-size: 13.5px; letter-spacing: 0; text-transform: none;
+    color: var(--ink-2); margin-left: 4px;
+  }
+
+  /* End of article */
+  .article-end {
+    margin-top: 56px; padding-top: 22px;
+    border-top: 1px solid var(--hairline);
+    transition: border-color 0.35s ease;
+    font-family: var(--serif); font-style: italic; font-size: 14.5px;
+    color: var(--ink-2);
+    display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 12px;
+  }
+  .article-end a { border-bottom: 1px solid var(--hairline); color: var(--ink-2); }
+  .article-end a:hover { color: var(--accent); }
+  .article-end .colophon { font-family: var(--mono); font-style: normal; font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+
+  /* Footer */
+  footer { margin-top: 64px; padding-top: 22px; border-top: 3px double var(--ink); transition: border-color 0.35s ease; display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 16px; font-style: italic; font-size: 13.5px; color: var(--muted); }
+  footer .left, footer .right { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+  footer a { border-bottom: none; color: var(--ink-2); }
+  footer a:hover { color: var(--accent); }
+
+  @media (max-width: 720px) {
+    .wrap { padding: 36px 22px 60px; }
+    .masthead h1.brand { font-size: 56px; }
+    .masthead .top-rule { font-size: 9.5px; }
+    .masthead .top-rule .hide-mobile { display: none; }
+    nav.primary { flex-direction: column; gap: 8px; }
+    nav.primary .theme-toggle { position: static; }
+    nav.primary a { margin: 0 8px; }
+    .article-head h1.title { font-size: 34px; line-height: 1.08; }
+    .article-body { font-size: 17px; line-height: 1.62; }
+    .article-body p:first-of-type::first-letter {
+      font-size: 40px; padding: 2px 6px 0 0;
+    }
+    .article-body h2 { font-size: 24px; }
+    .article-body h3 { font-size: 19px; }
+    .article-end { flex-direction: column; gap: 8px; }
+    footer { flex-direction: column; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="top-rule">
+      <span>Est. MMXXIV</span>
+      <span class="hide-mobile">Anjay Goel — Personal Almanac</span>
+      <span>anjay.sh</span>
+    </div>
+    <h1 class="brand"><a href="/preview-7.html">Anjay <em>Goel</em></a></h1>
+    <div class="edition">
+      <span>Vol. I</span><span class="sep">·</span>
+      <span>Software, Notes &amp; Adjacent Topics</span><span class="sep">·</span>
+      <span>Issue No. 22</span><span class="sep">·</span>
+      <span>May MMXXVI</span>
+    </div>
+    <nav class="primary">
+      <span class="nav-links">
+        <a href="/preview-7.html">Home</a>
+        <a href="/posts/">Writing</a>
+        <a href="/work/">Work</a>
+        <a href="/about/">About</a>
+        <a href="/rss.xml">RSS</a>
+      </span>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <span class="icon" aria-hidden="true">☾</span>
+        <span class="label">dark</span>
+      </button>
+    </nav>
+  </header>
+
+  <article class="post-article reading">
+
+    <div class="article-head">
+      <div class="eyebrow">
+        <span>Dispatch №01 — Technology · May 2026</span>
+        <span class="right"><a href="/preview-7.html">← Front page</a></span>
+      </div>
+
+      <h1 class="title">Letting Claude Code Run <em>Wild</em> For A Few Days</h1>
+
+      <div class="byline">
+        By <em>Anjay Goel</em><span class="dot">·</span>
+        2 May 2026<span class="dot">·</span>
+        9 min read
+      </div>
+
+      <div class="filed">
+        Filed under: <span class="accent">programming</span> · opinion · claude · agents
+      </div>
+
+      <hr class="head-rule" />
+    </div>
+
+    <div class="article-body">
+
+      <p>Late last Sunday night, I'd just wrapped up some work, and in my half-sleepy state I got an itch to do something "fun". While it's not unusual to feel that way from time to time, what's changed is that putting together a shabby piece of code that just works is a single prompt away now. So I decided to do something I'd been wanting to do for a while: migrating our entire <a href="https://play.google.com/store/apps/details?id=com.dashtoon.video.shortfree&hl=en_IN">app</a> from Flutter to KMP.</p>
+
+      <div class="columns">
+
+      <p>To give a bit of context, when we started three years ago, Flutter fit our use case very well. Over time, we launched a few more apps. Our requirements &amp; constraints changed and Flutter didn't feel like the best fit anymore, but it stuck. Switching would have meant learning a framework and rebuilding an entire app under a short deadline, which was too expensive to justify.</p>
+
+      <p>So in my sleep-induced creativity, I prompted claude code to make a KMP app, cloning the most basic functionality: the home screen &amp; the video player screen (reels screen, as we call it). I gave it access to the original codebase, seeded it with some screenshots of the app, spun up an emulator &amp; let it do its thing. And in ten minutes, it got back to me with a working clone, obviously with very limited functionality, but it worked. The home screen populated via API calls; the reels screen worked with basic player controls. And the video playback felt smoother than in our Flutter app!</p>
+
+      <p>I spent the next half an hour or so adding more features, prompting it, giving it references, etc. It was making real progress. By this time, I was fully convinced it would be able to migrate the whole thing. But telling claude how to align a button got boring quickly &amp; I was sleepy. The progress it had made in those 30-40 mins was crazy, not something I'd have imagined three years ago.</p>
+
+      <p>So I said f**k it, let me automate myself away as well. I spun up another emulator, started the original app on it, asked claude to migrate everything feature by feature, screenshotting the original app and verifying it worked on the new one. After a few iterations of trial and error, I ended up with the setup described below, with claude obviously writing most of it.</p>
+
+      <h2>The Long-Running Agent Setup</h2>
+
+      <p>Claude Code recently introduced a <code>loop</code> feature to schedule automated tasks. I combined it with Claude Code's <code>remote-control</code>, <code>caffeinate</code> (keeps the Mac awake) &amp; <code>pmset displaysleepnow</code> (to turn off my Mac's display), making Claude Code a perfect long-running agent, doing stuff while I slept. The setup had a few markdown files that became the entire state of the run. Since the state lives in files, it survives a multi-day run, and the next iteration picks up exactly where the last one stopped.</p>
+
+      <h3><code>CLAUDE.md</code></h3>
+
+      <p>It tells claude how the new codebase is laid out, the tech stack, its coding conventions. Stuff like "Flutter is a reference, not a template, migrate behavior not architecture" or "files under 300 LOC, no business logic in Composables". It also includes details of the original Flutter project, its structure, features, the APIs, conventions, etc.</p>
+
+      <h3><code>TODO.md</code></h3>
+
+      <p>The progress tracker for the migration. claude would spawn subagents to discover features, break them down into smaller tasks &amp; add them to the TODO. Every finding, every subagent report, every blocker logged here before the next dispatch. A <code>## Requires human assistance</code> section for things genuinely outside the agent's reach. By the end it was ~1200 lines long.</p>
+
+      <h3><code>LOOP.md</code></h3>
+
+      <p>This is the heart of the whole execution: a ~200 line recurring prompt that claude re-read on every fire. It had the following structure:</p>
+
+      <ul>
+        <li>Mission: a short one-paragraph statement of what we are doing, the north star, etc.</li>
+        <li>The iteration recipe: pick a task → migrate → verify on emulator side-by-side → tick todo → commit → schedule.</li>
+        <li>Standing directives: a huge list of rules like:
+          <ul>
+            <li>Keep the loop alive, never stall on blockers.</li>
+            <li>State lives in markdown entirely.</li>
+            <li>Cover breadth over depth.</li>
+            <li>Don't simply copy the code; adapt to KMP/Compose.</li>
+            <li>Dispatch multiple subagents each working on different tasks.</li>
+            <li>Original codebase is messy, think like a senior engineer would.</li>
+          </ul>
+        </li>
+        <li>The guardrails: every ~20 commits, dispatch a code-review subagent + UI-verification subagent.</li>
+        <li>The "what if X happens" branches: explicit rules for handling things that could derail the loop, like transient errors, rate limits, stuck subagents, etc.</li>
+        <li>Codebase hygiene: basic sections on how to maintain code quality, what patterns to follow, etc.</li>
+        <li>The re-audit step: walk the original repo for anything missed, log it in <code>TODO.md</code> and continue.</li>
+      </ul>
+
+      <h2>The Results</h2>
+
+      <p>After a few iterations of fine-tuning the loop, the TODO, etc. (which BTW claude did itself with some prompting), I went to sleep. When I woke up, claude was still working! It had almost migrated half of the entire app. I left it running for the next day, until it decided it had completed the migration. By the time it was done, the TODO file had grown to ~1200 lines and the codebase had ~40K lines spread across ~500 files. <em>None of it written by hand.</em></p>
+
+      <p>And the result? I'll let you decide. One half of the video below is the original app &amp; the other is the KMP port made by claude.</p>
+
+      <p>Can you tell which is which? (Hint: Check the video URL)</p>
+
+      <figure class="fig">
+        <video src="/videos/new-vs-original.mp4" autoplay loop muted playsinline></video>
+        <figcaption>Fig. 1 — <em>Original (left) and Claude-generated KMP port (right). Side-by-side playback on identical hardware.</em></figcaption>
+      </figure>
+
+      <p>I have been using it for the past week. The UI is pretty much identical. All the user-facing features are fully functional, and owing to it being "native", the app is substantially smoother. It's almost there!</p>
+
+      <p>Now, I am not saying the codebase is perfect, or that the app is ready to ship to production. It's not. It couldn't get quite a few things to work correctly. But more often than not, the parts it had trouble migrating were heavily tech debt ridden with various nuances that were not documented properly in the original codebase. I also have no working knowledge of KMP either. The instructions I gave were pretty much just "follow the best practices". I'm pretty sure it would have done an even better job if someone with experience in KMP and a fairly opinionated idea of how the codebase should look prompted it. Still, most of the generated codebase is better than what I would have written if I were given a short deadline to do the same.</p>
+
+      <p>This is a far, far better starting point for when we actually decide to do it. A small traditional engineering team working on it full-time would have easily taken a month to get here. A single Claude Code instance did it in two days! And I didn't even hit my weekly usage limits! Granted, this is somewhat of an "easy task" for claude. LLMs are, after all, good at following instructions, and taking one codebase &amp; copying it over to another language is a fairly structured task, with comparatively less ambiguity and decision-making involved.</p>
+
+      <p>But it should still force us to take a hard look at how engineering decisions are made and executed. The whole reason we stuck with Flutter is that switching was too expensive to justify. Once you factor in LLMs/Coding Assistants, calls like that don't look the same anymore, and most of the processes built around the old answers don't either.</p>
+
+      </div>
+
+    </div>
+
+    <div class="article-end">
+      <span><a href="/preview-7.html">← Return to front page</a></span>
+      <span class="colophon">— · End of dispatch · —</span>
+    </div>
+
+  </article>
+
+  <footer>
+    <div class="left">
+      <span>© MMXXVI <em>Anjay Goel</em></span><span>·</span>
+      <a href="/rss.xml">RSS</a><span>·</span>
+      <a href="mailto:hi@anjay.sh">hi@anjay.sh</a>
+    </div>
+    <div class="right">
+      <span><em>Set in Newsreader &amp; Inter Tight</em></span>
+    </div>
+  </footer>
+
+</div>
+
+<script>(()=>{const r=document.documentElement;const btn=document.getElementById("theme-toggle");const upd=()=>{btn.querySelector(".label").textContent=r.dataset.theme==="dark"?"light":"dark";btn.querySelector(".icon").textContent=r.dataset.theme==="dark"?"☀":"☾";};upd();btn.addEventListener("click",()=>{r.dataset.theme=r.dataset.theme==="dark"?"light":"dark";localStorage.setItem("anjay-theme",r.dataset.theme);upd();});})();</script>
+</body>
+</html>

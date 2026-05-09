@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Anjay Goel — software engineer, notes & work</title>
+<script>(()=>{try{const s=localStorage.getItem("anjay-theme");const d=window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=s||(d?"dark":"light");}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --serif: "Newsreader", Georgia, "Times New Roman", serif;
+    --sans: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f1e8; --ink: #1c1814; --ink-2: #4a4239; --muted: #807769;
+    --faint: #b8ad9b; --hairline: #d8d0bd; --dot-faint: #c5b89e;
+    --accent: #6b3a1f; --selection: #e6dcc4;
+  }
+  :root[data-theme="dark"] {
+    --bg: #14110d; --ink: #e8e1d2; --ink-2: #b1a994; --muted: #807665;
+    --faint: #4a4438; --hairline: #2a2519; --dot-faint: #3a3424;
+    --accent: #c89761; --selection: #2e271a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg); color: var(--ink);
+    font-family: var(--serif); font-size: 18px; line-height: 1.62; font-weight: 400;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    transition: background-color 0.35s ease, color 0.35s ease;
+  }
+  ::selection { background: var(--selection); color: var(--ink); }
+  a { color: inherit; text-decoration: none; transition: color 0.2s ease, border-color 0.2s ease; }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 56px 32px 80px; }
+
+  /* Header */
+  .site-header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 24px; margin-bottom: 72px;
+  }
+  .wordmark { font-size: 17px; font-weight: 500; letter-spacing: -0.01em; color: var(--ink); }
+  .header-right { display: flex; align-items: baseline; gap: 22px; }
+  .nav { display: flex; gap: 22px; font-family: var(--sans); font-size: 13.5px; color: var(--muted); }
+  .nav a:hover { color: var(--accent); }
+
+  /* Hero */
+  .hero { margin-bottom: 88px; }
+  .hero p {
+    font-size: 19.5px; line-height: 1.6; color: var(--ink);
+    margin: 0 0 22px; max-width: 60ch;
+  }
+  .socials { font-family: var(--sans); font-size: 13.5px; color: var(--muted); margin-top: 18px; }
+  .socials a {
+    color: var(--ink-2); border-bottom: 1px solid var(--hairline); padding-bottom: 1px;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .socials a:hover { color: var(--accent); border-color: var(--accent); }
+  .socials .sep { color: var(--faint); margin: 0 9px; }
+
+  /* Section labels */
+  .section-label {
+    font-family: var(--sans); font-size: 11.5px; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 36px;
+  }
+
+  /* Writing timeline */
+  .writing { margin-bottom: 96px; }
+  .timeline {
+    display: grid; grid-template-columns: 78px 1fr;
+    column-gap: 36px; position: relative;
+  }
+  .timeline::before {
+    content: ""; position: absolute; left: 78px; top: 6px; bottom: 6px;
+    width: 1px; background-color: var(--hairline);
+    transition: background-color 0.35s ease;
+  }
+  .post { display: contents; }
+  .post-rail { position: relative; padding-top: 4px; text-align: right; padding-right: 18px; }
+  .post-date {
+    font-family: var(--mono); font-size: 11.5px; color: var(--muted);
+    letter-spacing: -0.01em; line-height: 1.4; transition: color 0.2s ease;
+  }
+  .post-dot {
+    position: absolute; right: -7px; top: 11px;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--bg); border: 1.5px solid var(--dot-faint);
+    transition: background-color 0.25s ease, border-color 0.25s ease; z-index: 1;
+  }
+  .post-body { padding-bottom: 38px; }
+  .post-title {
+    font-weight: 500; color: var(--ink); line-height: 1.28;
+    letter-spacing: -0.012em; margin: 0 0 6px; transition: color 0.2s ease;
+  }
+  .post:hover .post-title { color: var(--accent); }
+  .post:hover .post-dot { border-color: var(--accent); background: var(--accent); }
+  .post:hover .post-date { color: var(--ink-2); }
+  .post:not(.featured) .post-title { font-size: 18.5px; }
+  .post-preview {
+    font-size: 16px; line-height: 1.55; color: var(--muted);
+    margin: 0; max-width: 58ch;
+  }
+
+  /* Featured */
+  .post.featured .post-body { padding-bottom: 56px; }
+  .post.featured .post-title {
+    font-size: 30px; line-height: 1.18; margin-bottom: 14px; letter-spacing: -0.018em;
+  }
+  .post.featured .post-excerpt {
+    font-size: 18px; line-height: 1.62; color: var(--ink-2);
+    margin: 0 0 16px; max-width: 58ch;
+  }
+  .post.featured .post-meta { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .post.featured .post-meta .tag { color: var(--ink-2); }
+  .post.featured .post-meta .dot { color: var(--faint); margin: 0 8px; }
+  .post.featured .post-dot { width: 10px; height: 10px; border-color: var(--ink-2); }
+
+  .archive-link {
+    grid-column: 2; margin-top: 8px;
+    font-family: var(--sans); font-size: 13.5px; color: var(--muted);
+  }
+  .archive-link a {
+    color: var(--ink-2); border-bottom: 1px solid var(--hairline); padding-bottom: 1px;
+  }
+  .archive-link a:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* Work */
+  .work { margin-bottom: 88px; }
+  .work-list { display: flex; flex-direction: column; }
+  .work-item {
+    display: grid; grid-template-columns: 1fr auto; column-gap: 24px;
+    padding: 22px 0; border-top: 1px solid var(--hairline);
+    transition: border-color 0.35s ease;
+  }
+  .work-item:last-child { border-bottom: 1px solid var(--hairline); }
+  .work-head {
+    display: flex; align-items: baseline; gap: 14px;
+    margin-bottom: 6px; flex-wrap: wrap;
+  }
+  .work-name {
+    font-size: 19px; font-weight: 500; color: var(--ink);
+    letter-spacing: -0.012em; transition: color 0.2s ease;
+  }
+  .work-stack { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .work-stack .badge { color: var(--ink-2); }
+  .work-desc {
+    font-size: 15.5px; line-height: 1.5; color: var(--muted);
+    margin: 0; max-width: 58ch;
+  }
+  .work-arrow {
+    align-self: center; font-style: italic; font-size: 18px;
+    color: var(--faint); padding-left: 8px;
+    transition: color 0.2s ease, transform 0.25s ease;
+  }
+  .work-item:hover .work-name { color: var(--accent); }
+  .work-item:hover .work-arrow { color: var(--accent); transform: translateX(3px); }
+
+  /* Topics */
+  .topics { margin-bottom: 64px; }
+  .topics-list {
+    font-family: var(--sans); font-size: 13px; color: var(--muted);
+    line-height: 1.9; max-width: 58ch;
+  }
+  .topics-list a { color: var(--ink-2); transition: color 0.2s ease; }
+  .topics-list a:hover { color: var(--accent); }
+  .topics-list .sep { color: var(--faint); margin: 0 7px; }
+
+  /* Footer */
+  .site-footer {
+    border-top: 1px solid var(--hairline); padding-top: 22px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px;
+    font-family: var(--sans); font-size: 12.5px; color: var(--muted);
+    transition: border-color 0.35s ease;
+  }
+  .site-footer .left { display: flex; gap: 18px; align-items: center; }
+  .site-footer a { color: var(--ink-2); transition: color 0.2s ease; }
+  .site-footer a:hover { color: var(--accent); }
+
+  .theme-toggle {
+    background: none; border: none; cursor: pointer; padding: 4px 0;
+    font-family: var(--serif); font-style: italic; font-size: 14px;
+    color: var(--muted); display: inline-flex; align-items: center; gap: 6px;
+    transition: color 0.2s ease;
+  }
+  .theme-toggle:hover { color: var(--accent); }
+  .theme-toggle .icon { font-style: normal; font-size: 13px; line-height: 1; }
+  .theme-toggle:focus-visible { outline: 1px dotted var(--accent); outline-offset: 4px; }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .wrap { padding: 36px 22px 56px; }
+    body { font-size: 17px; }
+    .site-header { margin-bottom: 48px; flex-wrap: wrap; }
+    .nav { gap: 16px; font-size: 13px; }
+    .hero { margin-bottom: 64px; }
+    .hero p { font-size: 18px; }
+    .timeline { display: block; }
+    .timeline::before { display: none; }
+    .post { display: block; padding-bottom: 32px; }
+    .post-rail { text-align: left; padding: 0 0 6px 0; }
+    .post-dot { display: none; }
+    .post-body { padding-bottom: 0; }
+    .post.featured .post-title { font-size: 26px; }
+    .work-head { gap: 10px; }
+    .archive-link { margin-top: 0; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header class="site-header">
+      <a href="/" class="wordmark">Anjay Goel</a>
+      <div class="header-right">
+        <nav class="nav" aria-label="Primary">
+          <a href="/">Home</a>
+          <a href="/posts/">Writing</a>
+          <a href="/work/">Work</a>
+          <a href="/about/">About</a>
+        </nav>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+          <span class="icon" aria-hidden="true">☾</span>
+          <span class="label">dark</span>
+        </button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <p>I'm Anjay. A software engineer based in India. I work on backend &amp; mobile systems and write notes here on software internals — containers, async I/O, debugging — with the occasional detour into economics &amp; finance.</p>
+      <div class="socials">
+        <a href="https://github.com/AnjayGoel">GitHub</a><span class="sep">·</span>
+        <a href="#">LinkedIn</a><span class="sep">·</span>
+        <a href="mailto:hi@anjay.sh">Email</a><span class="sep">·</span>
+        <a href="/rss.xml">RSS</a>
+      </div>
+    </section>
+
+    <section class="writing" aria-labelledby="writing-label">
+      <div class="section-label" id="writing-label">Writing</div>
+      <div class="timeline">
+
+        <a class="post featured" href="/preview-10-post.html">
+          <div class="post-rail">
+            <span class="post-date">2026<br/>05·02</span>
+            <span class="post-dot" aria-hidden="true"></span>
+          </div>
+          <div class="post-body">
+            <h2 class="post-title">Letting Claude Code Run Wild For A Few Days</h2>
+            <p class="post-excerpt">A Claude Code loop running an agent migrated our entire app from Flutter to KMP in two days. What worked, what didn't, and what surprised me about hands-off agent coding — including the moment I realised I'd lost track of what it had changed.</p>
+            <div class="post-meta">
+              <span class="tag">9 min read</span><span class="dot">·</span>
+              <span>claude</span><span class="dot">·</span>
+              <span>agents</span><span class="dot">·</span>
+              <span>mobile</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="post" href="/posts/debugging-in-the-dark/">
+          <div class="post-rail"><span class="post-date">2025<br/>12·26</span><span class="post-dot" aria-hidden="true"></span></div>
+          <div class="post-body">
+            <h3 class="post-title">Debugging In The Dark</h3>
+            <p class="post-preview">TL;DR: It was the DNS, it's always the DNS.</p>
+          </div>
+        </a>
+
+        <a class="post" href="/posts/anatomy-of-containers-iii/">
+          <div class="post-rail"><span class="post-date">2025<br/>12·08</span><span class="post-dot" aria-hidden="true"></span></div>
+          <div class="post-body">
+            <h3 class="post-title">Anatomy of Containers, Part III: What's real, really?</h3>
+            <p class="post-preview">Understanding how root privileges work in Linux and what it means for containers.</p>
+          </div>
+        </a>
+
+        <a class="post" href="/posts/anatomy-of-containers-ii/">
+          <div class="post-rail"><span class="post-date">2025<br/>11·04</span><span class="post-dot" aria-hidden="true"></span></div>
+          <div class="post-body">
+            <h3 class="post-title">Anatomy of Containers, Part II: Too Far</h3>
+            <p class="post-preview">A peek at how networking &amp; filesystems are wired in containers, with examples.</p>
+          </div>
+        </a>
+
+        <a class="post" href="/posts/anatomy-of-containers-i/">
+          <div class="post-rail"><span class="post-date">2025<br/>11·04</span><span class="post-dot" aria-hidden="true"></span></div>
+          <div class="post-body">
+            <h3 class="post-title">Anatomy of Containers, Part I: They're Just Fancy Processes</h3>
+            <p class="post-preview">Containers are, at their core, just processes. Let's take a look at the Linux primitives behind them.</p>
+          </div>
+        </a>
+
+        <a class="post" href="/posts/async-non-blocking-io/">
+          <div class="post-rail"><span class="post-date">2025<br/>05·24</span><span class="post-dot" aria-hidden="true"></span></div>
+          <div class="post-body">
+            <h3 class="post-title">How Does Async / Non-Blocking IO Actually Work?</h3>
+            <p class="post-preview">A deep dive into the OS internals that make async IO actually work.</p>
+          </div>
+        </a>
+
+        <a class="post" href="/posts/10x-concurrent-users-bug/">
+          <div class="post-rail"><span class="post-date">2025<br/>01·30</span><span class="post-dot" aria-hidden="true"></span></div>
+          <div class="post-body">
+            <h3 class="post-title">A Bug That Drove a 10× Surge in Concurrent Users</h3>
+            <p class="post-preview">A push-notification mishap that turned into a load story — and what we learned.</p>
+          </div>
+        </a>
+
+        <a class="post" href="/posts/myth-of-market-timing/">
+          <div class="post-rail"><span class="post-date">2024<br/>12·26</span><span class="post-dot" aria-hidden="true"></span></div>
+          <div class="post-body">
+            <h3 class="post-title">The Myth of Market Timing</h3>
+            <p class="post-preview">Why investors should mostly stay invested, even when it feels wrong.</p>
+          </div>
+        </a>
+
+        <div class="archive-link">
+          <a href="/posts/">Earlier in the archive — 22 posts in total →</a>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="work" aria-labelledby="work-label">
+      <div class="section-label" id="work-label">Selected Work</div>
+      <div class="work-list">
+
+        <a class="work-item" href="https://github.com/AnjayGoel/RedScout">
+          <div>
+            <div class="work-head">
+              <span class="work-name">RedScout</span>
+              <span class="work-stack"><span class="badge">OSS</span> · Go · Redis · CLI</span>
+            </div>
+            <p class="work-desc">Namespace-level Redis monitoring — breaks memory, TTLs, and ops/sec down by logical key prefix.</p>
+          </div>
+          <span class="work-arrow" aria-hidden="true">↗</span>
+        </a>
+
+        <a class="work-item" href="https://play.google.com/store/apps/details?id=com.dashtoon.video.reels">
+          <div>
+            <div class="work-head">
+              <span class="work-name">DashReels</span>
+              <span class="work-stack"><span class="badge">1M+</span> · Android · Kotlin</span>
+            </div>
+            <p class="work-desc">Short-form video Android app — low-latency playback over a flaky last mile.</p>
+          </div>
+          <span class="work-arrow" aria-hidden="true">↗</span>
+        </a>
+
+        <a class="work-item" href="https://play.google.com/store/apps/details?id=com.dashtoon.app">
+          <div>
+            <div class="work-head">
+              <span class="work-name">DashToon</span>
+              <span class="work-stack"><span class="badge">Live</span> · Android · Kotlin</span>
+            </div>
+            <p class="work-desc">Comics &amp; webtoons reader — fluid panel-by-panel reading experience.</p>
+          </div>
+          <span class="work-arrow" aria-hidden="true">↗</span>
+        </a>
+
+        <a class="work-item" href="https://github.com/AnjayGoel/stable-roommate-generalised">
+          <div>
+            <div class="work-head">
+              <span class="work-name">Stable Roommate</span>
+              <span class="work-stack"><span class="badge">OSS</span> · Python · Algorithms</span>
+            </div>
+            <p class="work-desc">Generalises Irving's stable roommate matching to k-sized groups.</p>
+          </div>
+          <span class="work-arrow" aria-hidden="true">↗</span>
+        </a>
+
+      </div>
+    </section>
+
+    <section class="topics" aria-labelledby="topics-label">
+      <div class="section-label" id="topics-label">Topics</div>
+      <p class="topics-list">
+        <a href="/topics/android/">android</a><span class="sep">·</span>
+        <a href="/topics/backend/">backend</a><span class="sep">·</span>
+        <a href="/topics/debugging/">debugging</a><span class="sep">·</span>
+        <a href="/topics/distributed-systems/">distributed-systems</a><span class="sep">·</span>
+        <a href="/topics/economics/">economics</a><span class="sep">·</span>
+        <a href="/topics/finance/">finance</a><span class="sep">·</span>
+        <a href="/topics/go/">go</a><span class="sep">·</span>
+        <a href="/topics/ios/">ios</a><span class="sep">·</span>
+        <a href="/topics/kotlin/">kotlin</a><span class="sep">·</span>
+        <a href="/topics/linux/">linux</a><span class="sep">·</span>
+        <a href="/topics/networking/">networking</a><span class="sep">·</span>
+        <a href="/topics/python/">python</a>
+      </p>
+    </section>
+
+    <footer class="site-footer">
+      <div class="left">
+        <span>© 2026 Anjay Goel</span>
+        <a href="/rss.xml">RSS</a>
+      </div>
+    </footer>
+
+  </div>
+
+<script>(()=>{const r=document.documentElement;const btn=document.getElementById("theme-toggle");const upd=()=>{btn.querySelector(".label").textContent=r.dataset.theme==="dark"?"light":"dark";btn.querySelector(".icon").textContent=r.dataset.theme==="dark"?"☀":"☾";};upd();btn.addEventListener("click",()=>{r.dataset.theme=r.dataset.theme==="dark"?"light":"dark";localStorage.setItem("anjay-theme",r.dataset.theme);upd();});})();</script>
+</body>
+</html>

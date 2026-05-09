@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Anjay Goel — preview / bone minimal</title>
+    <script>(()=>{try{const s=localStorage.getItem("anjay-theme");const d=window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=s||(d?"dark":"light");}catch(e){}})();</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --sans: "General Sans", -apple-system, system-ui, sans-serif;
+        --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+      }
+      :root[data-theme="light"] {
+        --bg: #efeae0;
+        --paper: #f5f1e8;
+        --ink: #1c1a16;
+        --ink-2: #4a4640;
+        --muted: #807a70;
+        --faint: #b8b1a3;
+        --hairline: #d6cfbf;
+        --accent: #6b3a1f;
+      }
+      :root[data-theme="dark"] {
+        --bg: #14110d;
+        --paper: #19150f;
+        --ink: #e8e1d2;
+        --ink-2: #b1a994;
+        --muted: #807665;
+        --faint: #4a4438;
+        --hairline: #2a2519;
+        --accent: #c08454;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 15.5px;
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+        transition: background-color 0.35s ease, color 0.35s ease;
+      }
+      .layout {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 80px 40px 96px;
+        display: grid;
+        grid-template-columns: 56px 1fr;
+        gap: 48px;
+        position: relative;
+      }
+
+      /* vertical accent rail */
+      .rail {
+        position: relative;
+        padding-top: 4px;
+      }
+      .rail .v-text {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        font-family: var(--mono);
+        font-size: 10.5px;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: var(--muted);
+        white-space: nowrap;
+        padding-bottom: 18px;
+      }
+      .rail .v-line {
+        position: absolute;
+        top: 80px;
+        left: 50%;
+        bottom: 0;
+        width: 1px;
+        background: linear-gradient(to bottom, var(--hairline), transparent);
+        transform: translateX(-50%);
+      }
+      .rail .num {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--accent);
+        text-align: center;
+        margin-bottom: 16px;
+        letter-spacing: 0.04em;
+      }
+
+      .content { min-width: 0; max-width: 600px; }
+
+      header.site {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding-bottom: 0;
+        margin-bottom: 96px;
+      }
+      .brand {
+        font-family: var(--sans);
+        font-weight: 500;
+        font-size: 14.5px;
+        letter-spacing: 0.01em;
+        color: var(--ink);
+        text-decoration: none;
+      }
+      nav.top {
+        display: flex;
+        gap: 28px;
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.02em;
+      }
+      nav.top a {
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+      nav.top a:hover { color: var(--ink); }
+      nav.top a.active { color: var(--ink); }
+      nav.top a.active::before {
+        content: "·";
+        color: var(--accent);
+        margin-right: 4px;
+      }
+
+      .hero {
+        margin-bottom: 120px;
+      }
+      .hero .eyebrow {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 32px;
+      }
+      .hero h1 {
+        font-family: var(--sans);
+        font-weight: 400;
+        font-size: clamp(28px, 4.6vw, 38px);
+        line-height: 1.32;
+        letter-spacing: -0.015em;
+        margin: 0 0 32px;
+        color: var(--ink);
+        max-width: 22ch;
+      }
+      .hero h1 strong {
+        font-weight: 500;
+        color: var(--accent);
+      }
+      .hero p.intro {
+        font-size: 15px;
+        line-height: 1.75;
+        color: var(--ink-2);
+        margin: 0 0 36px;
+        max-width: 50ch;
+      }
+      .hero .meta {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        gap: 8px 20px;
+        flex-wrap: wrap;
+      }
+      .hero .meta a {
+        color: var(--ink-2);
+        text-decoration: none;
+        position: relative;
+      }
+      .hero .meta a:hover { color: var(--accent); }
+      .hero .meta a::before {
+        content: "→ ";
+        color: var(--faint);
+        margin-right: 2px;
+      }
+
+      section.block { margin-bottom: 96px; }
+
+      .block-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 40px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--hairline);
+        transition: border-color 0.35s ease;
+      }
+      .block-head h2 {
+        font-family: var(--sans);
+        font-size: 12.5px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin: 0;
+        color: var(--ink);
+      }
+      .block-head h2 .num {
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 400;
+        color: var(--muted);
+        margin-left: 8px;
+      }
+      .block-head .more {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        text-decoration: none;
+      }
+      .block-head .more:hover { color: var(--accent); }
+
+      .featured {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        padding: 4px 0 36px;
+        margin-bottom: 8px;
+      }
+      .featured .stamp {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        letter-spacing: 0.1em;
+        color: var(--accent);
+        text-transform: uppercase;
+        margin-bottom: 16px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .featured .stamp::before {
+        content: "";
+        width: 5px; height: 5px;
+        background: var(--accent);
+        display: inline-block;
+      }
+      .featured h3 {
+        font-family: var(--sans);
+        font-weight: 500;
+        font-size: 22px;
+        line-height: 1.3;
+        letter-spacing: -0.012em;
+        margin: 0 0 14px;
+        color: var(--ink);
+        transition: color 0.2s ease;
+      }
+      .featured p {
+        font-size: 15px;
+        line-height: 1.7;
+        color: var(--ink-2);
+        margin: 0 0 16px;
+        max-width: 52ch;
+      }
+      .featured .meta {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 0.02em;
+      }
+      .featured:hover h3 { color: var(--accent); }
+
+      ul.posts {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      ul.posts li {
+        border-top: 1px solid var(--hairline);
+        transition: border-color 0.35s ease;
+      }
+      ul.posts li:last-child { border-bottom: 1px solid var(--hairline); }
+      ul.posts a {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        align-items: baseline;
+        gap: 24px;
+        padding: 18px 0;
+        text-decoration: none;
+        color: inherit;
+      }
+      ul.posts a:hover .post-title { color: var(--accent); }
+      ul.posts .post-date {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      ul.posts .post-title {
+        font-family: var(--sans);
+        font-size: 15.5px;
+        font-weight: 500;
+        line-height: 1.45;
+        color: var(--ink);
+        letter-spacing: -0.005em;
+        transition: color 0.2s ease;
+      }
+      .all-link {
+        display: inline-block;
+        margin-top: 32px;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        text-decoration: none;
+        letter-spacing: 0.04em;
+      }
+      .all-link::after { content: "  →"; color: var(--accent); }
+      .all-link:hover { color: var(--ink); }
+
+      ul.work { list-style: none; padding: 0; margin: 0; }
+      ul.work li {
+        border-top: 1px solid var(--hairline);
+        padding: 24px 0;
+        transition: border-color 0.35s ease;
+      }
+      ul.work li:last-child { border-bottom: 1px solid var(--hairline); }
+      ul.work a {
+        text-decoration: none;
+        color: inherit;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 24px;
+        align-items: baseline;
+      }
+      ul.work .left .head {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+      }
+      ul.work .name {
+        font-family: var(--sans);
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        color: var(--ink);
+        transition: color 0.2s ease;
+      }
+      ul.work a:hover .name { color: var(--accent); }
+      ul.work .stack {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        letter-spacing: 0.04em;
+      }
+      ul.work p {
+        font-size: 14px;
+        color: var(--ink-2);
+        margin: 0;
+        max-width: 48ch;
+        line-height: 1.6;
+      }
+      ul.work .right {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        white-space: nowrap;
+        padding-top: 2px;
+      }
+      ul.work .right.live { color: var(--accent); }
+
+      .topics {
+        margin-top: 16px;
+        transition: border-color 0.35s ease;
+      }
+      .topics .list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 22px;
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.02em;
+      }
+      .topics .list a {
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+      .topics .list a:hover { color: var(--accent); }
+
+      footer.site {
+        margin-top: 80px;
+        padding-top: 24px;
+        border-top: 1px solid var(--hairline);
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        transition: border-color 0.35s ease;
+      }
+      .theme-toggle {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        background: transparent;
+        border: 0;
+        padding: 2px 8px;
+        border-radius: 0;
+        letter-spacing: 0.04em;
+        text-transform: lowercase;
+        cursor: pointer;
+        transition: color 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .theme-toggle:hover { color: var(--accent); }
+      footer.site a { color: var(--muted); text-decoration: none; }
+      footer.site a:hover { color: var(--accent); }
+
+      @media (max-width: 720px) {
+        .layout { grid-template-columns: 1fr; gap: 0; padding: 36px 24px 64px; }
+        .rail { display: none; }
+        .hero { margin-bottom: 72px; }
+        section.block { margin-bottom: 72px; }
+        ul.posts a { grid-template-columns: 78px 1fr; gap: 14px; }
+        ul.work a { grid-template-columns: 1fr; gap: 6px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="rail" aria-hidden="true">
+        <div class="num">01</div>
+        <div class="v-text">Anjay Goel — 2026</div>
+        <div class="v-line"></div>
+      </aside>
+
+      <div class="content">
+        <header class="site">
+          <a class="brand" href="/">Anjay Goel</a>
+          <div style="display:flex;align-items:baseline;gap:20px;">
+            <nav class="top">
+              <a class="active" href="/">Index</a>
+              <a href="/posts/">Writing</a>
+              <a href="/showcase/">Work</a>
+              <a href="/about/">About</a>
+            </nav>
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+              <span class="icon" aria-hidden="true">☾</span>
+              <span class="label">dark</span>
+            </button>
+          </div>
+        </header>
+
+        <section class="hero">
+          <div class="eyebrow">Software Engineer · India</div>
+          <h1>I build software, and write <strong>notes</strong> on how it works.</h1>
+          <p class="intro">
+            Backend &amp; mobile by trade, writer by habit. Notes here cover
+            software internals — containers, async I/O, debugging — with the
+            occasional detour into economics &amp; finance.
+          </p>
+          <div class="meta">
+            <a href="https://github.com/AnjayGoel">github</a>
+            <a href="#">linkedin</a>
+            <a href="mailto:hi@anjay.sh">email</a>
+            <a href="/rss.xml">rss</a>
+          </div>
+        </section>
+
+        <section class="block">
+          <div class="block-head">
+            <h2>Writing<span class="num">/ 22</span></h2>
+            <a class="more" href="/posts/">all →</a>
+          </div>
+
+          <a class="featured" href="/preview-5-post.html">
+            <div class="stamp">Latest · May 2026</div>
+            <h3>Letting Claude Code Run Wild For A Few Days</h3>
+            <p>
+              A Claude Code loop running an agent migrated our entire app
+              from Flutter to KMP in two days — what worked, what didn't,
+              and what surprised me about hands-off agent coding.
+            </p>
+            <div class="meta">9 min · claude / agents / mobile</div>
+          </a>
+
+          <ul class="posts">
+            <li><a href="#"><span class="post-date">2025.12.26</span><span class="post-title">Debugging In The Dark</span></a></li>
+            <li><a href="#"><span class="post-date">2025.12.08</span><span class="post-title">Anatomy of Containers, Part III: What's real, really?</span></a></li>
+            <li><a href="#"><span class="post-date">2025.11.04</span><span class="post-title">Anatomy of Containers, Part II: Too Far</span></a></li>
+            <li><a href="#"><span class="post-date">2025.11.04</span><span class="post-title">Anatomy of Containers, Part I: They're Just Fancy Processes</span></a></li>
+            <li><a href="#"><span class="post-date">2025.05.24</span><span class="post-title">How Does Async / Non-Blocking IO Actually Work?</span></a></li>
+            <li><a href="#"><span class="post-date">2025.01.30</span><span class="post-title">A Bug That Drove a 10× Surge in Concurrent Users</span></a></li>
+            <li><a href="#"><span class="post-date">2024.12.26</span><span class="post-title">The Myth of Market Timing</span></a></li>
+          </ul>
+          <a class="all-link" href="/posts/">view all 22 posts</a>
+        </section>
+
+        <section class="block">
+          <div class="block-head">
+            <h2>Selected Work<span class="num">/ 04</span></h2>
+            <a class="more" href="/showcase/">all →</a>
+          </div>
+          <ul class="work">
+            <li>
+              <a href="https://github.com/AnjayGoel/RedScout">
+                <div class="left">
+                  <div class="head">
+                    <span class="name">RedScout</span>
+                    <span class="stack">Go · Redis · CLI</span>
+                  </div>
+                  <p>Namespace-level Redis monitoring — memory, TTLs &amp; ops/sec by logical key prefix.</p>
+                </div>
+                <div class="right">OSS</div>
+              </a>
+            </li>
+            <li>
+              <a href="https://play.google.com/store/apps/details?id=com.dashtoon.video.reels">
+                <div class="left">
+                  <div class="head">
+                    <span class="name">DashReels</span>
+                    <span class="stack">Android · Kotlin</span>
+                  </div>
+                  <p>Short-form video Android app — 1M+ installs, low-latency playback over a flaky last mile.</p>
+                </div>
+                <div class="right live">1M+</div>
+              </a>
+            </li>
+            <li>
+              <a href="https://play.google.com/store/apps/details?id=com.dashtoon.app">
+                <div class="left">
+                  <div class="head">
+                    <span class="name">DashToon</span>
+                    <span class="stack">Android · Kotlin</span>
+                  </div>
+                  <p>Comics &amp; webtoons reader — fluid panel-by-panel reading experience.</p>
+                </div>
+                <div class="right">Live</div>
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/AnjayGoel/stable-roommate-generalised">
+                <div class="left">
+                  <div class="head">
+                    <span class="name">Stable Roommate (Generalised)</span>
+                    <span class="stack">Python · Algorithms</span>
+                  </div>
+                  <p>Generalises Irving's stable roommate matching to k-sized groups, with a small webapp.</p>
+                </div>
+                <div class="right">OSS</div>
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <section class="block topics">
+          <div class="block-head">
+            <h2>Topics</h2>
+          </div>
+          <div class="list">
+            <a href="#">android</a><a href="#">backend</a><a href="#">debugging</a><a href="#">distributed-systems</a><a href="#">economics</a><a href="#">finance</a><a href="#">go</a><a href="#">ios</a><a href="#">kotlin</a><a href="#">linux</a><a href="#">networking</a><a href="#">python</a>
+          </div>
+        </section>
+
+        <footer class="site">
+          <span>© 2026 — Anjay Goel</span>
+          <span style="display:flex;gap:14px;align-items:center;">
+            <a href="/rss.xml">rss</a>
+          </span>
+        </footer>
+      </div>
+    </div>
+    <script>(()=>{const r=document.documentElement;const btn=document.getElementById("theme-toggle");const upd=()=>{btn.querySelector(".label").textContent=r.dataset.theme==="dark"?"light":"dark";btn.querySelector(".icon").textContent=r.dataset.theme==="dark"?"☀":"☾";};upd();btn.addEventListener("click",()=>{r.dataset.theme=r.dataset.theme==="dark"?"light":"dark";localStorage.setItem("anjay-theme",r.dataset.theme);upd();});})();</script>
+  </body>
+</html>
