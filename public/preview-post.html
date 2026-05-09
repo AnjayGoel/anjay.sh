@@ -241,11 +241,12 @@
       .post-header h1 {
         font-family: var(--serif);
         font-weight: 500;
-        font-size: clamp(32px, 5vw, 48px);
+        font-size: clamp(28px, 5vw, 48px);
         line-height: 1.08;
         letter-spacing: -0.025em;
         margin: 0 0 24px;
         color: var(--text);
+        word-break: break-word;
       }
 
       .post-meta {
@@ -342,6 +343,15 @@
         border-radius: 3px;
         border: 1px solid var(--hairline);
         white-space: nowrap;
+        word-break: break-word;
+      }
+
+      .prose p, .prose li {
+        overflow-wrap: anywhere;
+      }
+
+      .prose a {
+        overflow-wrap: anywhere;
       }
 
       .prose strong {
@@ -450,11 +460,24 @@
 
       /* responsive */
       @media (max-width: 540px) {
-        .container { padding: 24px 20px 64px; }
+        .container { padding: 24px 18px 64px; }
+        header.site { flex-wrap: wrap; gap: 12px; padding-bottom: 40px; }
         nav.top { gap: 14px; font-size: 12px; }
         .brand .wordmark .where { display: none; }
-        .post-header h1 { font-size: clamp(28px, 8vw, 36px); }
+        .post-header h1 { font-size: clamp(26px, 8vw, 36px); }
         .prose { font-size: 16px; }
+        .post-meta { font-size: 11.5px; gap: 4px 12px; }
+      }
+      @media (max-width: 420px) {
+        .container { padding: 20px 16px 56px; }
+        header.site > div { gap: 10px !important; width: 100%; justify-content: space-between; }
+        nav.top { gap: 12px; font-size: 11.5px; }
+        .theme-toggle .label { display: none; }
+        .theme-toggle { padding: 4px 8px; }
+        .post-header h1 { font-size: 26px; }
+        .prose { font-size: 15.5px; line-height: 1.7; }
+        .prose h2 { font-size: 22px; }
+        .prose code { font-size: 0.82em; }
       }
 
       /* fade-in */

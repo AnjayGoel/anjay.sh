@@ -137,18 +137,49 @@
 
   @media (max-width: 720px) {
     .wrap { padding: 36px 22px 60px; }
-    .masthead h1 { font-size: 56px; }
-    .masthead .top-rule { font-size: 9.5px; }
+    .masthead { padding-bottom: 22px; }
+    .masthead h1 { font-size: clamp(48px, 13vw, 64px); margin: 6px 0 12px; }
+    .masthead .top-rule { font-size: 9px; letter-spacing: 0.14em; padding: 5px 0; margin-bottom: 18px; }
     .masthead .top-rule .hide-mobile { display: none; }
+    .masthead .edition { font-size: 9.5px; letter-spacing: 0.18em; gap: 10px; padding-top: 12px; }
     .lede { grid-template-columns: 1fr; gap: 28px; padding-top: 28px; }
-    .lede .meta { border-left: none; padding-left: 0; border-top: 1px solid var(--hairline); padding-top: 22px; }
+    .lede .bio { font-size: 17.5px; }
+    .lede .meta { border-left: none; padding-left: 0; border-top: 1px solid var(--hairline); padding-top: 22px; font-size: 14px; }
     .grid, .work-grid { grid-template-columns: 1fr; column-gap: 0; row-gap: 26px; }
     .featured h2 { font-size: 28px; }
+    .featured .excerpt { font-size: 16.5px; }
     .featured .excerpt::first-letter { font-size: 3em; }
-    nav.primary { flex-direction: column; gap: 8px; }
-    nav.primary .theme-toggle { position: static; }
-    nav.primary a { margin: 0 8px; }
+    .section-head { font-size: 9.5px; letter-spacing: 0.18em; gap: 10px; flex-wrap: wrap; }
+    .section-head .right { font-size: 12px; }
+    nav.primary { flex-wrap: wrap; gap: 6px 14px; padding-top: 12px; row-gap: 10px; }
+    nav.primary .nav-links { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 4px 0; }
+    nav.primary .theme-toggle { position: static; margin-left: 6px; }
+    nav.primary a { margin: 0 8px; font-size: 14px; }
     footer { flex-direction: column; gap: 12px; }
+  }
+
+  @media (max-width: 420px) {
+    .wrap { padding: 28px 18px 52px; }
+    .masthead { padding-bottom: 18px; }
+    .masthead h1 { font-size: clamp(40px, 12vw, 48px); margin: 4px 0 10px; }
+    .masthead .top-rule { font-size: 8.5px; letter-spacing: 0.1em; }
+    .masthead .top-rule span { padding: 0 2px; }
+    .masthead .edition { font-size: 9px; gap: 6px 8px; letter-spacing: 0.14em; }
+    .masthead .edition .sep { display: none; }
+    nav.primary { gap: 4px 10px; padding-top: 10px; font-size: 13.5px; }
+    nav.primary a { margin: 0 6px; font-size: 13.5px; }
+    nav.primary .theme-toggle { font-size: 13.5px; gap: 4px; }
+    nav.primary .theme-toggle .icon { display: none; }
+    section { margin-top: 44px; }
+    .lede { padding-top: 22px; gap: 22px; }
+    .lede .bio { font-size: 16.5px; }
+    .featured h2 { font-size: 25px; }
+    .featured .excerpt::first-letter { font-size: 2.6em; padding: 4px 8px 0 0; }
+    .featured .byline { font-size: 13px; }
+    .featured .byline .dot { padding: 0 5px; }
+    .post h3 { font-size: 18px; }
+    .project h3 { font-size: 20px; }
+    .topics { font-size: 14px; }
   }
 </style>
 </head>

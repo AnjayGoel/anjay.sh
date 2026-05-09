@@ -55,7 +55,9 @@
         line-height: 1.65;
         -webkit-font-smoothing: antialiased;
         transition: background-color 0.35s ease, color 0.35s ease;
+        overflow-x: hidden;
       }
+      .prose a { word-wrap: break-word; overflow-wrap: break-word; }
       .theme-toggle {
         background: transparent;
         border: 1px solid var(--hairline);
@@ -280,12 +282,23 @@
 
       @media (max-width: 540px) {
         .container { padding: 36px 22px 64px; }
-        header.site { margin-bottom: 48px; }
-        nav.top { gap: 16px; font-size: 13px; }
+        header.site { margin-bottom: 48px; flex-wrap: wrap; gap: 14px; }
+        header.site > div { flex-wrap: wrap; gap: 12px !important; }
+        nav.top { gap: 16px; font-size: 13px; flex-wrap: wrap; }
         .prose { font-size: 16px; }
         .prose h2 { font-size: 23px; }
         .prose h3 { font-size: 18px; }
         footer.site { margin-left: -22px; margin-right: -22px; padding-left: 22px; padding-right: 22px; }
+      }
+      @media (max-width: 420px) {
+        .container { padding: 32px 18px 56px; }
+        header.site { margin-bottom: 40px; }
+        header.site > div { gap: 10px !important; width: 100%; justify-content: space-between; }
+        nav.top { gap: 14px; font-size: 12.5px; }
+        .post-title { font-size: 28px !important; }
+        .theme-toggle .label { display: none; }
+        .theme-toggle { padding: 4px 8px; }
+        footer.site { margin-left: -18px; margin-right: -18px; padding-left: 18px; padding-right: 18px; flex-wrap: wrap; gap: 8px; }
       }
     </style>
   </head>

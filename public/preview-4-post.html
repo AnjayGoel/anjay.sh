@@ -47,7 +47,9 @@
         line-height: 1.65;
         -webkit-font-smoothing: antialiased;
         transition: background-color 0.35s ease, color 0.35s ease;
+        overflow-x: hidden;
       }
+      article.post a { word-wrap: break-word; overflow-wrap: break-word; }
       .container {
         max-width: 660px;
         margin: 0 auto;
@@ -119,7 +121,7 @@
       h1.post-title {
         font-family: var(--serif);
         font-weight: 500;
-        font-size: clamp(36px, 6vw, 50px);
+        font-size: clamp(30px, 6vw, 50px);
         line-height: 1.1;
         letter-spacing: -0.02em;
         margin: 0 0 28px;
@@ -305,7 +307,8 @@
       @media (max-width: 540px) {
         .container { padding: 36px 22px 64px; }
         header.site { margin-bottom: 56px; flex-wrap: wrap; gap: 16px; }
-        nav.top { gap: 18px; font-size: 13px; }
+        header.site > div { flex-wrap: wrap; gap: 12px !important; }
+        nav.top { gap: 18px; font-size: 13px; flex-wrap: wrap; }
         h1.post-title { margin-bottom: 22px; }
         article.post { font-size: 16px; line-height: 1.68; }
         article.post p:first-of-type::first-letter {
@@ -314,6 +317,24 @@
         }
         article.post h2 { font-size: 24px; }
         article.post h3 { font-size: 19px; }
+      }
+      @media (max-width: 420px) {
+        .container { padding: 28px 18px 56px; }
+        header.site { margin-bottom: 44px; }
+        header.site > div { gap: 10px !important; width: 100%; justify-content: space-between; }
+        nav.top { gap: 14px; font-size: 12.5px; }
+        .theme-toggle .label { display: none; }
+        .theme-toggle { padding: 4px 8px; }
+        article.post { font-size: 15.5px; }
+        article.post p:first-of-type::first-letter {
+          font-size: 2.8em;
+          padding-right: 6px;
+        }
+        article.post h2 { font-size: 22px; }
+        article.post h3 { font-size: 18px; }
+        .byline { font-size: 14.5px; }
+        .post-tags { font-size: 11px; word-wrap: break-word; }
+        footer.site { flex-wrap: wrap; gap: 8px; }
       }
     </style>
   </head>

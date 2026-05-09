@@ -66,6 +66,7 @@
         font-size: 15.5px;
         line-height: 1.6;
         -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
         transition: background-color 0.35s ease, color 0.35s ease;
       }
       .container {
@@ -131,11 +132,12 @@
       .hero h1 {
         font-family: var(--sans);
         font-weight: 500;
-        font-size: clamp(28px, 4.6vw, 38px);
+        font-size: clamp(26px, 4.6vw, 38px);
         line-height: 1.18;
         letter-spacing: -0.022em;
         margin: 0 0 22px;
         max-width: 22ch;
+        word-break: break-word;
       }
       .hero h1 .accent {
         color: var(--accent);
@@ -435,10 +437,25 @@
       .theme-toggle .icon { font-size: 12px; line-height: 1; }
 
       @media (max-width: 600px) {
-        .container { padding: 28px 22px 64px; }
+        .container { padding: 28px 20px 64px; }
         header.site { grid-template-columns: 1fr; gap: 12px; }
-        nav.top { justify-content: flex-start; gap: 18px; }
+        nav.top { justify-content: flex-start; gap: 18px; flex-wrap: wrap; }
         ul.work { grid-template-columns: 1fr; }
+        ul.posts a { padding: 13px 4px; margin: 0 -4px; }
+      }
+      @media (max-width: 420px) {
+        .container { padding: 24px 16px 56px; }
+        nav.top { gap: 14px; font-size: 13px; }
+        .theme-toggle .label { display: none; }
+        .theme-toggle { padding: 4px 8px; }
+        .brand .role { display: none; }
+        .hero h1 { font-size: 24px; }
+        .hero p { font-size: 15px; }
+        .hero .cta a { font-size: 13px; padding: 7px 12px; }
+        .featured { padding: 18px 18px; }
+        .featured h3 { font-size: 17px; }
+        ul.posts a { gap: 12px; }
+        ul.posts .post-title { font-size: 14.5px; }
       }
     </style>
   </head>

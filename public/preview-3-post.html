@@ -67,7 +67,9 @@
         line-height: 1.6;
         -webkit-font-smoothing: antialiased;
         transition: background-color 0.35s ease, color 0.35s ease;
+        overflow-x: hidden;
       }
+      article.post a { word-wrap: break-word; overflow-wrap: break-word; }
       .container {
         max-width: 720px;
         margin: 0 auto;
@@ -382,6 +384,18 @@
         article.post h2 { font-size: 20px; margin-top: 44px; }
         article.post h3 { font-size: 17px; }
         .post-end { flex-direction: row; padding: 18px 20px; }
+      }
+      @media (max-width: 420px) {
+        .container { padding: 24px 18px 56px; }
+        header.site { margin-bottom: 40px; }
+        nav.top { gap: 14px; font-size: 13px; }
+        .post-header h1 { font-size: 28px; }
+        .post-header .excerpt { font-size: 15.5px; }
+        .brand .role { margin-left: 8px; padding-left: 8px; font-size: 11px; }
+        .theme-toggle .label { display: none; }
+        .theme-toggle { padding: 4px 8px; }
+        .post-end { padding: 16px 16px; gap: 10px; }
+        .post-end .end-title { font-size: 14.5px; }
       }
     </style>
   </head>

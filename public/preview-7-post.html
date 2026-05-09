@@ -213,13 +213,22 @@
 
   @media (max-width: 720px) {
     .wrap { padding: 36px 22px 60px; }
-    .masthead h1.brand { font-size: 56px; }
-    .masthead .top-rule { font-size: 9.5px; }
+    .masthead { padding-bottom: 22px; }
+    .masthead h1.brand { font-size: clamp(48px, 13vw, 64px); margin: 6px 0 12px; }
+    .masthead .top-rule { font-size: 9px; letter-spacing: 0.14em; padding: 5px 0; margin-bottom: 18px; }
     .masthead .top-rule .hide-mobile { display: none; }
-    nav.primary { flex-direction: column; gap: 8px; }
-    nav.primary .theme-toggle { position: static; }
-    nav.primary a { margin: 0 8px; }
-    .article-head h1.title { font-size: 34px; line-height: 1.08; }
+    .masthead .edition { font-size: 9.5px; letter-spacing: 0.18em; gap: 10px; padding-top: 12px; }
+    nav.primary { flex-wrap: wrap; gap: 6px 14px; padding-top: 12px; row-gap: 10px; }
+    nav.primary .nav-links { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 4px 0; }
+    nav.primary .theme-toggle { position: static; margin-left: 6px; }
+    nav.primary a { margin: 0 8px; font-size: 14px; }
+    article.post-article { margin-top: 44px; }
+    .article-head .eyebrow { font-size: 9.5px; letter-spacing: 0.18em; gap: 10px; }
+    .article-head .eyebrow .right { font-size: 12px; }
+    .article-head h1.title { font-size: clamp(30px, 8vw, 36px); line-height: 1.08; }
+    .article-head .byline { font-size: 14.5px; }
+    .article-head .byline .dot { padding: 0 6px; }
+    .article-head .filed { font-size: 9.5px; letter-spacing: 0.14em; }
     .article-body { font-size: 17px; line-height: 1.62; }
     .article-body p:first-of-type::first-letter {
       font-size: 40px; padding: 2px 6px 0 0;
@@ -228,6 +237,35 @@
     .article-body h3 { font-size: 19px; }
     .article-end { flex-direction: column; gap: 8px; }
     footer { flex-direction: column; gap: 12px; }
+  }
+
+  @media (max-width: 420px) {
+    .wrap { padding: 28px 18px 52px; }
+    .masthead { padding-bottom: 18px; }
+    .masthead h1.brand { font-size: clamp(40px, 12vw, 48px); margin: 4px 0 10px; }
+    .masthead .top-rule { font-size: 8.5px; letter-spacing: 0.1em; }
+    .masthead .top-rule span { padding: 0 2px; }
+    .masthead .edition { font-size: 9px; gap: 6px 8px; letter-spacing: 0.14em; }
+    .masthead .edition .sep { display: none; }
+    nav.primary { gap: 4px 10px; padding-top: 10px; font-size: 13.5px; }
+    nav.primary a { margin: 0 6px; font-size: 13.5px; }
+    nav.primary .theme-toggle { font-size: 13.5px; gap: 4px; }
+    nav.primary .theme-toggle .icon { display: none; }
+    article.post-article { margin-top: 36px; }
+    .article-head .eyebrow { margin-bottom: 24px; }
+    .article-head h1.title { font-size: 28px; line-height: 1.1; margin-bottom: 18px; }
+    .article-head .byline { font-size: 13.5px; margin-bottom: 10px; }
+    .article-head .byline .dot { padding: 0 5px; }
+    .article-head .filed { font-size: 9px; letter-spacing: 0.12em; margin-bottom: 18px; }
+    .article-head .head-rule { margin-bottom: 28px; }
+    .article-body { font-size: 16.5px; line-height: 1.6; }
+    .article-body p:first-of-type::first-letter {
+      font-size: 36px; padding: 2px 6px 0 0;
+    }
+    .article-body h2 { font-size: 22px; }
+    .article-body h3 { font-size: 18px; }
+    figure.fig figcaption { font-size: 10px; letter-spacing: 0.1em; }
+    figure.fig figcaption em { font-size: 12.5px; }
   }
 </style>
 </head>

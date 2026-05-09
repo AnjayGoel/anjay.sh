@@ -43,6 +43,7 @@
       }
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
+      html, body { overflow-x: hidden; }
       body {
         background: var(--bg);
         color: var(--ink);
@@ -241,6 +242,7 @@
         border: 1px solid var(--hairline);
         padding: 1px 6px;
         white-space: nowrap;
+        word-break: break-word;
         transition: border-color 0.35s ease;
       }
       article.body ul {
@@ -346,9 +348,26 @@
       @media (max-width: 720px) {
         .layout { grid-template-columns: 1fr; gap: 0; padding: 36px 24px 64px; }
         .rail { display: none; }
+        .content { max-width: 100%; }
+        header.site { flex-wrap: wrap; gap: 14px 18px; margin-bottom: 64px; }
         .article-head { margin-bottom: 48px; }
         article.body h2 { margin-top: 2.4em; }
         .article-foot { flex-direction: column; gap: 14px; align-items: flex-start; }
+      }
+      @media (max-width: 420px) {
+        .layout { padding: 28px 18px 56px; }
+        header.site { margin-bottom: 56px; }
+        header.site > div { gap: 12px !important; flex-wrap: wrap; }
+        nav.top { gap: 16px; font-size: 11.5px; flex-wrap: wrap; }
+        .theme-toggle { padding: 2px 6px; }
+        .article-head { margin-bottom: 40px; }
+        .article-head .eyebrow { margin-bottom: 22px; }
+        .article-head h1 { font-size: 26px; line-height: 1.3; }
+        article.body { font-size: 15px; }
+        article.body h2 { font-size: 20px; }
+        article.body h3 { font-size: 16.5px; }
+        article.body code { font-size: 12px; word-break: break-word; white-space: normal; }
+        footer.site { flex-direction: column; gap: 8px; align-items: flex-start; }
       }
     </style>
   </head>
