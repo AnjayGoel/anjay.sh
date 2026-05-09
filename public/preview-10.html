@@ -239,6 +239,85 @@
     .topics-list { font-size: 12.5px; }
     .site-footer { font-size: 11.5px; gap: 12px; }
   }
+
+  /* ---------- Refinement Pass 1: Visual coherence & polish ---------- */
+  /* Focus-visible accent outline */
+  a:focus-visible,
+  button:focus-visible,
+  .post:focus-visible,
+  .work-item:focus-visible,
+  .nav a:focus-visible,
+  .wordmark:focus-visible,
+  .topics-list a:focus-visible,
+  .socials a:focus-visible,
+  .archive-link a:focus-visible,
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+  .post:focus-visible,
+  .work-item:focus-visible { outline-offset: 4px; border-radius: 4px; }
+  .theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+
+  /* Theme transitions on themed elements */
+  .work-item, .post-dot, .post-title, .post-date, .work-name, .work-arrow, .archive-link a, .topics-list a, .socials a, .nav a, .wordmark, hr, .site-footer, .theme-toggle {
+    transition-property: background-color, border-color, color, transform;
+    transition-duration: 0.25s, 0.35s, 0.2s, 0.25s;
+    transition-timing-function: ease;
+  }
+
+  /* Anchor the timeline rail: bookend caps so it doesn't float */
+  .timeline::after {
+    content: ""; position: absolute; left: 78px; top: 6px;
+    width: 1px; height: 1px;
+    box-shadow: 0 0 0 0 transparent;
+  }
+
+  /* Wordmark hover */
+  .wordmark { transition: color 0.2s ease, border-color 0.2s ease; }
+  .wordmark:hover { color: var(--accent); }
+
+  /* Featured dot is filled with ink-2 by default; on hover use accent */
+  .post.featured:hover .post-dot { background: var(--accent); border-color: var(--accent); }
+
+  /* Hover refinement: the row shouldn't break the rail rhythm; keep dot crisp */
+  .post:hover .post-dot { box-shadow: 0 0 0 3px var(--bg); }
+
+  /* Edge cases: word-wrap & media fit */
+  .post-title, .post-excerpt, .post-preview, .work-name, .work-desc, .hero p { word-wrap: break-word; overflow-wrap: anywhere; }
+  img, video { max-width: 100%; height: auto; }
+  pre, code { overflow-x: auto; max-width: 100%; }
+
+  /* Hairline rule strength consistency: keep all separators at 1px solid var(--hairline) */
+  .work-item { border-top-width: 1px; }
+  .work-item:last-child { border-bottom-width: 1px; }
+
+  /* ---------- Refinement Pass 2: Typography & detail polish ---------- */
+  /* Tabular numerals on mono dates and meta */
+  .post-date, .post.featured .post-meta, .work-stack { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+  /* Mono date weight: slight lift for optical balance against serif title */
+  .post-date { font-weight: 500; }
+
+  /* Display headings letter-spacing for ≥30px */
+  .post.featured .post-title { letter-spacing: -0.02em; line-height: 1.14; }
+  .post:not(.featured) .post-title { line-height: 1.3; }
+
+  /* Hero paragraph rhythm */
+  .hero p { line-height: 1.65; }
+
+  /* Topics list spacing rhythm */
+  .topics-list { line-height: 2; }
+
+  /* Rail dot optical balance: featured slightly larger so it reads as anchor */
+  .post.featured .post-dot { width: 11px; height: 11px; right: -8px; top: 12px; }
+
+  /* Work arrow micro-interaction (already exists; ensure consistency) */
+  .work-arrow { display: inline-block; }
+
+  /* Archive link arrow nudge */
+  .archive-link a { transition: color 0.2s ease, border-color 0.2s ease; }
 </style>
 </head>
 <body>

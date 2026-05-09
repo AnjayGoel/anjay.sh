@@ -15,19 +15,22 @@
     --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
     --maxw: 880px;
   }
-  :root[data-theme="light"] { --bg:#f6f3ec; --ink:#1c1814; --ink-2:#4a4239; --muted:#807769; --faint:#b8ad9b; --hairline:#d8d0bd; --accent:#8b3a3a; }
-  :root[data-theme="dark"] { --bg:#14110d; --ink:#e8e1d2; --ink-2:#b1a994; --muted:#807665; --faint:#4a4438; --hairline:#2a2519; --accent:#c46a6a; }
+  :root[data-theme="light"] { --bg:#f6f3ec; --ink:#1c1814; --ink-2:#4a4239; --muted:#807769; --faint:#b8ad9b; --hairline:#d8d0bd; --accent:#8b3a3a; --selection:rgba(139,58,58,0.18); }
+  :root[data-theme="dark"] { --bg:#14110d; --ink:#e8e1d2; --ink-2:#b1a994; --muted:#807665; --faint:#4a4438; --hairline:#2a2519; --accent:#c46a6a; --selection:rgba(196,106,106,0.28); }
 
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
     background-color: var(--bg); color: var(--ink);
-    font-family: var(--serif); font-size: 17px; line-height: 1.55;
+    font-family: var(--serif); font-size: 17px; line-height: 1.6;
     -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.35s ease, color 0.35s ease;
   }
+  ::selection { background: var(--selection); color: var(--ink); }
   a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--hairline); transition: border-color 0.35s ease, color 0.2s ease; }
   a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 1px; }
+  .theme-toggle:focus-visible { outline-offset: 4px; }
 
   .wrap { max-width: var(--maxw); margin: 0 auto; padding: 56px 32px 80px; }
 
@@ -43,8 +46,9 @@
   .masthead .top-rule span { padding: 0 4px; }
   .masthead h1 {
     font-family: var(--serif); font-weight: 800;
-    font-size: clamp(48px, 9vw, 84px); line-height: 0.95; letter-spacing: -0.02em;
+    font-size: clamp(48px, 9vw, 84px); line-height: 1.05; letter-spacing: -0.025em;
     margin: 8px 0 14px; color: var(--ink);
+    overflow-wrap: break-word; word-wrap: break-word;
   }
   .masthead h1 em { font-style: italic; font-weight: 500; color: var(--ink-2); }
   .masthead .edition {
@@ -89,22 +93,23 @@
 
   /* Featured */
   .featured .kicker { font-style: italic; font-size: 13.5px; color: var(--accent); margin-bottom: 12px; }
-  .featured h2 { font-weight: 600; font-size: clamp(30px, 4.6vw, 40px); line-height: 1.08; letter-spacing: -0.015em; margin: 0 0 14px; color: var(--ink); }
-  .featured h2 a { border-bottom: none; color: inherit; }
+  .featured h2 { font-weight: 600; font-size: clamp(30px, 4.6vw, 40px); line-height: 1.1; letter-spacing: -0.018em; margin: 0 0 14px; color: var(--ink); overflow-wrap: break-word; }
+  .featured h2 a { border-bottom: none; color: inherit; transition: color 0.2s ease; }
   .featured h2 a:hover { color: var(--accent); }
-  .featured .byline { font-style: italic; font-size: 14px; color: var(--muted); margin-bottom: 18px; }
+  .featured .byline { font-style: italic; font-size: 14px; color: var(--muted); margin-bottom: 18px; font-variant-numeric: tabular-nums; }
   .featured .byline .dot { color: var(--faint); padding: 0 8px; }
-  .featured .excerpt { font-size: 17.5px; line-height: 1.6; color: var(--ink-2); max-width: 70ch; }
-  .featured .excerpt::first-letter { font-weight: 700; font-size: 3.6em; float: left; line-height: 0.88; padding: 6px 10px 0 0; color: var(--ink); }
+  .featured .excerpt { font-size: 17.5px; line-height: 1.65; color: var(--ink-2); max-width: 70ch; }
+  .featured .excerpt::first-letter { font-weight: 700; font-size: 3.6em; float: left; line-height: 0.86; padding: 0.08em 0.12em 0 0; margin-top: 0.06em; color: var(--ink); transition: color 0.35s ease; }
   .featured .read { margin-top: 18px; font-style: italic; font-size: 14.5px; }
-  .featured .read a { border-bottom: 1px solid var(--hairline); color: var(--accent); }
+  .featured .read a { border-bottom: 1px solid var(--hairline); color: var(--accent); transition: color 0.2s ease, border-color 0.35s ease, transform 0.2s ease; display: inline-block; }
+  .featured .read a:hover { transform: translateX(2px); }
 
   /* Posts grid */
   .grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 44px; row-gap: 32px; }
   .post { border-top: 1px solid var(--hairline); padding-top: 18px; transition: border-color 0.35s ease; }
-  .post .date { font-family: var(--mono); font-style: italic; font-size: 11.5px; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 6px; }
-  .post h3 { font-weight: 500; font-size: 19.5px; line-height: 1.22; letter-spacing: -0.005em; margin: 0 0 6px; }
-  .post h3 a { border-bottom: none; color: var(--ink); }
+  .post .date { font-family: var(--mono); font-style: italic; font-size: 11.5px; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 6px; font-variant-numeric: tabular-nums; }
+  .post h3 { font-weight: 500; font-size: 19.5px; line-height: 1.25; letter-spacing: -0.005em; margin: 0 0 6px; overflow-wrap: break-word; }
+  .post h3 a { border-bottom: none; color: var(--ink); transition: color 0.2s ease; }
   .post h3 a:hover { color: var(--accent); }
   .post .excerpt { font-style: italic; font-size: 14.5px; color: var(--muted); line-height: 1.5; }
 
@@ -113,12 +118,13 @@
   .project { border-top: 1px solid var(--hairline); padding-top: 18px; transition: border-color 0.35s ease; }
   .project .stack { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
   .project .stack .tag { color: var(--accent); }
-  .project h3 { font-weight: 600; font-size: 22px; line-height: 1.18; margin: 0 0 8px; letter-spacing: -0.01em; }
-  .project h3 a { border-bottom: none; color: var(--ink); }
+  .project h3 { font-weight: 600; font-size: 22px; line-height: 1.2; margin: 0 0 8px; letter-spacing: -0.012em; overflow-wrap: break-word; }
+  .project h3 a { border-bottom: none; color: var(--ink); transition: color 0.2s ease; }
   .project h3 a:hover { color: var(--accent); }
-  .project p { font-size: 15.5px; color: var(--ink-2); margin: 0 0 12px; line-height: 1.5; }
+  .project p { font-size: 15.5px; color: var(--ink-2); margin: 0 0 12px; line-height: 1.55; }
   .project .see { font-style: italic; font-size: 14px; color: var(--accent); }
-  .project .see a { border-bottom: 1px solid var(--hairline); color: inherit; }
+  .project .see a { border-bottom: 1px solid var(--hairline); color: inherit; transition: color 0.2s ease, border-color 0.35s ease, transform 0.2s ease; display: inline-block; }
+  .project .see a:hover { transform: translateX(2px); }
 
   /* Topics */
   .topics { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--hairline); transition: border-color 0.35s ease; font-style: italic; font-size: 15px; color: var(--muted); line-height: 1.7; }

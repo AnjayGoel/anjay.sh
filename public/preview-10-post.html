@@ -253,6 +253,63 @@
     .post-end { font-size: 14px; }
     .site-footer { font-size: 11.5px; }
   }
+
+  /* ---------- Refinement Pass 1: Visual coherence & polish ---------- */
+  /* Focus-visible: 2px accent outline on all interactive elements */
+  a:focus-visible,
+  button:focus-visible,
+  .nav a:focus-visible,
+  .wordmark:focus-visible,
+  article a:focus-visible,
+  .post-end a:focus-visible,
+  .site-footer a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+  .theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+
+  /* Theme transitions on themed elements */
+  .post-title, .byline, .nav a, .wordmark, article a, article code, article video, .rule, .post-end, .site-footer, .theme-toggle, article blockquote {
+    transition-property: background-color, border-color, color, transform;
+    transition-duration: 0.35s, 0.35s, 0.2s, 0.25s;
+    transition-timing-function: ease;
+  }
+
+  /* Wordmark transition consistency */
+  .wordmark { transition: color 0.2s ease, border-color 0.2s ease; }
+
+  /* Edge cases: long titles, video/img fit, code overflow */
+  .post-title, article p, article h2, article h3, article li { word-wrap: break-word; overflow-wrap: anywhere; }
+  article img, article video { max-width: 100%; height: auto; }
+  article pre { overflow-x: auto; max-width: 100%; }
+
+  /* Hairline rule strength consistency: 1px solid var(--hairline) across all separators */
+  .rule, .post-end, .site-footer { border-color: var(--hairline); }
+
+  /* Post-end back-link micro-interaction */
+  .post-end a { display: inline-flex; align-items: center; gap: 4px; transition: color 0.2s ease, border-color 0.2s ease, transform 0.25s ease; }
+  .post-end a:hover { transform: translateX(-2px); }
+
+  /* ---------- Refinement Pass 2: Typography & detail polish ---------- */
+  /* Display heading letter-spacing for h1 ≥30px */
+  .post-title { letter-spacing: -0.022em; line-height: 1.1; }
+
+  /* Heading rhythm */
+  article h2 { letter-spacing: -0.016em; line-height: 1.2; }
+  article h3 { letter-spacing: -0.005em; line-height: 1.28; }
+
+  /* Body paragraph rhythm */
+  article p { line-height: 1.75; }
+  article p + p { margin-top: 0; }
+
+  /* Tabular numerals on mono columns */
+  .post-eyebrow, article code { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+  /* Inline code micro-polish: keep current colors, ensure consistent radius */
+  article code { border-radius: 3px; }
+
+  /* Selection inherits root */
 </style>
 </head>
 <body>

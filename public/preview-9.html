@@ -275,6 +275,94 @@
       .proj { padding: 14px 16px; }
       footer { font-size: 11.5px; flex-wrap: wrap; }
     }
+
+    /* ---------- Refinement Pass 1: Visual coherence & polish ---------- */
+    ::selection { background: var(--accent-soft-2); color: var(--ink); }
+
+    /* Focus-visible on all interactive elements */
+    a:focus-visible,
+    button:focus-visible,
+    .chip:focus-visible,
+    .topic:focus-visible,
+    .featured:focus-visible,
+    .proj:focus-visible,
+    .posts-list a:focus-visible,
+    .theme-toggle:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+    .featured:focus-visible,
+    .proj:focus-visible { outline-offset: 4px; border-radius: var(--radius); }
+    .chip:focus-visible,
+    .topic:focus-visible,
+    .theme-toggle:focus-visible { outline-offset: 2px; border-radius: 999px; }
+
+    /* Theme transitions on themed elements */
+    .featured, .proj, .chip, .topic, .theme-toggle, .posts-list a, .mono-mark, hr, footer {
+      transition-property: background-color, border-color, color, transform, box-shadow;
+      transition-duration: 0.25s, 0.25s, 0.2s, 0.25s, 0.25s;
+      transition-timing-function: ease;
+    }
+
+    /* Differentiate shadow tone between modes */
+    :root[data-theme="light"] .featured { box-shadow: 0 1px 2px rgba(60, 40, 25, 0.04), 0 8px 28px -16px rgba(60, 40, 25, 0.10); }
+    :root[data-theme="dark"] .featured { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.30), 0 14px 40px -18px rgba(0, 0, 0, 0.55); }
+    :root[data-theme="light"] .mono-mark { box-shadow: 0 2px 6px -2px rgba(168, 94, 63, 0.35), 0 1px 2px rgba(60, 40, 25, 0.06); }
+    :root[data-theme="dark"] .mono-mark { box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.55); }
+
+    /* Hover state lift on featured + projects (slightly stronger shadow on hover) */
+    :root[data-theme="light"] .featured:hover { box-shadow: 0 2px 4px rgba(60, 40, 25, 0.05), 0 14px 36px -16px rgba(60, 40, 25, 0.15); }
+    :root[data-theme="dark"] .featured:hover { box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35), 0 18px 48px -18px rgba(0, 0, 0, 0.65); }
+
+    /* Hover refinements on projects (use accent-tinted background for light, slightly lifted for dark) */
+    :root[data-theme="light"] .proj:hover { background: var(--panel); }
+    :root[data-theme="dark"] .proj:hover { background: var(--panel); }
+    .proj .open { transition: color 0.2s ease, transform 0.2s ease; }
+    .proj:hover .open { transform: translateX(2px); }
+
+    /* Theme toggle: subtle border so it reads as button in both modes */
+    .theme-toggle { border-color: var(--hairline); }
+    .theme-toggle:hover { border-color: var(--accent-soft-2); }
+
+    /* "more" link arrow micro-interaction */
+    .sec-head .more,
+    .proj .open { display: inline-flex; align-items: center; }
+    .sec-head .more { transition: color 0.2s ease; }
+
+    /* Edge case: long titles wrap & code/pre overflows */
+    .posts-list .title,
+    .proj .name,
+    .proj .desc,
+    .featured h3,
+    .bio p,
+    .topic { word-wrap: break-word; overflow-wrap: anywhere; }
+    pre, code { overflow-x: auto; max-width: 100%; }
+
+    /* ---------- Refinement Pass 2: Typography & detail polish ---------- */
+    /* Tabular numerals on mono dates */
+    .mono, .posts-list .date, .featured .meta .mono, .proj .stack { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+    /* Heading rhythm */
+    .featured h3 { letter-spacing: -0.012em; line-height: 1.28; }
+    .who .name { letter-spacing: -0.005em; }
+
+    /* Paragraph rhythm in bio */
+    .bio p { line-height: 1.7; }
+
+    /* Inline code styling (additive) */
+    code:not(pre code) {
+      font-family: var(--font-mono);
+      font-size: 0.88em;
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 1px 6px;
+      border-radius: 4px;
+      letter-spacing: -0.01em;
+    }
+
+    /* Chip / panel radius consistency: 999px pill for chips, 12 for proj, 16 for big panels */
+    .chip, .topic, .theme-toggle, .featured .latest, .featured .tags span, .proj .badge { border-radius: 999px; }
   </style>
 </head>
 <body>

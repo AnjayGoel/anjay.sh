@@ -302,6 +302,70 @@
       .back-link { font-size: 12.5px; padding: 7px 14px; }
       footer { font-size: 11.5px; flex-wrap: wrap; }
     }
+
+    /* ---------- Refinement Pass 1: Visual coherence & polish ---------- */
+    ::selection { background: var(--accent-soft-2); color: var(--ink); }
+
+    a:focus-visible,
+    button:focus-visible,
+    .back-link:focus-visible,
+    .theme-toggle:focus-visible,
+    .mono-mark-link:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+    .back-link:focus-visible,
+    .theme-toggle:focus-visible { outline-offset: 2px; border-radius: 999px; }
+    .mono-mark-link:focus-visible { outline-offset: 4px; border-radius: 12px; }
+
+    /* Theme transitions on themed elements */
+    .article, hr.hairline, .back-link, .theme-toggle, .mono-mark, .body video, .body code, footer {
+      transition-property: background-color, border-color, color, transform, box-shadow;
+      transition-duration: 0.35s, 0.35s, 0.2s, 0.25s, 0.35s;
+      transition-timing-function: ease;
+    }
+
+    /* Differentiate panel/article shadow between modes (gentler light, deeper dark) */
+    :root[data-theme="light"] .article { box-shadow: 0 1px 2px rgba(60, 40, 25, 0.04), 0 10px 32px -18px rgba(60, 40, 25, 0.10); }
+    :root[data-theme="dark"] .article { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.30), 0 16px 44px -20px rgba(0, 0, 0, 0.55); }
+    :root[data-theme="light"] .mono-mark { box-shadow: 0 2px 6px -2px rgba(168, 94, 63, 0.35), 0 1px 2px rgba(60, 40, 25, 0.06); }
+    :root[data-theme="dark"] .mono-mark { box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.55); }
+
+    .theme-toggle { border-color: var(--hairline); }
+    .theme-toggle:hover { border-color: var(--accent-soft-2); }
+
+    .mono-mark-link { transition: transform 0.25s ease; }
+    .mono-mark-link:hover { transform: translateY(-1px); }
+
+    /* Back-link arrow micro-interaction */
+    .back-link { transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.25s ease; }
+    .back-link:hover { transform: translateX(-2px); }
+
+    /* Edge case: video / img fit + code overflow */
+    .body video, .body img { max-width: 100%; height: auto; }
+    .body pre { overflow-x: auto; max-width: 100%; }
+    .body p, .body h1, .body h2, .body h3, .body li, .article h1 { word-wrap: break-word; overflow-wrap: anywhere; }
+
+    /* ---------- Refinement Pass 2: Typography & detail polish ---------- */
+    /* Display heading letter-spacing for h1 ≥30px */
+    .article h1 { letter-spacing: -0.022em; line-height: 1.12; }
+
+    /* Body paragraph rhythm tuning */
+    .body p + p { margin-top: 0; }
+    .body p { margin-bottom: 1.15em; }
+    .body h2 { letter-spacing: -0.015em; line-height: 1.25; }
+    .body h3 { letter-spacing: -0.005em; line-height: 1.3; }
+
+    /* Tabular numerals on mono dates */
+    .mono, .meta-row .mono { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+    /* Inline code subtle border for definition (additive, doesn't change color) */
+    .body code { border: 1px solid var(--accent-soft-2); }
+    .body h3 code { border: 1px solid var(--accent-soft-2); }
+
+    /* Radius tier consistency: chips 999px, code 6px, video 12px, panel 16px */
+    .eyebrow, .meta-row .tags span, .back-link { border-radius: 999px; }
   </style>
 </head>
 <body>

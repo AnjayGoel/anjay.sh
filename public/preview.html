@@ -69,6 +69,19 @@
         transition: background-color 0.35s ease, color 0.35s ease;
       }
 
+      ::selection {
+        background: var(--accent-soft);
+        color: var(--text);
+      }
+
+      a { text-decoration-skip-ink: auto; }
+
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 2px;
+      }
+
       /* warm radial atmosphere */
       body::before {
         content: "";
@@ -118,11 +131,21 @@
       .theme-toggle:hover {
         color: var(--accent);
         border-color: var(--accent-soft);
+        background: rgba(209, 138, 91, 0.04);
+      }
+      .theme-toggle:hover .icon {
+        transform: rotate(-12deg);
+      }
+      .theme-toggle:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-color: var(--accent-soft);
       }
       .theme-toggle .icon {
         width: 11px;
         height: 11px;
         display: inline-block;
+        transition: transform 0.25s ease;
       }
       .featured h3,
       .post-title,
@@ -157,7 +180,16 @@
         gap: 12px;
         text-decoration: none;
         color: var(--text);
+        transition: color 0.2s ease;
       }
+
+      .brand:hover .wordmark { color: var(--accent); }
+      .brand:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 4px;
+        border-radius: 3px;
+      }
+      .brand .wordmark { transition: color 0.2s ease; }
 
       .brand .mark {
         width: 28px;
@@ -206,6 +238,13 @@
       }
 
       nav.top a:hover {
+        color: var(--text);
+      }
+
+      nav.top a:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 4px;
+        border-radius: 2px;
         color: var(--text);
       }
 
@@ -258,6 +297,7 @@
         letter-spacing: -0.025em;
         margin: 0 0 22px;
         word-break: break-word;
+        text-wrap: balance;
       }
 
       .hero h1 .accent {
@@ -268,8 +308,9 @@
 
       .hero p.intro {
         font-size: 17px;
-        line-height: 1.6;
-        color: #c9c4ba;
+        line-height: 1.65;
+        color: var(--text);
+        opacity: 0.86;
         max-width: 56ch;
         margin: 0 0 28px;
       }
@@ -288,6 +329,7 @@
         font-size: 12.5px;
         color: var(--muted);
         margin-top: 8px;
+        font-variant-numeric: tabular-nums;
       }
 
       .meta-row a {
@@ -312,6 +354,18 @@
 
       .meta-row a:hover::before {
         opacity: 1;
+        transform: translateX(2px);
+      }
+
+      .meta-row a::before {
+        transition: opacity 0.2s ease, transform 0.2s ease;
+      }
+
+      .meta-row a:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 2px;
+        color: var(--text);
       }
 
       /* ---- section ---- */
@@ -354,6 +408,13 @@
         color: var(--accent);
       }
 
+      .block-head .more:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 2px;
+        color: var(--accent);
+      }
+
       /* ---- writing list ---- */
       .featured {
         display: block;
@@ -373,6 +434,16 @@
           rgba(209, 138, 91, 0.04),
           transparent 70%
         );
+      }
+
+      .featured:hover h3 {
+        color: var(--accent);
+      }
+
+      .featured:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 3px;
       }
 
       .featured .pill {
@@ -407,9 +478,10 @@
         font-weight: 500;
         font-size: 26px;
         line-height: 1.2;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.018em;
         margin: 0 0 10px;
         color: var(--text);
+        text-wrap: balance;
       }
 
       .featured p {
@@ -426,6 +498,7 @@
         color: var(--faint);
         display: flex;
         gap: 14px;
+        font-variant-numeric: tabular-nums;
       }
 
       ul.posts {
@@ -453,9 +526,23 @@
         color: var(--accent);
       }
 
+      ul.posts a:hover .post-date {
+        color: var(--muted);
+      }
+
       ul.posts a:hover .arrow {
         opacity: 1;
-        transform: translateX(2px);
+        transform: translateX(3px);
+      }
+
+      ul.posts a:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 2px;
+      }
+
+      ul.posts a:focus-visible .post-title {
+        color: var(--accent);
       }
 
       ul.posts .post-date {
@@ -464,6 +551,8 @@
         color: var(--faint);
         white-space: nowrap;
         padding-top: 2px;
+        font-variant-numeric: tabular-nums;
+        transition: color 0.2s ease;
       }
 
       ul.posts .post-title {
@@ -500,9 +589,22 @@
         color: var(--accent);
       }
 
+      .all-link:hover::after {
+        transform: translateX(3px);
+      }
+
+      .all-link:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 2px;
+        color: var(--accent);
+      }
+
       .all-link::after {
         content: " →";
         color: var(--accent);
+        display: inline-block;
+        transition: transform 0.2s ease;
       }
 
       /* ---- work list ---- */
@@ -556,6 +658,12 @@
         color: var(--accent);
       }
 
+      ul.work .work-row:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 3px;
+      }
+
       .work-head {
         display: flex;
         align-items: baseline;
@@ -605,6 +713,7 @@
         border: 1px solid var(--hairline);
         border-radius: 3px;
         margin-right: 4px;
+        transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
       }
 
       .work-tag.live {
@@ -645,6 +754,21 @@
         color: var(--accent);
       }
 
+      .topics .topic-list a:hover::before {
+        color: var(--accent);
+      }
+
+      .topics .topic-list a:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 2px;
+        color: var(--accent);
+      }
+
+      .topics .topic-list a::before {
+        transition: color 0.2s ease;
+      }
+
       /* ---- footer ---- */
       footer.site {
         margin-top: 80px;
@@ -666,10 +790,22 @@
       footer.site a {
         color: var(--muted);
         text-decoration: none;
+        transition: color 0.2s ease;
       }
 
       footer.site a:hover {
         color: var(--accent);
+      }
+
+      footer.site a:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 2px;
+        color: var(--accent);
+      }
+
+      footer.site {
+        font-variant-numeric: tabular-nums;
       }
 
       /* responsive */
@@ -756,6 +892,20 @@
         to {
           opacity: 1;
           transform: none;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .fade-in {
+          opacity: 1;
+          transform: none;
+          animation: none;
+        }
+        .featured .pill::before {
+          animation: none;
+        }
+        * {
+          transition-duration: 0.01ms !important;
         }
       }
     </style>

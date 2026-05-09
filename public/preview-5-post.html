@@ -345,6 +345,71 @@
       footer.site a { color: var(--muted); text-decoration: none; }
       footer.site a:hover { color: var(--accent); }
 
+      /* --- polish (pass 1 + pass 2) --- */
+      html { scroll-behavior: smooth; }
+      ::selection { background: var(--accent); color: var(--bg); }
+
+      a, button { outline: none; }
+      a:focus-visible,
+      button:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 1px;
+      }
+      .theme-toggle:focus-visible { outline-offset: 2px; }
+      article.body a:focus-visible { outline-offset: 2px; border-radius: 1px; }
+
+      .brand { transition: color 0.2s ease; }
+      .brand:hover { color: var(--accent); }
+
+      .article-head h1 { letter-spacing: -0.02em; }
+
+      /* tabular figures on mono date columns */
+      .article-head .meta,
+      .rail .stamp,
+      .article-foot { font-variant-numeric: tabular-nums; }
+
+      /* paragraph rhythm baseline (additive) */
+      article.body p { text-decoration-skip-ink: auto; }
+
+      /* inline code: bg tint variant for inline contexts (additive, kept harmonious with sienna palette) */
+      article.body code {
+        background: var(--paper);
+        border-radius: 3px;
+        transition: background-color 0.35s ease, border-color 0.35s ease;
+      }
+      article.body h3 code { background: transparent; }
+
+      /* arrow micro-interactions */
+      .article-foot .back,
+      .article-foot .all { transition: color 0.2s ease; display: inline-block; }
+      .article-foot .back::before,
+      .article-foot .all::after { display: inline-block; transition: transform 0.2s ease, color 0.2s ease; }
+      .article-foot .back:hover::before { transform: translateX(-3px); }
+      .article-foot .all:hover::after { transform: translateX(3px); }
+
+      /* rail crispness on theme swap */
+      .rail .v-line { transition: background 0.35s ease; }
+      .rail .v-text,
+      .rail .stamp { transition: color 0.35s ease; }
+      .rail .stamp .y { transition: color 0.35s ease; }
+
+      /* long titles + media + code overflow */
+      .article-head h1 { overflow-wrap: anywhere; word-break: normal; }
+      img, video { max-width: 100%; height: auto; }
+      article.body pre { overflow-x: auto; max-width: 100%; }
+
+      /* bullet markers transition smoothly */
+      article.body ul li::before { transition: background-color 0.35s ease; }
+
+      /* nav active dot transitions */
+      nav.top a.active::before { transition: color 0.35s ease; }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { transition: none !important; animation: none !important; }
+        html { scroll-behavior: auto; }
+      }
+
       @media (max-width: 720px) {
         .layout { grid-template-columns: 1fr; gap: 0; padding: 36px 24px 64px; }
         .rail { display: none; }
