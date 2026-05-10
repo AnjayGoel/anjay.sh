@@ -2,6 +2,10 @@
 import {siteConfig} from "@/site-config";
 import type {SiteMeta} from "@/types";
 import "../styles/global.css";
+// Vite-resolved hashed URL for the body font's primary subset — used to
+// preload the critical-render-path font file. Only Newsreader latin
+// (normal weight) is preloaded; everything else loads via @font-face.
+import newsreaderLatin from "@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2?url";
 
 type Props = SiteMeta;
 
@@ -44,17 +48,13 @@ const goatcounter = analytics?.goatcounterUrl;
 <meta content={description} name="description"/>
 <meta content={siteConfig.author} name="author"/>
 
-{/* Fonts */}
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-{/* Trim weights to keep CSS payload small — keep in sync with usage. */}
-<link
-    href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet"
-/>
+{/* Fonts — self-hosted via @fontsource-variable/* (see global.css). Preload
+    only the body-text Latin subset; @font-face handles the rest. */}
+<link rel="preload" as="font" type="font/woff2" href={newsreaderLatin} crossorigin />
 
-{/* Theme Colour */}
-<meta content="" name="theme-color"/>
+{/* Theme Colour — set a sensible default; ThemeProvider rewrites it on
+    load to the active theme's background. */}
+<meta content="#f6f1e6" name="theme-color"/>
 
 {/* Open Graph / Facebook */}
 <meta content={articleDate ? "article" : "website"} property="og:type"/>

@@ -1,6 +1,8 @@
 ---
 import { type CollectionEntry, render } from "astro:content";
+import { Image } from "astro:assets";
 
+import ShareButtons from "@/components/blog/ShareButtons.astro";
 import WebMentions from "@/components/blog/webmentions/index.astro";
 import { siteConfig } from "@/site-config";
 import { formatBylineDate, formatEyebrowDate } from "@/utils/date";
@@ -14,7 +16,7 @@ interface Props {
 
 const { post } = Astro.props;
 const {
-	data: { description, ogImage, publishDate, title, updatedDate, tags, draft },
+	data: { coverImage, description, ogImage, publishDate, title, updatedDate, tags, draft },
 	id: slug,
 } = post;
 const socialImage = ogImage ?? `/og-image/${slug}.png`;
@@ -89,19 +91,36 @@ const readingTime: string =
 				)}
 			</div>
 
-			<hr class="rule" />
+			{coverImage ? (
+				<figure class="post-cover">
+					<Image
+						src={coverImage.src}
+						alt={coverImage.alt}
+						loading="eager"
+						fetchpriority="high"
+						widths={[480, 720, 960, 1280]}
+						sizes="(max-width: 720px) 92vw, 696px"
+					/>
+				</figure>
+			) : (
+				<hr class="rule" />
+			)}
 
 			<article class="post-article">
 				<slot />
 			</article>
 
+			<ShareButtons title={title} url={postUrl} description={description} />
+
 			<WebMentions />
 
-			{comments && <div class="comments" id="comments"></div>}
+			<hr class="rule rule--footer" />
 
 			<div class="post-end">
 				<a href="/posts/">← All posts</a>
 			</div>
+
+			{comments && <div class="comments" id="comments"></div>}
 		</div>
 	</div>
 
@@ -139,6 +158,22 @@ const readingTime: string =
 		z-index: 100;
 		pointer-events: none;
 		transition: width 0.05s linear;
+	}
+
+	/* Article header — cover image */
+	.post-cover {
+		margin: 0 0 36px;
+		padding: 0;
+	}
+	.post-cover img {
+		display: block;
+		width: 100%;
+		height: auto;
+		max-height: 380px;
+		object-fit: cover;
+		border: 1px solid var(--hairline);
+		border-radius: 4px;
+		background: var(--paper);
 	}
 
 	/* Article header */
@@ -229,6 +264,11 @@ const readingTime: string =
 		margin: 0 0 44px;
 		transition: background-color 0.35s ease;
 	}
+	/* Footer-area separator — gives breathing room around stacked footer blocks
+	   (post-end link, comments) so each rule reads as intentional. */
+	.rule--footer {
+		margin: 56px 0 28px;
+	}
 
 	/* Comments container — match article body width */
 	.comments { max-width: var(--reading-width); margin: 56px 0 32px; }
@@ -236,14 +276,10 @@ const readingTime: string =
 
 	/* End-of-article back link */
 	.post-end {
-		margin-top: 64px;
-		padding-top: 22px;
-		border-top: 1px solid var(--hairline);
 		font-family: var(--font-serif);
 		font-style: italic;
 		font-size: 15.5px;
 		color: hsl(var(--theme-text) / 0.6);
-		transition: border-color 0.35s ease;
 	}
 	.post-end a {
 		color: hsl(var(--theme-text));

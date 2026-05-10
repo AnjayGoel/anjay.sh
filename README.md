@@ -29,6 +29,12 @@ live in [`src/site.config.ts`](./src/site.config.ts) (`profile`, `comments`,
 7. Update `public/google*.html` (Search Console verification) and
    `public/resume.pdf` to match your own — or remove them.
 
+## Math
+
+Posts support LaTeX via [KaTeX](https://katex.org/) — wrap math in single
+dollars for inline (`$E = mc^2$`) and double dollars for display blocks
+(`$$\int_0^\infty x^2 \, dx$$`).
+
 ## Develop
 
 ```sh

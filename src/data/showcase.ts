@@ -1,9 +1,4 @@
-/**
- * Showcase entries — projects, products, and side experiments.
- * Consumed by both `/` (homepage) and `/showcase/` to keep them in sync.
- *
- * Add, remove, or reorder entries here. `badge` is optional.
- */
+// Single source of showcase entries — consumed by `/` and `/showcase/`.
 export interface ShowcaseItem {
 	/** Display name. */
 	name: string;

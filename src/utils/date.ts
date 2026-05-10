@@ -1,17 +1,6 @@
 import { siteConfig } from "@/site-config";
 
-/**
- * Date formatting helpers used across the site.
- *
- * Conventions:
- *   - "rail"   -> short date in the timeline left rail (`5 Mar 2026`).
- *   - "stamp"  -> month + year stamp on the featured card (`March 2026`).
- *   - "byline" -> long-form date in the article byline (`5 March 2026`).
- *   - "eyebrow"-> month + year shown in the article eyebrow (`March 2026`).
- *
- * Formatters are constructed once at module scope; they're reused on every
- * call which keeps build-time formatting cheap on large post lists.
- */
+// Date formatters used across pages — built once at module scope, reused.
 
 const dateFormat = new Intl.DateTimeFormat(siteConfig.date.locale, siteConfig.date.options);
 

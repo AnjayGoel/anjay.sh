@@ -1,26 +1,21 @@
+/* `@import` must precede all other rules. */
+@import "@fontsource-variable/newsreader/wght.css";
+@import "@fontsource-variable/newsreader/wght-italic.css";
+@import "@fontsource-variable/inter/wght.css";
+@import "@fontsource-variable/jetbrains-mono/wght.css";
+@import "katex/dist/katex.min.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/*
- * Theme tokens — two intentional formats coexist:
- *
- *   1. `--theme-*` are "hsl-channel" strings (e.g. `28deg 16% 13%`) used via
- *      `hsl(var(--theme-..) / <alpha-value>)`. This format is required for
- *      Tailwind's color-with-alpha integration in `tailwind.config.ts`.
- *
- *   2. `--paper`, `--hairline`, `--faint`, `--accent-soft` are concrete colors
- *      (hex / rgba) consumed directly by component CSS. They don't need alpha
- *      variants from utilities, so they stay as-is for readability.
- *
- * Layout tokens (rail width, reading width, etc.) live alongside.
- */
+/* `--theme-*` are hsl-channel for Tailwind alpha utilities; `--paper`/`--hairline`/`--faint`/`--accent-soft` are direct colors. */
 
 @layer base {
 	:root {
-		--font-serif: "Newsreader", "Iowan Old Style", Georgia, serif;
-		--font-sans: "Inter", -apple-system, system-ui, sans-serif;
-		--font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+		--font-serif: "Newsreader Variable", "Iowan Old Style", Georgia, serif;
+		--font-sans: "Inter Variable", -apple-system, system-ui, sans-serif;
+		--font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, monospace;
 
 		/* Layout tokens — shared across home, posts archive, and article pages */
 		--reading-width: 64ch;          /* article body & long prose blocks */
@@ -87,5 +82,21 @@
 @media (max-width: 420px) {
 	.section-label {
 		margin-bottom: 26px;
+	}
+}
+
+/*
+ * Respect users who prefer reduced motion. Disables transitions,
+ * animations, and smooth-scroll across the site (theme cross-fade,
+ * reading-progress bar, hover transforms, etc.).
+ */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		transition: none !important;
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		scroll-behavior: auto !important;
 	}
 }

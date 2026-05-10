@@ -30,7 +30,7 @@ respective country. So, the ccTLDs have their own country-specific set of regula
 
 The hierarchy looks like this:
 <figure>
-<img src="https://www.cloudflare.com/img/learning/dns/glossary/what-is-a-domain-name-registrar/registrar-flow.png">
+<img src="https://www.cloudflare.com/img/learning/dns/glossary/what-is-a-domain-name-registrar/registrar-flow.png" alt="Domain registry, registrar, and registrant flow" width="1200" height="675" loading="lazy" decoding="async">
 <figcaption>Source: <a href="https://www.cloudflare.com/en-gb/learning/dns/glossary/what-is-a-domain-name-registrar/">Cloudflare: What is a domain name registrar?
 </a> </figcaption>
 </figure>
@@ -48,7 +48,7 @@ always thought that the DNS was a single monolithic system that stored all the d
 case.
 
 <figure>
-<img src="https://cf-assets.www.cloudflare.com/slt3lc6tev37/1NzaAqpEFGjqTZPAS02oNv/bf7b3f305d9c35bde5c5b93a519ba6d5/what_is_a_dns_server_dns_lookup.png">
+<img src="https://cf-assets.www.cloudflare.com/slt3lc6tev37/1NzaAqpEFGjqTZPAS02oNv/bf7b3f305d9c35bde5c5b93a519ba6d5/what_is_a_dns_server_dns_lookup.png" alt="DNS lookup flow showing recursive resolver, root, TLD, and authoritative servers" width="1200" height="675" loading="lazy" decoding="async">
 <figcaption>Source: <a href="https://www.cloudflare.com/en-gb/learning/dns/what-is-dns/">Cloudflare: What is DNS?</a>
 </figcaption>
 </figure>

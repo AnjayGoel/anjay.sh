@@ -12,10 +12,12 @@ import { siteConfig } from "./src/site.config";
 import partytown from "@astrojs/partytown";
 
 import remarkDirective from "remark-directive";
+import remarkMath from "remark-math";
 import { remarkAdmonitions } from "./src/plugins/remark-admonitions";
 import { remarkReadingTime } from "./src/plugins/remark-reading-time";
 
 import rehypeExternalLinks from "rehype-external-links";
+import rehypeKatex from "rehype-katex";
 import rehypeUnwrapImages from "rehype-unwrap-images";
 
 export default defineConfig({
@@ -80,6 +82,9 @@ export default defineConfig({
 	markdown: {
 		rehypePlugins: [
 			rehypeUnwrapImages,
+			// rehype-katex must run before rehype-external-links so the latter
+			// doesn't rewrite anchors inside katex's emitted DOM.
+			rehypeKatex,
 			[
 				rehypeExternalLinks,
 				{
@@ -88,7 +93,7 @@ export default defineConfig({
 				},
 			],
 		],
-		remarkPlugins: [remarkReadingTime, remarkDirective, remarkAdmonitions],
+		remarkPlugins: [remarkReadingTime, remarkDirective, remarkAdmonitions, remarkMath],
 		remarkRehype: {
 			footnoteLabelProperties: {
 				className: [""],

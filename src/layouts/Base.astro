@@ -49,6 +49,8 @@ const {
 				-moz-osx-font-smoothing: grayscale;
 				text-rendering: optimizeLegibility;
 				transition: background-color 0.35s ease, color 0.35s ease;
+				min-height: 100vh;
+				min-height: 100dvh;
 			}
 			a {
 				color: inherit;
@@ -56,11 +58,17 @@ const {
 				transition: color 0.2s ease, border-color 0.2s ease;
 			}
 
+			/* Sticky footer: wrap takes at least full viewport, main grows to push footer down */
 			.wrap {
 				max-width: 760px;
 				margin: 0 auto;
 				padding: 56px 32px 80px;
+				min-height: 100vh;
+				min-height: 100dvh;
+				display: flex;
+				flex-direction: column;
 			}
+			.wrap > main { flex: 1 0 auto; }
 
 			@media (max-width: 720px) {
 				.wrap {
