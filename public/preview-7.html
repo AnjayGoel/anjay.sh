@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Anjay Goel — Notes & Dispatches</title>
-<script>(()=>{try{const s=localStorage.getItem("anjay-theme");const d=window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=s||(d?"dark":"light");}catch(e){}})();</script>
+<script>(()=>{try{const s=localStorage.getItem("theme");const d=window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=s||(d?"dark":"light");}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400;1,6..72,500&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -348,6 +348,6 @@
 
 </div>
 
-<script>(()=>{const r=document.documentElement;const btn=document.getElementById("theme-toggle");const upd=()=>{btn.querySelector(".label").textContent=r.dataset.theme==="dark"?"light":"dark";btn.querySelector(".icon").textContent=r.dataset.theme==="dark"?"☀":"☾";};upd();btn.addEventListener("click",()=>{r.dataset.theme=r.dataset.theme==="dark"?"light":"dark";localStorage.setItem("anjay-theme",r.dataset.theme);upd();});})();</script>
+<script>(()=>{const r=document.documentElement;const btn=document.getElementById("theme-toggle");const upd=()=>{btn.querySelector(".label").textContent=r.dataset.theme==="dark"?"light":"dark";btn.querySelector(".icon").textContent=r.dataset.theme==="dark"?"☀":"☾";};upd();btn.addEventListener("click",()=>{r.dataset.theme=r.dataset.theme==="dark"?"light":"dark";localStorage.setItem("theme",r.dataset.theme);upd();});})();</script>
 </body>
 </html>

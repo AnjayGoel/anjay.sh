@@ -1,12 +1,10 @@
 ---
 import type { CollectionEntry } from "astro:content";
 
-import Masthead from "@/components/blog/Masthead.astro";
-import TOC from "@/components/blog/TOC.astro";
 import WebMentions from "@/components/blog/webmentions/index.astro";
-import PostNavigation from "@/components/blog/PostNavigation.astro";
 
 import BaseLayout from "./Base.astro";
+import { Schema } from "astro-seo-schema";
 
 interface Props {
 	post: CollectionEntry<"post">;
@@ -16,13 +14,29 @@ interface Props {
 
 const { post, prevPost, nextPost } = Astro.props;
 const {
-	data: { description, ogImage, publishDate, title, updatedDate },
+	data: { description, ogImage, publishDate, title, updatedDate, tags, draft },
 	slug,
 } = post;
 const socialImage = ogImage ?? `/og-image/${slug}.png`;
 const articleDate = updatedDate?.toISOString() ?? publishDate.toISOString();
-const { headings } = await post.render();
-import { Schema } from "astro-seo-schema";
+const { headings, remarkPluginFrontmatter } = await post.render();
+
+// Eyebrow: "Posts · Month YYYY"
+const eyebrowDate = publishDate.toLocaleDateString("en-US", {
+	month: "long",
+	year: "numeric",
+});
+
+// Byline date: "2 May 2026"
+const bylineDate = publishDate.toLocaleDateString("en-GB", {
+	day: "numeric",
+	month: "long",
+	year: "numeric",
+});
+
+// Reading time: prefer remark plugin's value, otherwise fall back gracefully.
+const readingTime: string =
+	(remarkPluginFrontmatter as { minutesRead?: string })?.minutesRead ?? "";
 ---
 
 <Schema
@@ -32,7 +46,7 @@ import { Schema } from "astro-seo-schema";
 		headline: title,
 		datePublished: articleDate,
 		dateModified: updatedDate?.toISOString(),
-    url: `https://anjay.sh/posts/${slug}`,
+		url: `https://anjay.sh/posts/${slug}`,
 		image: `https://anjay.sh${socialImage}`,
 		author: {
 			"@type": "Person",
@@ -43,30 +57,68 @@ import { Schema } from "astro-seo-schema";
 />
 
 <BaseLayout meta={{ articleDate, description, ogImage: socialImage, title }}>
-	<div class="gap-x-10 lg:flex lg:items-start">
-		{!!headings.length && <TOC headings={headings} />}
-		<article class="flex-grow break-words" data-pagefind-body>
-			<div id="blog-hero">
-				<Masthead content={post} />
+	<div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
+	<div class="post-shell">
+		<div class="post-main" data-pagefind-body>
+			<div id="blog-hero" class="post-header">
+				<div class="post-eyebrow">
+					Posts <span class="sep">·</span> {eyebrowDate}
+				</div>
+				{draft && <span class="draft-flag">(Draft)</span>}
+				<h1 class="post-title">{title}</h1>
+				<p class="byline">
+					By Anjay Goel<span class="sep">·</span>{bylineDate}{readingTime && (
+						<>
+							<span class="sep">·</span>{readingTime}
+						</>
+					)}
+				</p>
+				{!!tags?.length && (
+					<div class="post-tags">
+						{tags.map((tag, i) => (
+							<>
+								<span data-pagefind-filter="tag">{tag}</span>{i < tags.length - 1 && <span class="sep">·</span>}
+							</>
+						))}
+					</div>
+				)}
+				{updatedDate && (
+					<div class="post-updated">
+						Updated <time datetime={updatedDate.toISOString()}>
+							{updatedDate.toLocaleDateString("en-GB", {
+								day: "numeric",
+								month: "long",
+								year: "numeric",
+							})}
+						</time>
+					</div>
+				)}
 			</div>
-			<div
-				class="prose prose-sm text-[0.9375rem] prose-cactus mt-12 prose-headings:font-semibold prose-headings:text-accent-2 prose-headings:before:absolute prose-headings:before:-ms-4 prose-headings:before:text-accent sm:prose-headings:before:content-['#'] sm:prose-th:before:content-none prose-p:indent-6  [&_li>p]:indent-0 [&_li>p]:my-0 [&_li>p]:inline"
-			>
+
+			<hr class="rule" />
+
+			<article class="post-article">
 				<slot />
-				<WebMentions />
-				<PostNavigation prevPost={prevPost} nextPost={nextPost} />
+			</article>
+
+			<WebMentions />
+
+			<div class="comments" id="comments"></div>
+
+			<div class="post-end">
+				<a href="/posts/">← All posts</a>
 			</div>
-		</article>
+		</div>
 	</div>
+
 	<button
 		aria-label="Back to Top"
-		class="z-90 fixed bottom-8 end-4 flex h-10 w-10 translate-y-28 items-center justify-center rounded-full border-2 border-transparent bg-zinc-200 text-3xl opacity-0 transition-all duration-300 hover:border-zinc-400 data-[show=true]:translate-y-0 data-[show=true]:opacity-100 dark:bg-zinc-700 sm:end-8 sm:h-12 sm:w-12"
+		class="to-top-btn"
 		data-show="false"
 		id="to-top-btn"
 	>
 		<svg
 			aria-hidden="true"
-			class="h-6 w-6"
 			fill="none"
 			focusable="false"
 			stroke="currentColor"
@@ -78,6 +130,531 @@ import { Schema } from "astro-seo-schema";
 		</svg>
 	</button>
 </BaseLayout>
+
+<style>
+	.post-shell { display: block; position: relative; }
+
+	/* Reading progress bar (top of viewport) */
+	.reading-progress {
+		position: fixed;
+		top: 0;
+		left: 0;
+		height: 2px;
+		width: 0;
+		background: hsl(var(--theme-accent));
+		z-index: 100;
+		pointer-events: none;
+		transition: width 0.05s linear;
+	}
+
+	/* Article header */
+	.post-eyebrow {
+		font-family: var(--font-mono);
+		font-size: 11.5px;
+		font-weight: 500;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: hsl(var(--theme-text) / 0.55);
+		margin-bottom: 22px;
+		font-variant-numeric: tabular-nums;
+		font-feature-settings: "tnum";
+	}
+	.post-eyebrow .sep {
+		color: var(--faint);
+		margin: 0 8px;
+	}
+
+	.draft-flag {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 11.5px;
+		color: #c14a2b;
+		margin-bottom: 12px;
+		letter-spacing: 0.08em;
+	}
+
+	.post-title {
+		font-family: var(--font-serif);
+		font-weight: 500;
+		font-size: clamp(28px, 5.5vw, 46px);
+		letter-spacing: -0.022em;
+		line-height: 1.1;
+		color: hsl(var(--theme-text));
+		margin: 0 0 18px;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+	}
+	.post-title :global(em) {
+		font-style: italic;
+		color: hsl(var(--theme-accent));
+		font-weight: 400;
+	}
+
+	.byline {
+		font-family: var(--font-serif);
+		font-style: italic;
+		font-size: 16.5px;
+		color: hsl(var(--theme-text-muted));
+		margin: 0 0 14px;
+		line-height: 1.5;
+		font-variant-numeric: tabular-nums;
+		font-feature-settings: "tnum";
+	}
+	.byline .sep {
+		color: var(--faint);
+		margin: 0 6px;
+		font-style: normal;
+	}
+
+	.post-tags {
+		font-family: var(--font-mono);
+		font-size: 11.5px;
+		color: hsl(var(--theme-text) / 0.55);
+		letter-spacing: 0.02em;
+		margin-bottom: 32px;
+		word-break: break-word;
+	}
+	.post-tags a {
+		color: inherit;
+		transition: color 0.2s ease;
+	}
+	.post-tags a:hover {
+		color: hsl(var(--theme-accent));
+	}
+	.post-tags .sep {
+		color: var(--faint);
+		margin: 0 6px;
+	}
+
+	.post-updated {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: hsl(var(--theme-text) / 0.5);
+		margin: -16px 0 32px;
+	}
+
+	.rule {
+		height: 1px;
+		background: var(--hairline);
+		border: 0;
+		margin: 0 0 44px;
+		transition: background-color 0.35s ease;
+	}
+
+	/* Comments container — match article body width */
+	.comments { max-width: 64ch; margin: 56px 0 32px; }
+	.comments .giscus { max-width: 100%; }
+
+	/* End-of-article back link */
+	.post-end {
+		margin-top: 64px;
+		padding-top: 22px;
+		border-top: 1px solid var(--hairline);
+		font-family: var(--font-serif);
+		font-style: italic;
+		font-size: 15.5px;
+		color: hsl(var(--theme-text) / 0.6);
+		transition: border-color 0.35s ease;
+	}
+	.post-end a {
+		color: hsl(var(--theme-text-muted));
+		border-bottom: 1px solid var(--hairline);
+		padding-bottom: 1px;
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		transition: color 0.2s ease, border-color 0.2s ease, transform 0.25s ease;
+	}
+	.post-end a:hover {
+		color: hsl(var(--theme-accent));
+		border-color: hsl(var(--theme-accent));
+		transform: translateX(-2px);
+	}
+
+	/* Back-to-top button */
+	.to-top-btn {
+		position: fixed;
+		bottom: 32px;
+		right: 16px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 40px;
+		height: 40px;
+		border-radius: 999px;
+		border: 1px solid transparent;
+		background: var(--accent-soft);
+		color: hsl(var(--theme-text-muted));
+		cursor: pointer;
+		opacity: 0;
+		transform: translateY(28px);
+		transition: opacity 0.3s ease, transform 0.3s ease, color 0.2s ease, border-color 0.2s ease;
+		z-index: 90;
+	}
+	.to-top-btn[data-show="true"] {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	.to-top-btn:hover {
+		color: hsl(var(--theme-accent));
+		border-color: var(--hairline);
+	}
+	.to-top-btn svg {
+		width: 20px;
+		height: 20px;
+	}
+	@media (min-width: 720px) {
+		.to-top-btn {
+			right: 32px;
+			bottom: 32px;
+			width: 44px;
+			height: 44px;
+		}
+	}
+
+	/* Mobile article header */
+	@media (max-width: 720px) {
+		.post-title { font-size: 30px; line-height: 1.15; }
+		.byline { font-size: 15.5px; }
+		.rule { margin-bottom: 32px; }
+	}
+	@media (max-width: 420px) {
+		.post-eyebrow { font-size: 11px; margin-bottom: 18px; }
+		.post-eyebrow .sep { margin: 0 6px; }
+		.post-title { font-size: 26px; }
+		.byline { font-size: 14.5px; margin-bottom: 24px; }
+		.rule { margin-bottom: 26px; }
+		.post-end { font-size: 14px; }
+	}
+
+	/* Focus-visible accent outline */
+	.post-end a:focus-visible,
+	.post-tags a:focus-visible,
+	.to-top-btn:focus-visible {
+		outline: 2px solid hsl(var(--theme-accent));
+		outline-offset: 3px;
+		border-radius: 3px;
+	}
+</style>
+
+<style is:global>
+	/* ---------- Article body styling (preview-10) ---------- */
+	.post-article {
+		font-family: var(--font-serif);
+		color: hsl(var(--theme-text));
+	}
+
+	.post-article > p {
+		font-size: 17.5px;
+		line-height: 1.75;
+		color: hsl(var(--theme-text));
+		margin: 0 0 24px;
+		max-width: 64ch;
+		word-wrap: break-word;
+		overflow-wrap: anywhere;
+	}
+	.post-article > p:first-of-type::first-letter {
+		font-family: var(--font-serif);
+		font-style: italic;
+		font-weight: 500;
+		color: hsl(var(--theme-accent));
+		float: left;
+		font-size: 3.6em;
+		line-height: 0.92;
+		padding: 4px 10px 0 0;
+		margin-top: 4px;
+	}
+	.post-article p em,
+	.post-article em {
+		font-style: italic;
+	}
+	.post-article p strong,
+	.post-article strong {
+		font-weight: 500;
+		color: hsl(var(--theme-text));
+	}
+
+	.post-article h2 {
+		font-family: var(--font-serif);
+		font-weight: 500;
+		font-size: 27px;
+		line-height: 1.22;
+		letter-spacing: -0.014em;
+		color: hsl(var(--theme-text));
+		margin: 56px 0 20px;
+		word-wrap: break-word;
+		overflow-wrap: anywhere;
+	}
+	.post-article h3 {
+		font-family: var(--font-serif);
+		font-weight: 500;
+		font-style: italic;
+		font-size: 20px;
+		line-height: 1.3;
+		letter-spacing: -0.005em;
+		color: hsl(var(--theme-text));
+		margin: 38px 0 14px;
+		word-wrap: break-word;
+		overflow-wrap: anywhere;
+	}
+	.post-article h4 {
+		font-family: var(--font-serif);
+		font-weight: 500;
+		font-size: 17.5px;
+		line-height: 1.35;
+		color: hsl(var(--theme-text));
+		margin: 30px 0 12px;
+	}
+
+	/* Anchor links inside body */
+	.post-article a {
+		color: hsl(var(--theme-text));
+		border-bottom: 1px solid var(--hairline);
+		padding-bottom: 1px;
+		word-break: break-word;
+		overflow-wrap: anywhere;
+		transition: color 0.2s ease, border-color 0.2s ease;
+	}
+	.post-article a:hover {
+		color: hsl(var(--theme-accent));
+		border-color: hsl(var(--theme-accent));
+	}
+
+	/* Inline code */
+	.post-article :not(pre) > code {
+		font-family: var(--font-mono);
+		font-size: 14.5px;
+		background: var(--paper);
+		border: 1px solid var(--hairline);
+		padding: 1px 6px;
+		border-radius: 3px;
+		color: hsl(var(--theme-text-muted));
+		font-variant-numeric: tabular-nums;
+		font-feature-settings: "tnum";
+		transition: background-color 0.35s ease, border-color 0.35s ease;
+	}
+
+	/* Code blocks */
+	.post-article pre {
+		background: var(--paper);
+		border: 1px solid var(--hairline);
+		border-radius: 4px;
+		padding: 16px;
+		margin: 28px 0;
+		overflow-x: auto;
+		max-width: 100%;
+		font-size: 14px;
+		line-height: 1.7;
+		transition: background-color 0.35s ease, border-color 0.35s ease;
+	}
+	.post-article pre code {
+		background: transparent;
+		border: 0;
+		padding: 0;
+		font-size: inherit;
+		color: inherit;
+	}
+	/* expressive-code wrapper safety */
+	.post-article .expressive-code {
+		margin: 28px 0;
+	}
+
+	/* Lists */
+	.post-article ul {
+		margin: 0 0 28px;
+		padding: 0;
+		list-style: none;
+		max-width: 64ch;
+	}
+	.post-article ul li {
+		position: relative;
+		padding-left: 22px;
+		font-size: 17.5px;
+		line-height: 1.7;
+		color: hsl(var(--theme-text));
+		margin-bottom: 10px;
+		word-wrap: break-word;
+		overflow-wrap: anywhere;
+	}
+	.post-article ul li::before {
+		content: "";
+		position: absolute;
+		left: 4px;
+		top: 0.78em;
+		width: 5px;
+		height: 5px;
+		border-radius: 50%;
+		background: hsl(var(--theme-accent));
+	}
+	.post-article ul ul {
+		margin: 10px 0 4px;
+	}
+	.post-article ul ul li {
+		font-size: 17px;
+		color: hsl(var(--theme-text-muted));
+		margin-bottom: 6px;
+	}
+	.post-article ul ul li::before {
+		background: transparent;
+		border: 1px solid hsl(var(--theme-accent));
+		width: 5px;
+		height: 5px;
+	}
+
+	.post-article ol {
+		margin: 0 0 28px;
+		padding-left: 22px;
+		max-width: 64ch;
+	}
+	.post-article ol li {
+		font-size: 17.5px;
+		line-height: 1.7;
+		color: hsl(var(--theme-text));
+		margin-bottom: 10px;
+		padding-left: 6px;
+	}
+	.post-article ol li::marker {
+		color: hsl(var(--theme-accent));
+		font-family: var(--font-mono);
+		font-size: 14px;
+	}
+
+	.post-article li > p {
+		margin: 0;
+		display: inline;
+	}
+
+	/* Blockquote */
+	.post-article blockquote {
+		margin: 28px 0;
+		padding: 4px 0 4px 22px;
+		border-left: 2px solid hsl(var(--theme-accent));
+		font-style: italic;
+		color: hsl(var(--theme-text-muted));
+		font-size: 18px;
+		line-height: 1.65;
+		max-width: 64ch;
+	}
+	.post-article blockquote p {
+		margin: 0 0 12px;
+		font-size: inherit;
+		max-width: none;
+	}
+	.post-article blockquote p:last-child {
+		margin-bottom: 0;
+	}
+	.post-article blockquote p:first-of-type::first-letter {
+		all: unset;
+	}
+
+	/* Figure / video / images — predictable sizing prevents CLS */
+	.post-article figure {
+		margin: 36px 0;
+		padding: 0;
+	}
+	.post-article figure video,
+	.post-article video {
+		display: block;
+		width: 100%;
+		height: auto;
+		aspect-ratio: 16 / 9;
+		object-fit: cover;
+		border: 1px solid var(--hairline);
+		background: var(--paper);
+		transition: border-color 0.35s ease;
+	}
+	.post-article img {
+		display: block;
+		max-width: 100%;
+		height: auto;
+		border: 1px solid var(--hairline);
+		background: var(--paper);
+	}
+	.post-article figure img {
+		width: 100%;
+	}
+	.post-article figcaption {
+		font-family: var(--font-serif);
+		font-style: italic;
+		font-size: 14.5px;
+		color: hsl(var(--theme-text) / 0.6);
+		margin-top: 12px;
+		line-height: 1.5;
+	}
+	.post-article figcaption .label {
+		font-family: var(--font-mono);
+		font-style: normal;
+		font-size: 11px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: hsl(var(--theme-text-muted));
+		margin-right: 8px;
+	}
+
+	/* Tables */
+	.post-article table {
+		width: 100%;
+		max-width: 100%;
+		border-collapse: collapse;
+		margin: 28px 0;
+		font-size: 15.5px;
+		font-family: var(--font-sans);
+	}
+	.post-article th,
+	.post-article td {
+		text-align: left;
+		padding: 8px 12px;
+		border-bottom: 1px solid var(--hairline);
+	}
+	.post-article th {
+		font-weight: 500;
+		color: hsl(var(--theme-text));
+	}
+
+	.post-article hr {
+		border: 0;
+		height: 1px;
+		background: var(--hairline);
+		margin: 40px 0;
+	}
+
+	/* Mobile body */
+	@media (max-width: 720px) {
+		.post-article > p,
+		.post-article ul li,
+		.post-article ol li {
+			font-size: 17px;
+			line-height: 1.72;
+		}
+		.post-article h2 { font-size: 23px; margin: 44px 0 16px; }
+		.post-article h3 { font-size: 18.5px; margin: 30px 0 12px; }
+		.post-article :not(pre) > code { font-size: 13.5px; }
+		.post-article figure { margin: 28px 0; }
+	}
+	@media (max-width: 420px) {
+		.post-article > p,
+		.post-article ul li,
+		.post-article ol li {
+			font-size: 16px;
+			line-height: 1.7;
+		}
+		.post-article h2 { font-size: 20px; margin: 36px 0 14px; }
+		.post-article h3 { font-size: 17px; margin: 26px 0 10px; }
+		.post-article ul { padding-left: 0; }
+		.post-article ul li { padding-left: 18px; }
+		.post-article blockquote { padding-left: 16px; font-size: 16.5px; }
+		.post-article figcaption { font-size: 13.5px; }
+	}
+
+	/* Body anchor focus */
+	.post-article a:focus-visible {
+		outline: 2px solid hsl(var(--theme-accent));
+		outline-offset: 3px;
+		border-radius: 3px;
+	}
+</style>
 
 <script>
 	document.addEventListener("DOMContentLoaded", (_) => {
@@ -93,7 +670,7 @@ import { Schema } from "astro-seo-schema";
 		script.setAttribute("data-reactions-enabled", "1");
 		script.setAttribute("data-emit-metadata", "0");
 		script.setAttribute("data-input-position", "top");
-		script.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+		script.setAttribute("data-theme", theme === "dark" ? "noborder_dark" : "noborder_light");
 		script.setAttribute("data-lang", "en");
 		script.setAttribute("crossorigin", "anonymous");
 		script.async = true;
@@ -120,24 +697,41 @@ import { Schema } from "astro-seo-schema";
 			}
 		});
 
-		document.body.appendChild(script);
+		const mount = document.getElementById("comments") || document.body;
+		mount.appendChild(script);
 	});
 </script>
 <script>
 	const scrollBtn = document.getElementById("to-top-btn") as HTMLButtonElement;
 	const targetHeader = document.getElementById("blog-hero") as HTMLDivElement;
 
-	function callback(entries: IntersectionObserverEntry[]) {
-		entries.forEach((entry) => {
-			// only show the scroll to top button when the heading is out of view
-			scrollBtn.dataset.show = (!entry.isIntersecting).toString();
+	if (scrollBtn && targetHeader) {
+		function callback(entries: IntersectionObserverEntry[]) {
+			entries.forEach((entry) => {
+				scrollBtn.dataset.show = (!entry.isIntersecting).toString();
+			});
+		}
+
+		scrollBtn.addEventListener("click", () => {
+			document.documentElement.scrollTo({ behavior: "smooth", top: 0 });
 		});
+
+		const observer = new IntersectionObserver(callback);
+		observer.observe(targetHeader);
 	}
-
-	scrollBtn.addEventListener("click", () => {
-		document.documentElement.scrollTo({ behavior: "smooth", top: 0 });
-	});
-
-	const observer = new IntersectionObserver(callback);
-	observer.observe(targetHeader);
+</script>
+<script>
+	// Reading progress bar
+	const bar = document.getElementById("reading-progress");
+	if (bar) {
+		const update = () => {
+			const h = document.documentElement;
+			const max = h.scrollHeight - h.clientHeight;
+			const pct = max > 0 ? Math.min(100, (h.scrollTop / max) * 100) : 0;
+			bar.style.width = pct + "%";
+		};
+		update();
+		window.addEventListener("scroll", update, { passive: true });
+		window.addEventListener("resize", update, { passive: true });
+	}
 </script>

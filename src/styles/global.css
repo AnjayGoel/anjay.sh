@@ -3,27 +3,46 @@
 @tailwind utilities;
 
 @layer base {
+	:root {
+		/* Font families (preview-10 design system) */
+		--font-serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+		--font-sans: "Inter", -apple-system, system-ui, sans-serif;
+		--font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+	}
+
 	:root,
 	:root[data-theme="light"] {
 		color-scheme: light;
 		/* https://tailwindcss.com/docs/customizing-colors#using-css-variables */
-		--theme-bg: 0deg 0% 98%;
-		--theme-link: 237deg 68% 57%;
-		--theme-text: 203deg 11% 15%;
-		--theme-text-muted: 203deg 11% 35%;
-		--theme-accent: 237deg 68% 57%;
-		--theme-accent-2: 0deg 0% 7%;
-		--theme-quote: 351deg 66% 48%;
+		/* hsl-channel format consumed by tailwind.config.ts via hsl(var(--..) / <alpha-value>) */
+		--theme-bg: 37deg 47% 93%;            /* #f6f1e6 */
+		--theme-text: 28deg 16% 13%;          /* #25201b */
+		--theme-text-muted: 25deg 14% 26%;    /* #4a4239 */
+		--theme-accent: 17deg 60% 34%;        /* #8a4423 */
+		--theme-accent-2: 28deg 16% 13%;      /* same as ink */
+		--theme-link: 17deg 60% 34%;          /* same as accent */
+		--theme-quote: 17deg 60% 34%;         /* same as accent */
+
+		/* Additional preview-10 palette tokens (raw hex / rgba for direct use) */
+		--paper: #fbf6ec;
+		--hairline: #d9cfb9;
+		--faint: #b8ad9b;
+		--accent-soft: rgba(138, 68, 35, 0.1);
 	}
 
 	:root[data-theme="dark"] {
 		color-scheme: dark;
-		--theme-bg: 0deg 0% 10%;
-		--theme-link: 159deg 64% 45%;
-    --theme-text: 0deg 0% 100%;
-		--theme-text-muted: 220deg 3% 79%;
-		--theme-accent: 159deg 64% 45%;
-		--theme-accent-2: 0deg 0% 93%;
-		--theme-quote: 102deg 100% 86%;
+		--theme-bg: 20deg 9% 7%;              /* #131110 */
+		--theme-text: 42deg 35% 92%;          /* #f4f0e3 */
+		--theme-text-muted: 36deg 18% 73%;    /* #c8c1ae */
+		--theme-accent: 30deg 49% 59%;        /* #c89761 */
+		--theme-accent-2: 42deg 35% 92%;      /* same as ink */
+		--theme-link: 30deg 49% 59%;          /* same as accent */
+		--theme-quote: 30deg 49% 59%;         /* same as accent */
+
+		--paper: #1a1715;
+		--hairline: #2a2622;
+		--faint: #4f4a42;
+		--accent-soft: rgba(200, 151, 97, 0.12);
 	}
 }

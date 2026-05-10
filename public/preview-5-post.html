@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Letting Claude Code Run Wild For A Few Days — Anjay Goel</title>
-    <script>(()=>{try{const s=localStorage.getItem("anjay-theme");const d=window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=s||(d?"dark":"light");}catch(e){}})();</script>
+    <script>(()=>{try{const s=localStorage.getItem("theme");const d=window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=s||(d?"dark":"light");}catch(e){}})();</script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
@@ -633,6 +633,6 @@
         </footer>
       </div>
     </div>
-    <script>(()=>{const r=document.documentElement;const btn=document.getElementById("theme-toggle");const upd=()=>{btn.querySelector(".label").textContent=r.dataset.theme==="dark"?"light":"dark";btn.querySelector(".icon").textContent=r.dataset.theme==="dark"?"☀":"☾";};upd();btn.addEventListener("click",()=>{r.dataset.theme=r.dataset.theme==="dark"?"light":"dark";localStorage.setItem("anjay-theme",r.dataset.theme);upd();});})();</script>
+    <script>(()=>{const r=document.documentElement;const btn=document.getElementById("theme-toggle");const upd=()=>{btn.querySelector(".label").textContent=r.dataset.theme==="dark"?"light":"dark";btn.querySelector(".icon").textContent=r.dataset.theme==="dark"?"☀":"☾";};upd();btn.addEventListener("click",()=>{r.dataset.theme=r.dataset.theme==="dark"?"light":"dark";localStorage.setItem("theme",r.dataset.theme);upd();});})();</script>
   </body>
 </html>

@@ -6,7 +6,7 @@
     <title>Letting Claude Code Run Wild For A Few Days — Anjay Goel</title>
     <script>
       (() => {
-        const stored = localStorage.getItem("anjay-theme");
+        const stored = localStorage.getItem("theme");
         const sysDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
         document.documentElement.dataset.theme = stored || (sysDark ? "dark" : "light");
       })();
@@ -598,7 +598,7 @@
         upd();
         btn.addEventListener("click", () => {
           r.dataset.theme = r.dataset.theme === "dark" ? "light" : "dark";
-          localStorage.setItem("anjay-theme", r.dataset.theme);
+          localStorage.setItem("theme", r.dataset.theme);
           upd();
         });
       })();

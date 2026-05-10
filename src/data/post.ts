@@ -38,23 +38,17 @@ export function groupPostsByYear(posts: CollectionEntry<"post">[]) {
 	}, {});
 }
 
-/** returns all tags created from posts (inc duplicate tags)
- *  Note: This function doesn't filter draft posts, pass it the result of getAllPosts above to do so.
- *  */
+/** returns all tags (including duplicates) collected from posts */
 export function getAllTags(posts: CollectionEntry<"post">[]) {
 	return posts.flatMap((post) => [...post.data.tags]);
 }
 
-/** returns all unique tags created from posts
- *  Note: This function doesn't filter draft posts, pass it the result of getAllPosts above to do so.
- *  */
+/** returns the unique set of tags across all posts */
 export function getUniqueTags(posts: CollectionEntry<"post">[]) {
 	return [...new Set(getAllTags(posts))];
 }
 
-/** returns a count of each unique tag - [[tagName, count], ...]
- *  Note: This function doesn't filter draft posts, pass it the result of getAllPosts above to do so.
- *  */
+/** returns [tag, count] pairs sorted by count desc */
 export function getUniqueTagsWithCount(posts: CollectionEntry<"post">[]): [string, number][] {
 	return [
 		...getAllTags(posts).reduce(
@@ -63,3 +57,4 @@ export function getUniqueTagsWithCount(posts: CollectionEntry<"post">[]): [strin
 		),
 	].sort((a, b) => b[1] - a[1]);
 }
+

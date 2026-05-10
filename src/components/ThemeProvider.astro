@@ -1,5 +1,15 @@
 {/* Inlined to avoid FOUC. This is a parser blocking script. */}
 <script is:inline>
+	// Initial theme application — runs synchronously before paint to avoid FOUC.
+	// Mirrors preview-10's pattern; persists under the "theme" key.
+	(() => {
+		try {
+			const s = localStorage.getItem("theme");
+			const d = window.matchMedia("(prefers-color-scheme: dark)").matches;
+			document.documentElement.dataset.theme = s || (d ? "dark" : "light");
+		} catch (e) {}
+	})();
+
 	const lightModePref = window.matchMedia("(prefers-color-scheme: light)");
 
 	function getUserPref() {
@@ -24,15 +34,14 @@
 		root.setAttribute("data-theme", newTheme);
 
 		const colorThemeMetaTag = document.querySelector("meta[name='theme-color']");
-		const bgColour = getComputedStyle(document.body).getPropertyValue("--theme-bg");
-		colorThemeMetaTag.setAttribute("content", `hsl(${bgColour})`);
+		if (colorThemeMetaTag && document.body) {
+			const bgColour = getComputedStyle(document.body).getPropertyValue("--theme-bg");
+			colorThemeMetaTag.setAttribute("content", `hsl(${bgColour})`);
+		}
 		if (typeof localStorage !== "undefined") {
 			localStorage.setItem("theme", newTheme);
 		}
 	}
-
-	// initial setup
-	setTheme(getUserPref());
 
 	// View Transitions hook to restore theme
 	document.addEventListener("astro:after-swap", () => setTheme(getUserPref()));

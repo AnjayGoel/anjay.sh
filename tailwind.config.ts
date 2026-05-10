@@ -29,7 +29,7 @@ export default {
 					":after": { content: "''" },
 					":before": { content: "''" },
 				},
-				".cactus-link": {
+				".prose-link": {
 					"@apply underline underline-offset-2 decoration-accent": {},
 					"&:hover": {
 						"@apply decoration-2": {},
@@ -67,7 +67,7 @@ export default {
 				DEFAULT: {
 					css: {
 						a: {
-							"@apply cactus-link": "",
+							"@apply prose-link": "",
 						},
 						blockquote: {
 							borderLeftWidth: "0",
@@ -181,7 +181,7 @@ export default {
 						},
 					},
 				},
-				cactus: {
+				site: {
 					css: {
 						"--tw-prose-body": theme("colors.textColor / 1"),
 						"--tw-prose-bold": theme("colors.textColor / 1"),

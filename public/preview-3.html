@@ -7,7 +7,7 @@
     <script>
       (() => {
         try {
-          const s = localStorage.getItem("anjay-theme");
+          const s = localStorage.getItem("theme");
           const d = window.matchMedia("(prefers-color-scheme: dark)").matches;
           document.documentElement.dataset.theme = s || (d ? "dark" : "light");
         } catch (e) {}
@@ -614,7 +614,7 @@
     <script>
       (() => {
         const r = document.documentElement;
-        const stored = localStorage.getItem("anjay-theme");
+        const stored = localStorage.getItem("theme");
         const sysDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
         r.dataset.theme = stored || (sysDark ? "dark" : "light");
         const btn = document.getElementById("theme-toggle");
@@ -625,7 +625,7 @@
         upd();
         btn.addEventListener("click", () => {
           r.dataset.theme = r.dataset.theme === "dark" ? "light" : "dark";
-          localStorage.setItem("anjay-theme", r.dataset.theme);
+          localStorage.setItem("theme", r.dataset.theme);
           upd();
         });
       })();

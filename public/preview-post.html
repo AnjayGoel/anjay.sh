@@ -19,7 +19,7 @@
       // FOUC prevention — set theme before paint
       (() => {
         try {
-          const stored = localStorage.getItem("anjay-theme");
+          const stored = localStorage.getItem("theme");
           const sysDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
           document.documentElement.dataset.theme = stored || (sysDark ? "dark" : "light");
         } catch (e) {
@@ -813,7 +813,7 @@
         updateUI();
         btn.addEventListener("click", () => {
           root.dataset.theme = root.dataset.theme === "dark" ? "light" : "dark";
-          localStorage.setItem("anjay-theme", root.dataset.theme);
+          localStorage.setItem("theme", root.dataset.theme);
           updateUI();
         });
       })();
