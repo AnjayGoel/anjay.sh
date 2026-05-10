@@ -1,14 +1,21 @@
 ---
-import SocialList from "@/components/SocialList.astro";
-import PostPreview from "@/components/blog/PostPreview.astro";
-import { getAllPosts, getUniqueTags, sortMDByDate } from "@/data/post";
+import { getAllPosts, getPostSortDate, sortMDByDate } from "@/data/post";
+import { showcase } from "@/data/showcase";
 import PageLayout from "@/layouts/Base.astro";
+import { siteConfig } from "@/site-config";
+import { formatRailDate, formatStampDate } from "@/utils/date";
 import { Schema } from "astro-seo-schema";
 
-const MAX_POSTS = 10;
 const allPosts = await getAllPosts();
-const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS);
-const uniqueTags = getUniqueTags(allPosts);
+const allPostsByDate = sortMDByDate(allPosts);
+const TIMELINE_LIMIT = 5;
+const timelinePosts = allPostsByDate.slice(0, TIMELINE_LIMIT);
+const featured = timelinePosts[0];
+const rest = timelinePosts.slice(1);
+const archiveCount = allPosts.length;
+
+const profile = siteConfig.profile;
+const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 ---
 
 <Schema
@@ -20,97 +27,508 @@ const uniqueTags = getUniqueTags(allPosts);
 				"@type": "ListItem",
 				position: 1,
 				name: "Home",
-				item: "https://anjay.sh",
+				item: siteUrl("/"),
 			},
 			{
 				"@type": "ListItem",
 				position: 2,
 				name: "About",
-				item: "https://anjay.sh/about",
+				item: siteUrl("/about"),
 			},
 			{
 				"@type": "ListItem",
 				position: 3,
 				name: "Posts",
-				item: "https://anjay.sh/posts",
+				item: siteUrl("/posts"),
 			},
 		],
 	}}
 />
 
-<PageLayout meta={{ title: "Home" }}>
-	<div>
-		<section>
-			<h1 class="title mb-6">Hi There!</h1>
-			<p class="mb-4 text-textMuted">
-				I am Anjay. I love to write about software development, technology and occasionally other
-				stuff like economics & finance. I hope you find something interesting here. <br />
-			</p>
-			<SocialList />
-		</section>
-		<div class="mt-16 grid gap-y-16 sm:grid-cols-[3fr_1fr] sm:gap-x-8">
-			<section aria-label="Blog post list">
-				<h2 class="title mb-4 text-xl">Posts</h2>
-				<ul class="space-y-6">
-					{
-						allPostsByDate.map((p) => (
-							<li class="grid gap-1.5">
-								{/* @ts-ignore-next-line - issue with -> @astrojs/check@0.9.3 */}
-								<PostPreview post={p} />
-							</li>
-						))
-					}
-				</ul>
-				<nav class="mt-8 flex items-center gap-x-4">
-					<a class="mr-3 me-auto py-2 sm:hover:text-accent" data-astro-prefetch href={"/posts"}>
-						<span class="sr-only">View All →</span>
-						View All ({allPosts.length}) →
-					</a>
-				</nav>
-			</section>
+<PageLayout meta={{ title: "Home", description: siteConfig.description }}>
+	<section class="hero">
+		<p>{siteConfig.description}</p>
+		<div class="socials">
+			{profile?.github && (
+				<>
+					<a href={profile.github} rel="noreferrer" target="_blank">GitHub</a>
+					<span class="sep">·</span>
+				</>
+			)}
+			{profile?.linkedin && (
+				<>
+					<a href={profile.linkedin} rel="noreferrer" target="_blank">LinkedIn</a>
+					<span class="sep">·</span>
+				</>
+			)}
+			{profile?.email && (
+				<>
+					<a href={`mailto:${profile.email}`}>Email</a>
+					<span class="sep">·</span>
+				</>
+			)}
+			<a href="/rss.xml">RSS</a>
+		</div>
+	</section>
+
+	<section class="writing" aria-labelledby="writing-label">
+		<div class="section-label" id="writing-label">Writing</div>
+		<div class="timeline">
 			{
-				!!uniqueTags.length && (
-					<aside>
-						<h2 class="title mb-4 flex items-center text-lg">
-							<svg
-								aria-hidden="true"
-								class="h-6 w-6"
-								fill="none"
-								stroke="currentColor"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="1.5"
-								viewBox="0 0 24 24"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path d="M0 0h24v24H0z" fill="none" stroke="none" />
-								<path d="M7.859 6h-2.834a2.025 2.025 0 0 0 -2.025 2.025v2.834c0 .537 .213 1.052 .593 1.432l6.116 6.116a2.025 2.025 0 0 0 2.864 0l2.834 -2.834a2.025 2.025 0 0 0 0 -2.864l-6.117 -6.116a2.025 2.025 0 0 0 -1.431 -.593z" />
-								<path d="M17.573 18.407l2.834 -2.834a2.025 2.025 0 0 0 0 -2.864l-7.117 -7.116" />
-								<path d="M6 9h-.01" />
-							</svg>
-							Tags
-						</h2>
-						<ul class="flex flex-wrap gap-2 text-bgColor">
-							{uniqueTags.map((tag) => (
-								<li>
-									<a
-										aria-label={`View all posts with the tag: ${tag}`}
-										class="flex items-center justify-center rounded-lg bg-accent p-1"
-										href={`/tags/${tag}/`}
-									>
-										{tag}
-									</a>
-								</li>
-							))}
-						</ul>
-						<span class="mt-4 block sm:text-end">
-							<a aria-label="View all blog categories" class="sm:hover:text-accent" href="/tags/">
-								View all →
-							</a>
-						</span>
-					</aside>
+				featured && (
+					<a class="post featured" data-astro-prefetch href={`/posts/${featured.id}/`}>
+						<div class="post-rail">
+							<time class="post-date" datetime={getPostSortDate(featured).toISOString()}>
+								{formatRailDate(getPostSortDate(featured))}
+							</time>
+							<span class="post-dot" aria-hidden="true" />
+						</div>
+						<div class="post-body">
+							<div class="post-stamp">Latest · {formatStampDate(getPostSortDate(featured))}</div>
+							<h2 class="post-title">{featured.data.title}</h2>
+							<p class="post-excerpt">{featured.data.description}</p>
+							{!!featured.data.tags?.length && (
+								<div class="post-meta">
+									{featured.data.tags.map((t, i) => (
+										<Fragment>
+											{i > 0 && <span class="dot">·</span>}
+											<span>{t}</span>
+										</Fragment>
+									))}
+								</div>
+							)}
+						</div>
+					</a>
 				)
 			}
+
+			{
+				rest.map((p) => (
+					<a class="post" data-astro-prefetch href={`/posts/${p.id}/`}>
+						<div class="post-rail">
+							<time class="post-date" datetime={getPostSortDate(p).toISOString()}>
+								{formatRailDate(getPostSortDate(p))}
+							</time>
+							<span class="post-dot" aria-hidden="true" />
+						</div>
+						<div class="post-body">
+							<h3 class="post-title">{p.data.title}</h3>
+							<p class="post-preview">{p.data.description}</p>
+						</div>
+					</a>
+				))
+			}
+
+			<div class="archive-link">
+				<a data-astro-prefetch href="/posts/"
+					>View all {archiveCount} posts →</a
+				>
+			</div>
 		</div>
-	</div>
+	</section>
+
+	<section class="work" aria-labelledby="work-label">
+		<div class="section-label" id="work-label">Showcase</div>
+		<ul class="work-list">
+			{
+				showcase.map((item) => (
+					<li>
+						<a href={item.href} rel="noreferrer" target="_blank">
+							<div class="head">
+								<span class="name">{item.name}</span>
+								<span class="stack">{item.stack}</span>
+								{item.badge && <span class="badge">{item.badge}</span>}
+							</div>
+							<p>{item.desc}</p>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
 </PageLayout>
+
+<style>
+	/* ---------- Hero ---------- */
+	.hero {
+		margin-bottom: 88px;
+	}
+	.hero p {
+		font-size: 19.5px;
+		line-height: 1.65;
+		color: hsl(var(--theme-text));
+		margin: 0 0 22px;
+		max-width: 60ch;
+		text-wrap: pretty;
+		white-space: pre-line;
+	}
+	.socials {
+		font-family: var(--font-sans);
+		font-size: 13.5px;
+		color: hsl(var(--theme-text) / 0.6);
+		margin-top: 18px;
+	}
+	.socials a {
+		color: hsl(var(--theme-text-muted));
+		text-decoration: underline;
+		text-decoration-color: hsl(var(--theme-text) / 0.35);
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+		transition: color 0.2s ease, text-decoration-color 0.2s ease;
+	}
+	.socials a:hover {
+		color: hsl(var(--theme-accent));
+		text-decoration-color: hsl(var(--theme-accent));
+	}
+	.socials .sep {
+		color: var(--faint);
+		margin: 0 9px;
+	}
+
+	/* ---------- Writing timeline ---------- */
+	.writing {
+		margin-bottom: 96px;
+	}
+	.timeline {
+		display: grid;
+		grid-template-columns: var(--rail-width) 1fr;
+		column-gap: var(--rail-gap);
+		position: relative;
+	}
+	.timeline::before {
+		content: "";
+		position: absolute;
+		left: var(--rail-width);
+		top: 6px;
+		bottom: 6px;
+		width: 1px;
+		background-color: var(--hairline);
+		transition: background-color 0.35s ease;
+	}
+	.post {
+		display: contents;
+	}
+	.post-rail {
+		position: relative;
+		padding-top: 4px;
+		text-align: right;
+		padding-right: 18px;
+	}
+	.post-date {
+		font-family: var(--font-mono);
+		font-size: 11.5px;
+		color: hsl(var(--theme-text) / 0.6);
+		letter-spacing: -0.01em;
+		line-height: 1.4;
+		white-space: nowrap;
+		font-weight: 500;
+		font-variant-numeric: tabular-nums;
+		font-feature-settings: "tnum";
+		transition: color 0.2s ease;
+	}
+	.post-dot {
+		position: absolute;
+		right: -5px;
+		top: 11px;
+		width: 9px;
+		height: 9px;
+		border-radius: 50%;
+		background: hsl(var(--theme-bg));
+		border: 1.5px solid var(--faint);
+		transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+		z-index: 1;
+	}
+	.post-body {
+		padding-bottom: 38px;
+	}
+	.post-title {
+		font-family: var(--font-serif);
+		font-weight: 500;
+		color: hsl(var(--theme-text));
+		line-height: 1.3;
+		letter-spacing: -0.012em;
+		margin: 0 0 6px;
+		text-wrap: balance;
+		word-wrap: break-word;
+		overflow-wrap: anywhere;
+		transition: color 0.2s ease;
+	}
+	.post:hover .post-title {
+		color: hsl(var(--theme-accent));
+	}
+	.post:hover .post-dot {
+		border-color: hsl(var(--theme-accent));
+		background: hsl(var(--theme-accent));
+		box-shadow: 0 0 0 3px hsl(var(--theme-bg));
+	}
+	.post:hover .post-date {
+		color: hsl(var(--theme-text-muted));
+	}
+	.post:not(.featured) .post-title {
+		font-size: 18.5px;
+	}
+	.post-preview {
+		font-size: 16px;
+		line-height: 1.55;
+		color: hsl(var(--theme-text) / 0.6);
+		margin: 0;
+		max-width: 58ch;
+		word-wrap: break-word;
+		overflow-wrap: anywhere;
+		display: -webkit-box;
+		-webkit-line-clamp: 1;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	/* ---------- Featured post ---------- */
+	.post.featured .post-body {
+		padding-bottom: 56px;
+	}
+	.post.featured .post-stamp {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: hsl(var(--theme-accent));
+		margin-bottom: 12px;
+	}
+	.post.featured .post-title {
+		font-size: 30px;
+		line-height: 1.14;
+		margin-bottom: 14px;
+		letter-spacing: -0.02em;
+	}
+	.post.featured .post-excerpt {
+		font-size: 18px;
+		line-height: 1.62;
+		color: hsl(var(--theme-text-muted));
+		margin: 0 0 16px;
+		max-width: 58ch;
+		word-wrap: break-word;
+		overflow-wrap: anywhere;
+	}
+	.post.featured .post-meta {
+		font-family: var(--font-mono);
+		font-size: 11.5px;
+		color: hsl(var(--theme-text) / 0.6);
+		font-variant-numeric: tabular-nums;
+		font-feature-settings: "tnum";
+	}
+	.post.featured .post-meta .dot {
+		color: var(--faint);
+		margin: 0 8px;
+	}
+	.post.featured .post-dot {
+		width: 11px;
+		height: 11px;
+		right: -6px;
+		top: 12px;
+		border-color: hsl(var(--theme-text-muted));
+	}
+	.post.featured:hover .post-dot {
+		background: hsl(var(--theme-accent));
+		border-color: hsl(var(--theme-accent));
+	}
+
+	.archive-link {
+		grid-column: 2;
+		margin-top: 8px;
+		font-family: var(--font-sans);
+		font-size: 13.5px;
+		color: hsl(var(--theme-text) / 0.6);
+	}
+	.archive-link a {
+		color: hsl(var(--theme-text-muted));
+		text-decoration: underline;
+		text-decoration-color: hsl(var(--theme-text) / 0.35);
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+		transition: color 0.2s ease, text-decoration-color 0.2s ease;
+	}
+	.archive-link a:hover {
+		color: hsl(var(--theme-accent));
+		text-decoration-color: hsl(var(--theme-accent));
+	}
+
+	/* ---------- Work / showcase ---------- */
+	.work {
+		margin-bottom: 88px;
+	}
+	ul.work-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+	ul.work-list li {
+		padding: 22px 0;
+		border-top: 1px solid var(--hairline);
+		transition: border-color 0.35s ease;
+	}
+	ul.work-list li:last-child {
+		border-bottom: 1px solid var(--hairline);
+	}
+	ul.work-list a {
+		text-decoration: none;
+		color: inherit;
+		display: block;
+	}
+	ul.work-list .head {
+		display: flex;
+		align-items: baseline;
+		gap: 14px;
+		flex-wrap: wrap;
+		margin-bottom: 6px;
+	}
+	ul.work-list .name {
+		font-family: var(--font-serif);
+		font-size: 21px;
+		font-weight: 600;
+		letter-spacing: -0.012em;
+		color: hsl(var(--theme-text));
+		transition: color 0.2s ease;
+		word-wrap: break-word;
+		overflow-wrap: anywhere;
+	}
+	ul.work-list a:hover .name,
+	ul.work-list a:focus-visible .name {
+		color: hsl(var(--theme-accent));
+	}
+	ul.work-list .stack {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: hsl(var(--theme-text) / 0.6);
+		font-variant-numeric: tabular-nums;
+		font-feature-settings: "tnum";
+	}
+	ul.work-list .badge {
+		font-family: var(--font-mono);
+		font-size: 10px;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: hsl(var(--theme-accent));
+		background: var(--accent-soft);
+		padding: 2px 8px;
+		border-radius: 2px;
+	}
+	ul.work-list p {
+		font-size: 14.5px;
+		color: hsl(var(--theme-text-muted));
+		margin: 6px 0 0;
+		max-width: 60ch;
+		line-height: 1.55;
+		word-wrap: break-word;
+		overflow-wrap: anywhere;
+	}
+
+	/* ---------- Focus states ---------- */
+	.post:focus-visible,
+	ul.work-list a:focus-visible {
+		outline: 2px solid hsl(var(--theme-accent));
+		outline-offset: 4px;
+		border-radius: 4px;
+	}
+	.socials a:focus-visible,
+	.archive-link a:focus-visible {
+		outline: 2px solid hsl(var(--theme-accent));
+		outline-offset: 3px;
+		border-radius: 3px;
+	}
+
+	/* ---------- Mobile breakpoints ---------- */
+	@media (max-width: 720px) {
+		.hero {
+			margin-bottom: 64px;
+		}
+		.hero p {
+			font-size: 18px;
+		}
+		.timeline {
+			display: block;
+		}
+		.timeline::before {
+			display: none;
+		}
+		.post {
+			display: block;
+			padding-bottom: 32px;
+		}
+		.post-rail {
+			text-align: left;
+			padding: 0 0 6px 0;
+		}
+		.post-dot {
+			display: none;
+		}
+		.post-body {
+			padding-bottom: 0;
+		}
+		.post.featured .post-rail {
+			display: none;
+		}
+		.post.featured .post-body {
+			padding-bottom: 24px;
+			border-bottom: 1px solid var(--hairline);
+			margin-bottom: 4px;
+		}
+		.post.featured .post-title {
+			font-size: 22px;
+			line-height: 1.2;
+			letter-spacing: -0.015em;
+			margin-bottom: 10px;
+		}
+		.post.featured .post-excerpt {
+			font-size: 15.5px;
+			line-height: 1.55;
+			margin: 0 0 10px;
+		}
+		.post.featured .post-meta {
+			font-size: 11px;
+		}
+		.archive-link {
+			margin-top: 0;
+		}
+	}
+
+	@media (max-width: 420px) {
+		.hero {
+			margin-bottom: 48px;
+		}
+		.hero p {
+			font-size: 17px;
+		}
+		.socials {
+			font-size: 12.5px;
+		}
+		.socials .sep {
+			margin: 0 6px;
+		}
+		.writing {
+			margin-bottom: 64px;
+		}
+		.post.featured .post-title {
+			font-size: 17px;
+		}
+		.post.featured .post-excerpt {
+			font-size: 15px;
+		}
+		.post:not(.featured) .post-title {
+			font-size: 17px;
+		}
+		.post-preview {
+			font-size: 15px;
+		}
+		.post-date {
+			font-size: 11px;
+		}
+		.work {
+			margin-bottom: 56px;
+		}
+		ul.work-list .name {
+			font-size: 17.5px;
+		}
+		ul.work-list p {
+			font-size: 15px;
+		}
+	}
+</style>

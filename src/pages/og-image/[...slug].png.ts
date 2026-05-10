@@ -9,7 +9,6 @@ import satori, { type SatoriOptions } from "satori";
 import { html } from "satori-html";
 
 const ogOptions: SatoriOptions = {
-	// debug: true,
 	fonts: [
 		{
 			data: Buffer.from(RobotoMono),
@@ -81,7 +80,7 @@ export async function getStaticPaths() {
 	return posts
 		.filter(({ data }) => !data.ogImage)
 		.map((post) => ({
-			params: { slug: post.slug },
+			params: { slug: post.id },
 			props: {
 				pubDate: post.data.updatedDate ?? post.data.publishDate,
 				title: post.data.title,

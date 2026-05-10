@@ -1,26 +1,49 @@
 ---
-import { menuLinks, siteConfig } from "@/site-config";
+import { siteConfig } from "@/site-config";
 
 const year = new Date().getFullYear();
 ---
 
-<footer
-	class="mt-auto flex w-full flex-col items-center justify-center gap-y-2 pb-4 pt-20 text-center align-top font-semibold text-gray-600 dark:text-gray-400 sm:flex-row sm:justify-between sm:text-xs"
->
-	<div class="me-0 sm:me-4">
-		&copy; {siteConfig.author}
-		{year}.<span class="inline-block">&nbsp;🚀&nbsp;Astro Cactus</span>
+<footer class="site-footer">
+	<div class="left">
+		<span>&copy; {year} {siteConfig.author}</span>
 	</div>
-	<nav
-		aria-label="More on this site"
-		class="flex gap-x-2 sm:gap-x-0 sm:divide-x sm:divide-gray-500"
-	>
-		{
-			menuLinks.map((link) => (
-				<a class="px-4 py-2 sm:py-0 sm:hover:text-textColor sm:hover:underline" href={link.path}>
-					{link.title}
-				</a>
-			))
-		}
-	</nav>
+	<div class="right">
+		<a href="/rss.xml">RSS</a>
+	</div>
 </footer>
+
+<style>
+	.site-footer {
+		border-top: 1px solid var(--hairline);
+		padding-top: 22px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 16px;
+		font-family: var(--font-sans);
+		font-size: 12.5px;
+		color: hsl(var(--theme-text) / 0.6);
+		transition: border-color 0.35s ease;
+	}
+	.site-footer .left {
+		display: flex;
+		gap: 18px;
+		align-items: center;
+	}
+	.site-footer a {
+		color: hsl(var(--theme-text-muted));
+		transition: color 0.2s ease;
+	}
+	.site-footer a:hover {
+		color: hsl(var(--theme-accent));
+	}
+
+	@media (max-width: 420px) {
+		.site-footer {
+			font-size: 11.5px;
+			gap: 12px;
+		}
+	}
+</style>

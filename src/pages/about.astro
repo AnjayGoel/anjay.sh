@@ -1,12 +1,24 @@
 ---
 import PageLayout from "@/layouts/Base.astro";
-import SocialList from "../components/SocialList.astro";
+import { siteConfig } from "@/site-config";
 import { Schema } from "astro-seo-schema";
 
+const profile = siteConfig.profile;
+const authorName = profile?.name ?? siteConfig.author;
+
 const meta = {
-	description: "Anjay Goel",
+	description: `${authorName} — about me.`,
 	title: "About",
 };
+
+const personSameAs = [
+	profile?.linkedin,
+	profile?.github,
+	profile?.twitter,
+	profile?.mastodon,
+].filter((s): s is string => Boolean(s));
+
+const avatarUrl = profile?.avatar ? new URL(profile.avatar, Astro.site).toString() : undefined;
 ---
 
 <Schema
@@ -15,36 +27,107 @@ const meta = {
 		"@type": "ProfilePage",
 		mainEntity: {
 			"@type": "Person",
-			name: "Anjay Goel",
-			image: "https://anjay.sh/avatar.png",
-			jobTitle: "Software Engineer",
-			worksFor: {
-				"@type": "Organization",
-				name: "Dashtoon",
-			},
-			alumniOf: {
-				"@type": "CollegeOrUniversity",
-				name: "IIT Kharagpur",
-			},
-			sameAs: ["https://www.linkedin.com/in/anjaygoel/", "https://github.com/anjaygoel"],
+			name: authorName,
+			...(avatarUrl ? { image: avatarUrl } : {}),
+			...(profile?.jobTitle ? { jobTitle: profile.jobTitle } : {}),
+			...(profile?.employer
+				? {
+						worksFor: {
+							"@type": "Organization",
+							name: profile.employer,
+							...(profile.employerUrl ? { url: profile.employerUrl } : {}),
+						},
+					}
+				: {}),
+			...(profile?.alumni
+				? {
+						alumniOf: {
+							"@type": "CollegeOrUniversity",
+							name: profile.alumni,
+						},
+					}
+				: {}),
+			...(personSameAs.length ? { sameAs: personSameAs } : {}),
 		},
 	}}
 />
 
 <PageLayout meta={meta}>
-	<div class="space-y-6">
-		<h1 class="title">About</h1>
-		<ul class="list-inside list-disc space-y-2">
-			<li>
-				🚀 Software Engineer at <a
-					class="text-accent"
-					href="https://www.linkedin.com/company/dashtoon/">Dashtoon</a
-				>
-			</li>
-			<li>🎓 IIT KGP graduate (2023)</li>
-			<li>📝 Occasional blogger on tech, economics, and everything in between</li>
-		</ul>
-	</div>
-	<br />
-	<SocialList />
+	<section class="about" aria-labelledby="about-label">
+		<div class="section-label" id="about-label">About</div>
+		<div class="bio">
+			<p>
+				I'm Anjay — a software engineer based in India. I currently work at <a
+					href={profile?.employerUrl ?? "#"}
+					rel="noreferrer"
+					target="_blank">{profile?.employer ?? ""}</a
+				> on backend &amp; mobile systems. Before that, I graduated from {profile?.alumni ?? ""} in 2023.
+			</p>
+			<p>
+				I write here, occasionally, about software internals — containers, async I/O, debugging — with
+				the occasional detour into economics &amp; finance. The goal is to think out loud about things
+				I'm trying to understand more deeply.
+			</p>
+			<p>
+				You can find me on <a
+					href={profile?.github ?? "#"}
+					rel="noreferrer"
+					target="_blank">GitHub</a
+				>, <a
+					href={profile?.linkedin ?? "#"}
+					rel="noreferrer"
+					target="_blank">LinkedIn</a
+				>, or by <a href={`mailto:${profile?.email ?? ""}`}>email</a>.
+			</p>
+		</div>
+	</section>
 </PageLayout>
+
+<style>
+	.about {
+		margin-bottom: 64px;
+	}
+	.bio p {
+		font-family: var(--font-serif);
+		font-size: 17.5px;
+		line-height: 1.75;
+		color: hsl(var(--theme-text));
+		margin: 0 0 22px;
+		max-width: var(--reading-width);
+		text-wrap: pretty;
+		word-wrap: break-word;
+		overflow-wrap: anywhere;
+	}
+	.bio p:last-child {
+		margin-bottom: 0;
+	}
+	.bio a {
+		color: hsl(var(--theme-text));
+		text-decoration: underline;
+		text-decoration-color: hsl(var(--theme-text) / 0.35);
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+		transition: color 0.2s ease, text-decoration-color 0.2s ease;
+	}
+	.bio a:hover {
+		color: hsl(var(--theme-accent));
+		text-decoration-color: hsl(var(--theme-accent));
+	}
+	.bio a:focus-visible {
+		outline: 2px solid hsl(var(--theme-accent));
+		outline-offset: 3px;
+		border-radius: 3px;
+	}
+
+	@media (max-width: 720px) {
+		.bio p {
+			font-size: 17px;
+			line-height: 1.7;
+		}
+	}
+	@media (max-width: 420px) {
+		.bio p {
+			font-size: 16.5px;
+		}
+	}
+</style>

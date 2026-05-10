@@ -11,16 +11,15 @@ import { expressiveCodeOptions } from "./src/site.config";
 import { siteConfig } from "./src/site.config";
 import partytown from "@astrojs/partytown";
 
-// Remark plugins
-import remarkDirective from "remark-directive"; /* Handle ::: directives as nodes */
-import { remarkAdmonitions } from "./src/plugins/remark-admonitions"; /* Add admonitions */
+import remarkDirective from "remark-directive";
+import remarkMath from "remark-math";
+import { remarkAdmonitions } from "./src/plugins/remark-admonitions";
 import { remarkReadingTime } from "./src/plugins/remark-reading-time";
 
-// Rehype plugins
 import rehypeExternalLinks from "rehype-external-links";
+import rehypeKatex from "rehype-katex";
 import rehypeUnwrapImages from "rehype-unwrap-images";
 
-// https://astro.build/config
 export default defineConfig({
 	site: "https://anjay.sh",
 	image: {
@@ -47,20 +46,13 @@ export default defineConfig({
 		robotsTxt(),
 		webmanifest({
 			// See: https://github.com/alextim/astro-lib/blob/main/packages/astro-webmanifest/README.md
-			/**
-			 * required
-			 **/
 			name: siteConfig.title,
-			/**
-			 * optional
-			 **/
-			// short_name: "Astro_Cactus",
 			description: siteConfig.description,
 			lang: siteConfig.lang,
-			icon: "public/icon.png", // the source for generating favicon & icons
+			icon: "public/icon.png",
 			icons: [
 				{
-					src: "icons/apple-touch-icon.png", // used in src/components/BaseHead.astro L:26
+					src: "icons/apple-touch-icon.png",
 					sizes: "180x180",
 					type: "image/png",
 				},
@@ -90,6 +82,9 @@ export default defineConfig({
 	markdown: {
 		rehypePlugins: [
 			rehypeUnwrapImages,
+			// rehype-katex must run before rehype-external-links so the latter
+			// doesn't rewrite anchors inside katex's emitted DOM.
+			rehypeKatex,
 			[
 				rehypeExternalLinks,
 				{
@@ -98,7 +93,7 @@ export default defineConfig({
 				},
 			],
 		],
-		remarkPlugins: [remarkReadingTime, remarkDirective, remarkAdmonitions],
+		remarkPlugins: [remarkReadingTime, remarkDirective, remarkAdmonitions, remarkMath],
 		remarkRehype: {
 			footnoteLabelProperties: {
 				className: [""],
@@ -107,7 +102,6 @@ export default defineConfig({
 	},
 	// https://docs.astro.build/en/guides/prefetch/
 	prefetch: true,
-	// ! Please remember to replace the following site property with your own domain
 	vite: {
 		optimizeDeps: {
 			exclude: ["@resvg/resvg-js"],
