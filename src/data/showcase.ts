@@ -18,14 +18,14 @@ export const showcase: ShowcaseItem[] = [
 		href: "https://github.com/AnjayGoel/RedScout",
 		stack: "Redis · Monitoring · CLI Tool",
 		badge: "OSS",
-		desc: "A Redis monitoring tool that provides namespace-level insights into your Redis database. Unlike traditional tools that focus on server-level metrics, RedScout breaks down memory usage, key TTLs, and operations per second by logical namespaces.",
+		desc: "A Redis monitoring tool that provides namespace-level insights into your Redis database. Unlike traditional tools, It breaks down memory usage, key TTLs, and operations per second by logical namespaces.",
 	},
 	{
 		name: "DashReels",
 		href: "https://play.google.com/store/apps/details?id=com.dashtoon.video.reels&hl=en_IN",
 		stack: "Mobile App ·  Short Videos",
 		badge: "20M+ installs",
-		desc: "A mobile entertainment app with over 1 million installs, offering short-form video content across multiple genres. Features include free short dramas, a personalized recommendation system, and an engaging, user-friendly experience.",
+		desc: "A mobile entertainment app offering short-form video content across multiple genres. Features include free short dramas, a personalized recommendation system, and an engaging, user-friendly experience.",
 	},
 	{
 		name: "DashToon",
