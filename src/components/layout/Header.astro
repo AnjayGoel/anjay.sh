@@ -78,33 +78,45 @@ const navIcons: Record<string, string> = {
 	}
 	.nav {
 		display: flex;
+		align-items: baseline;
 		gap: 22px;
 		font-family: var(--font-sans);
 		font-size: 13.5px;
 		color: hsl(var(--theme-text) / 0.6);
 	}
 	.nav a {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		/* Reserve space for the active-indicator on every item so the row
-		   doesn't shift vertically when one becomes active. */
-		border-bottom: 1px solid transparent;
-		padding-bottom: 2px;
+		display: inline-block;
+		position: relative;
+		padding-bottom: 3px;
 		transition: color 0.2s ease;
 	}
+	/* Indicator extends a small buffer past the text on each side so the
+	   underline doesn't feel abrupt against the word. */
+	.nav a::after {
+		content: "";
+		position: absolute;
+		left: -3px;
+		right: -3px;
+		bottom: 0;
+		height: 1px;
+		background: transparent;
+	}
 	.nav a svg {
+		display: inline-block;
 		width: 14px;
 		height: 14px;
 		stroke: currentColor;
-		flex-shrink: 0;
+		vertical-align: -2px;
+		margin-right: 6px;
 	}
 	.nav a:hover {
 		color: hsl(var(--theme-accent));
 	}
 	.nav a.active {
 		color: hsl(var(--theme-text));
-		border-bottom-color: hsl(var(--theme-accent));
+	}
+	.nav a.active::after {
+		background: hsl(var(--theme-accent));
 	}
 
 	@media (max-width: 720px) {

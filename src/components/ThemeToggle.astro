@@ -5,9 +5,7 @@
 
 <style is:global>
 	.theme-toggle {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
+		display: inline-block;
 		padding: 6px 12px;
 		border-radius: 999px;
 		background: var(--accent-soft);
@@ -16,8 +14,9 @@
 		font-family: var(--font-sans);
 		font-size: 12px;
 		font-weight: 500;
+		line-height: 1.4;
 		cursor: pointer;
-		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+		transition: background 0.2s ease, color 0.2s ease;
 	}
 	.theme-toggle:hover {
 		background: var(--accent-soft-strong);
@@ -28,33 +27,20 @@
 		outline-offset: 3px;
 	}
 
-	/* Icon + label use grid-stacking: both states occupy the same cell,
-	   the cell sizes to the larger glyph/word, only the active one is
-	   visible. Switching theme can't cause width or height shift. */
-	.theme-toggle .icon,
-	.theme-toggle .label {
-		display: inline-grid;
-		grid-template-areas: "stack";
-	}
-	.theme-toggle .icon::before,
-	.theme-toggle .icon::after,
-	.theme-toggle .label::before,
-	.theme-toggle .label::after {
-		grid-area: stack;
-	}
 	.theme-toggle .icon {
 		font-size: 13px;
-		line-height: 1;
+		margin-right: 6px;
 	}
 	.theme-toggle .icon::before { content: "☾"; }
-	.theme-toggle .icon::after { content: "☀"; visibility: hidden; }
-	.theme-toggle .label::before { content: "Dark"; }
-	.theme-toggle .label::after { content: "Light"; visibility: hidden; }
+	[data-theme="dark"] .theme-toggle .icon::before { content: "☀"; }
 
-	[data-theme="dark"] .theme-toggle .icon::before,
-	[data-theme="dark"] .theme-toggle .label::before { visibility: hidden; }
-	[data-theme="dark"] .theme-toggle .icon::after,
-	[data-theme="dark"] .theme-toggle .label::after { visibility: visible; }
+	.theme-toggle .label {
+		display: inline-block;
+		min-width: 2.6em;
+		text-align: left;
+	}
+	.theme-toggle .label::before { content: "Dark"; }
+	[data-theme="dark"] .theme-toggle .label::before { content: "Light"; }
 </style>
 
 <script>
