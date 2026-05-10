@@ -44,11 +44,16 @@ pnpm format       # biome + prettier
 ```
 src/
   site.config.ts          # author / profile / comments / analytics
-  layouts/                # Base + BlogPost
-  components/             # Header, Footer, ThemeToggle, BaseHead, ...
-  data/showcase.ts        # showcase entries
+  types.ts                # SiteConfig + supporting interfaces
+  content.config.ts       # Astro v6 content collection (post) + schema
+  layouts/                # Base.astro + BlogPost.astro
+  components/             # BaseHead, ThemeProvider/Toggle, layout/, blog/
+  data/                   # post.ts (helpers), showcase.ts (entries)
+  utils/                  # date.ts, webmentions.ts
+  plugins/                # remark-admonitions, remark-reading-time
+  styles/global.css       # tokens (theme vars, layout), shared utilities
   content/post/*.md       # blog posts (Astro content collection)
-  pages/                  # routes
+  pages/                  # routes (incl. /og-image, /posts pagination, rss)
 public/                   # static assets served at site root
 design-explorations/      # historical HTML mockups, not built
 ```

@@ -3,6 +3,7 @@ import { getAllPosts, getPostSortDate, sortMDByDate } from "@/data/post";
 import { showcase } from "@/data/showcase";
 import PageLayout from "@/layouts/Base.astro";
 import { siteConfig } from "@/site-config";
+import { formatRailDate, formatStampDate } from "@/utils/date";
 import { Schema } from "astro-seo-schema";
 
 const allPosts = await getAllPosts();
@@ -12,20 +13,6 @@ const timelinePosts = allPostsByDate.slice(0, TIMELINE_LIMIT);
 const featured = timelinePosts[0];
 const rest = timelinePosts.slice(1);
 const archiveCount = allPosts.length;
-
-// Date formatters
-const railFormatter = new Intl.DateTimeFormat("en-US", {
-	day: "numeric",
-	month: "short",
-	year: "numeric",
-});
-const stampFormatter = new Intl.DateTimeFormat("en-US", {
-	month: "long",
-	year: "numeric",
-});
-
-const formatRailDate = (date: Date) => railFormatter.format(date);
-const formatStampDate = (date: Date) => stampFormatter.format(date);
 
 const profile = siteConfig.profile;
 const siteUrl = (path: string) => new URL(path, Astro.site).toString();
@@ -196,17 +183,6 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 	.socials .sep {
 		color: var(--faint);
 		margin: 0 9px;
-	}
-
-	/* ---------- Section labels ---------- */
-	.section-label {
-		font-family: var(--font-sans);
-		font-size: 11.5px;
-		font-weight: 500;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: hsl(var(--theme-text) / 0.6);
-		margin-bottom: 36px;
 	}
 
 	/* ---------- Writing timeline ---------- */
@@ -526,9 +502,6 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 		}
 		.socials .sep {
 			margin: 0 6px;
-		}
-		.section-label {
-			margin-bottom: 26px;
 		}
 		.writing {
 			margin-bottom: 64px;

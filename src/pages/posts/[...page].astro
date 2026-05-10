@@ -2,6 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import { getAllPosts, getPostSortDate, sortMDByDate } from "@/data/post";
 import PageLayout from "@/layouts/Base.astro";
+import { formatRailDate } from "@/utils/date";
 import type { GetStaticPaths, Page } from "astro";
 
 export const getStaticPaths = (async ({ paginate }) => {
@@ -36,13 +37,6 @@ const paginationProps = {
 		},
 	}),
 };
-
-const railFormatter = new Intl.DateTimeFormat("en-US", {
-	day: "numeric",
-	month: "short",
-	year: "numeric",
-});
-const formatRailDate = (date: Date) => railFormatter.format(date);
 
 const totalCount = page.total;
 ---
@@ -90,15 +84,6 @@ const totalCount = page.total;
 <style>
 	.writing {
 		margin-bottom: 96px;
-	}
-	.section-label {
-		font-family: var(--font-sans);
-		font-size: 11.5px;
-		font-weight: 500;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: hsl(var(--theme-text) / 0.6);
-		margin-bottom: 36px;
 	}
 
 	.timeline {
@@ -259,9 +244,6 @@ const totalCount = page.total;
 	}
 
 	@media (max-width: 420px) {
-		.section-label {
-			margin-bottom: 26px;
-		}
 		.writing {
 			margin-bottom: 64px;
 		}

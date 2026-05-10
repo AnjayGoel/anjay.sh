@@ -9,29 +9,31 @@ const validWebmentionTypes = ["like-of", "mention-of", "in-reply-to"];
 
 const hostName = new URL(DOMAIN).hostname;
 
+let warnedMissingToken = false;
+
 async function fetchWebmentions(timeFrom: string | null, perPage = 1000) {
 	if (!DOMAIN) {
-		console.warn("No domain specified. Please set in astro.config.ts");
+		if (!warnedMissingToken) {
+			console.warn("[webmentions] No site URL configured in astro.config.ts");
+			warnedMissingToken = true;
+		}
 		return null;
 	}
 
 	if (!API_TOKEN) {
-		console.warn("No webmention api token specified in .env");
+		if (!warnedMissingToken) {
+			console.warn("[webmentions] WEBMENTION_API_KEY not set in .env — skipping fetch");
+			warnedMissingToken = true;
+		}
 		return null;
 	}
 
 	let url = `https://webmention.io/api/mentions.jf2?domain=${hostName}&token=${API_TOKEN}&sort-dir=up&per-page=${perPage}`;
-
-	if (timeFrom) url += `&since${timeFrom}`;
+	if (timeFrom) url += `&since=${encodeURIComponent(timeFrom)}`;
 
 	const res = await fetch(url);
-
-	if (res.ok) {
-		const data = (await res.json()) as WebmentionsFeed;
-		return data;
-	}
-
-	return null;
+	if (!res.ok) return null;
+	return (await res.json()) as WebmentionsFeed;
 }
 
 /** Merge cached and fresh webmentions, deduplicating by `wm-id`. */
@@ -57,16 +59,10 @@ export function filterWebmentions(webmentions: WebmentionsChildren[]) {
 }
 
 function writeToCache(data: WebmentionsCache) {
-	const fileContent = JSON.stringify(data, null, 2);
-
 	if (!fs.existsSync(CACHE_DIR)) {
-		fs.mkdirSync(CACHE_DIR);
+		fs.mkdirSync(CACHE_DIR, { recursive: true });
 	}
-
-	fs.writeFile(filePath, fileContent, (err) => {
-		if (err) throw err;
-		console.log(`Webmentions saved to ${filePath}`);
-	});
+	fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 }
 
 function getFromCache(): WebmentionsCache {

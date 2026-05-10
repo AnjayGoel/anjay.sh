@@ -3,6 +3,7 @@ import { type CollectionEntry, render } from "astro:content";
 
 import WebMentions from "@/components/blog/webmentions/index.astro";
 import { siteConfig } from "@/site-config";
+import { formatBylineDate, formatEyebrowDate } from "@/utils/date";
 
 import BaseLayout from "./Base.astro";
 import { Schema } from "astro-seo-schema";
@@ -26,17 +27,10 @@ const postUrl = new URL(`/posts/${slug}`, Astro.site).toString();
 const socialImageAbsolute = new URL(socialImage, Astro.site).toString();
 
 // Eyebrow: "Posts · Month YYYY"
-const eyebrowDate = publishDate.toLocaleDateString("en-US", {
-	month: "long",
-	year: "numeric",
-});
+const eyebrowDate = formatEyebrowDate(publishDate);
 
 // Byline date: "2 May 2026"
-const bylineDate = publishDate.toLocaleDateString("en-GB", {
-	day: "numeric",
-	month: "long",
-	year: "numeric",
-});
+const bylineDate = formatBylineDate(publishDate);
 
 // Reading time: prefer remark plugin's value, otherwise fall back gracefully.
 const readingTime: string =
@@ -89,11 +83,7 @@ const readingTime: string =
 				{updatedDate && (
 					<div class="post-updated">
 						Updated <time datetime={updatedDate.toISOString()}>
-							{updatedDate.toLocaleDateString("en-GB", {
-								day: "numeric",
-								month: "long",
-								year: "numeric",
-							})}
+							{formatBylineDate(updatedDate)}
 						</time>
 					</div>
 				)}

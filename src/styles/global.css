@@ -65,3 +65,27 @@
 		--accent-soft-strong: rgba(200, 151, 97, 0.22);
 	}
 }
+
+/*
+ * Shared component-level utilities.
+ *
+ * Hoisted here when the same selector + ruleset appears in 3+ pages.
+ * Keep these few; prefer page-scoped <style> for one-off styles.
+ */
+
+/* Section heading eyebrow — used by Home, Posts archive, Showcase, About, 404. */
+.section-label {
+	font-family: var(--font-sans);
+	font-size: 11.5px;
+	font-weight: 500;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: hsl(var(--theme-text) / 0.6);
+	margin-bottom: 36px;
+}
+
+@media (max-width: 420px) {
+	.section-label {
+		margin-bottom: 26px;
+	}
+}
