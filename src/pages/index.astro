@@ -97,11 +97,7 @@ const showcase: {
 
 <PageLayout meta={{ title: "Home", description: siteConfig.description }}>
 	<section class="hero">
-		<p>
-			I'm Anjay. A software engineer based in India. I work on backend &amp; mobile systems and
-			write notes here on software internals — containers, async I/O, debugging — with the
-			occasional detour into economics &amp; finance.
-		</p>
+		<p>{siteConfig.description}</p>
 		<div class="socials">
 			<a href="https://github.com/anjaygoel" rel="noreferrer" target="_blank">GitHub</a><span
 				class="sep">·</span
@@ -162,7 +158,7 @@ const showcase: {
 
 			<div class="archive-link">
 				<a data-astro-prefetch href="/posts/"
-					>Earlier in the archive — {archiveCount} posts in total →</a
+					>View all {archiveCount} posts →</a
 				>
 			</div>
 		</div>

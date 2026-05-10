@@ -38,23 +38,3 @@ export function groupPostsByYear(posts: CollectionEntry<"post">[]) {
 	}, {});
 }
 
-/** returns all tags (including duplicates) collected from posts */
-export function getAllTags(posts: CollectionEntry<"post">[]) {
-	return posts.flatMap((post) => [...post.data.tags]);
-}
-
-/** returns the unique set of tags across all posts */
-export function getUniqueTags(posts: CollectionEntry<"post">[]) {
-	return [...new Set(getAllTags(posts))];
-}
-
-/** returns [tag, count] pairs sorted by count desc */
-export function getUniqueTagsWithCount(posts: CollectionEntry<"post">[]): [string, number][] {
-	return [
-		...getAllTags(posts).reduce(
-			(acc, t) => acc.set(t, (acc.get(t) ?? 0) + 1),
-			new Map<string, number>(),
-		),
-	].sort((a, b) => b[1] - a[1]);
-}
-
