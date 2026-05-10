@@ -26,6 +26,9 @@ export default defineConfig({
 		domains: ["webmention.io"],
 	},
 	output: "static",
+	build: {
+		inlineStylesheets: "always",
+	},
 	integrations: [
 		partytown({
 			config: {
