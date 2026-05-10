@@ -137,11 +137,11 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 		</div>
 	</section>
 
-	<section class="work" aria-labelledby="work-label">
-		<div class="section-label" id="work-label">Showcase</div>
-		<ul class="work-list">
-			{
-				showcase.map((item, idx) => (
+	{showcase.length > 0 && (
+		<section class="work" aria-labelledby="work-label">
+			<div class="section-label" id="work-label">Showcase</div>
+			<ul class="work-list">
+				{showcase.map((item, idx) => (
 					<li style={`--i: ${idx + 1}`}>
 						<a href={item.href} rel="noreferrer" target="_blank">
 							<div class="head">
@@ -152,10 +152,10 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 							<p>{item.desc}</p>
 						</a>
 					</li>
-				))
-			}
-		</ul>
-	</section>
+				))}
+			</ul>
+		</section>
+	)}
 </PageLayout>
 
 <style>

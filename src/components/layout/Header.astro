@@ -1,9 +1,15 @@
 ---
+import { showcase } from "@/data/showcase";
 import { menuLinks, siteConfig } from "@/site-config";
 import ThemeToggle from "../ThemeToggle.astro";
 
 const url = new URL(Astro.request.url);
 const wordmark = siteConfig.title;
+
+const visibleMenuLinks = menuLinks.filter((link) => {
+	if (link.path === "/showcase/" && showcase.length === 0) return false;
+	return true;
+});
 
 const isActive = (path: string) => {
 	if (path === "/") return url.pathname === "/";
@@ -26,7 +32,7 @@ const navIcons: Record<string, string> = {
 	<div class="header-right">
 		<nav class="nav" aria-label="Primary">
 			{
-				menuLinks.map((link) => (
+				visibleMenuLinks.map((link) => (
 					<a
 						aria-current={isActive(link.path) ? "page" : false}
 						class:list={[{ active: isActive(link.path) }]}
