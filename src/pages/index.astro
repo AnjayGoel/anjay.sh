@@ -76,7 +76,12 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 		<div class="timeline">
 			{
 				featured && (
-					<a class="post featured" data-astro-prefetch href={`/posts/${featured.id}/`}>
+					<a
+						class="post featured"
+						data-astro-prefetch
+						href={`/posts/${featured.id}/`}
+						style="--i: 0"
+					>
 						<div class="post-rail">
 							<time class="post-date" datetime={getPostSortDate(featured).toISOString()}>
 								{formatRailDate(getPostSortDate(featured))}
@@ -103,8 +108,13 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 			}
 
 			{
-				rest.map((p) => (
-					<a class="post" data-astro-prefetch href={`/posts/${p.id}/`}>
+				rest.map((p, idx) => (
+					<a
+						class="post"
+						data-astro-prefetch
+						href={`/posts/${p.id}/`}
+						style={`--i: ${idx + 1}`}
+					>
 						<div class="post-rail">
 							<time class="post-date" datetime={getPostSortDate(p).toISOString()}>
 								{formatRailDate(getPostSortDate(p))}
@@ -119,7 +129,7 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 				))
 			}
 
-			<div class="archive-link">
+			<div class="archive-link" style={`--i: ${rest.length + 1}`}>
 				<a data-astro-prefetch href="/posts/"
 					>View all {archiveCount} posts →</a
 				>
@@ -131,8 +141,8 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 		<div class="section-label" id="work-label">Showcase</div>
 		<ul class="work-list">
 			{
-				showcase.map((item) => (
-					<li>
+				showcase.map((item, idx) => (
+					<li style={`--i: ${idx + 1}`}>
 						<a href={item.href} rel="noreferrer" target="_blank">
 							<div class="head">
 								<span class="name">{item.name}</span>
@@ -198,7 +208,8 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 	.timeline::before {
 		content: "";
 		position: absolute;
-		left: var(--rail-width);
+		/* 1px line geometrically centered on the rail's right edge */
+		left: calc(var(--rail-width) - 0.5px);
 		top: 6px;
 		bottom: 6px;
 		width: 1px;
@@ -210,16 +221,19 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 	}
 	.post-rail {
 		position: relative;
-		padding-top: 4px;
-		text-align: right;
+		--rail-pad-top: 4px;
+		--rail-date-size: 11.5px;
+		--rail-date-lh: 1.4;
+		padding-top: var(--rail-pad-top);
 		padding-right: 18px;
+		text-align: right;
 	}
 	.post-date {
 		font-family: var(--font-mono);
-		font-size: 11.5px;
+		font-size: var(--rail-date-size);
 		color: hsl(var(--theme-text) / 0.6);
 		letter-spacing: -0.01em;
-		line-height: 1.4;
+		line-height: var(--rail-date-lh);
 		white-space: nowrap;
 		font-weight: 500;
 		font-variant-numeric: tabular-nums;
@@ -227,11 +241,19 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 		transition: color 0.2s ease;
 	}
 	.post-dot {
+		--rail-dot-size: 9px;
 		position: absolute;
-		right: -5px;
-		top: 11px;
-		width: 9px;
-		height: 9px;
+		/* horizontal: dot center sits on the rail's right edge (the line) */
+		right: calc(-0.5 * var(--rail-dot-size));
+		/* vertical: dot center sits on date's first-line midline.
+		   `0.5lh` = half of the dot's own line-box height, which we mirror
+		   from the date below so the math is identical regardless of size. */
+		top: calc(var(--rail-pad-top) + 0.5lh);
+		font-size: var(--rail-date-size);
+		line-height: var(--rail-date-lh);
+		transform: translateY(-50%);
+		width: var(--rail-dot-size);
+		height: var(--rail-dot-size);
 		border-radius: 50%;
 		background: hsl(var(--theme-bg));
 		border: 1.5px solid var(--faint);
@@ -320,10 +342,7 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 		margin: 0 8px;
 	}
 	.post.featured .post-dot {
-		width: 11px;
-		height: 11px;
-		right: -6px;
-		top: 12px;
+		--rail-dot-size: 11px;
 		border-color: hsl(var(--theme-text-muted));
 	}
 	.post.featured:hover .post-dot {
@@ -339,6 +358,8 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 		color: hsl(var(--theme-text) / 0.6);
 	}
 	.archive-link a {
+		display: inline-block;
+		padding: 6px 0;
 		color: hsl(var(--theme-text-muted));
 		text-decoration: underline;
 		text-decoration-color: hsl(var(--theme-text) / 0.35);

@@ -167,33 +167,38 @@ const linkedinHref = `https://www.linkedin.com/sharing/share-offsite/?url=${enco
 </style>
 
 <script>
-	const buttons = document.querySelectorAll<HTMLButtonElement>("[data-share-copy]");
-	buttons.forEach((btn) => {
-		const label = btn.querySelector<HTMLElement>(".share-copy-label");
-		const original = label?.textContent ?? "Copy link";
-		const originalAria = btn.getAttribute("aria-label") ?? "Copy link";
+	const setup = () => {
+		const buttons = document.querySelectorAll<HTMLButtonElement>("[data-share-copy]");
+		buttons.forEach((btn) => {
+			if (btn.dataset.bound === "1") return;
+			btn.dataset.bound = "1";
+			const label = btn.querySelector<HTMLElement>(".share-copy-label");
+			const original = label?.textContent ?? "Copy link";
+			const originalAria = btn.getAttribute("aria-label") ?? "Copy link";
 
-		btn.addEventListener("click", async () => {
-			const url = btn.dataset.url ?? window.location.href;
-			try {
-				await navigator.clipboard.writeText(url);
-			} catch {
-				// Fallback: select via temporary input.
-				const input = document.createElement("input");
-				input.value = url;
-				document.body.appendChild(input);
-				input.select();
-				try { document.execCommand("copy"); } catch {}
-				input.remove();
-			}
-			btn.dataset.copied = "true";
-			btn.setAttribute("aria-label", "Copied");
-			if (label) label.textContent = "Copied!";
-			setTimeout(() => {
-				delete btn.dataset.copied;
-				btn.setAttribute("aria-label", originalAria);
-				if (label) label.textContent = original;
-			}, 1500);
+			btn.addEventListener("click", async () => {
+				const url = btn.dataset.url ?? window.location.href;
+				try {
+					await navigator.clipboard.writeText(url);
+				} catch {
+					const input = document.createElement("input");
+					input.value = url;
+					document.body.appendChild(input);
+					input.select();
+					try { document.execCommand("copy"); } catch {}
+					input.remove();
+				}
+				btn.dataset.copied = "true";
+				btn.setAttribute("aria-label", "Copied");
+				if (label) label.textContent = "Copied!";
+				setTimeout(() => {
+					delete btn.dataset.copied;
+					btn.setAttribute("aria-label", originalAria);
+					if (label) label.textContent = original;
+				}, 1500);
+			});
 		});
-	});
+	};
+	setup();
+	document.addEventListener("astro:page-load", setup);
 </script>

@@ -98,6 +98,7 @@ const readingTime: string =
 						alt={coverImage.alt}
 						loading="eager"
 						fetchpriority="high"
+						decoding="async"
 						widths={[480, 720, 960, 1280]}
 						sizes="(max-width: 720px) 92vw, 696px"
 					/>
@@ -680,75 +681,97 @@ const readingTime: string =
 
 {comments && (
 	<script is:inline define:vars={{ comments }}>
-		document.addEventListener("DOMContentLoaded", () => {
-			const theme = document.documentElement.getAttribute("data-theme");
-			const script = document.createElement("script");
-			script.src = "https://giscus.app/client.js";
-			script.setAttribute("data-repo", comments.repo);
-			script.setAttribute("data-repo-id", comments.repoId);
-			script.setAttribute("data-category", comments.category);
-			script.setAttribute("data-category-id", comments.categoryId);
-			script.setAttribute("data-mapping", "title");
-			script.setAttribute("data-strict", "0");
-			script.setAttribute("data-reactions-enabled", "1");
-			script.setAttribute("data-emit-metadata", "0");
-			script.setAttribute("data-input-position", "top");
-			script.setAttribute("data-theme", theme === "dark" ? "noborder_dark" : "noborder_light");
-			script.setAttribute("data-lang", "en");
-			script.setAttribute("crossorigin", "anonymous");
-			script.async = true;
-			document.addEventListener("theme-change", (e) => {
-				const iframe = document.querySelector("iframe.giscus-frame");
-				if (iframe && iframe.contentWindow) {
-					iframe.contentWindow.postMessage(
-						{
-							giscus: {
-								setConfig: {
-									theme: e.detail.theme === "dark" ? "dark" : "light",
-								},
-							},
-						},
-						"https://giscus.app",
-					);
-				}
-			});
-
-			const mount = document.getElementById("comments") || document.body;
-			mount.appendChild(script);
-		});
+		(() => {
+			const mountGiscus = () => {
+				const mount = document.getElementById("comments");
+				// Skip if no mount or already populated for this page
+				if (!mount || mount.querySelector("script") || mount.querySelector(".giscus")) return;
+				const theme = document.documentElement.getAttribute("data-theme");
+				const script = document.createElement("script");
+				script.src = "https://giscus.app/client.js";
+				script.setAttribute("data-repo", comments.repo);
+				script.setAttribute("data-repo-id", comments.repoId);
+				script.setAttribute("data-category", comments.category);
+				script.setAttribute("data-category-id", comments.categoryId);
+				script.setAttribute("data-mapping", "title");
+				script.setAttribute("data-strict", "0");
+				script.setAttribute("data-reactions-enabled", "1");
+				script.setAttribute("data-emit-metadata", "0");
+				script.setAttribute("data-input-position", "top");
+				script.setAttribute("data-theme", theme === "dark" ? "noborder_dark" : "noborder_light");
+				script.setAttribute("data-lang", "en");
+				script.setAttribute("crossorigin", "anonymous");
+				script.async = true;
+				mount.appendChild(script);
+			};
+			if (!window.__giscusThemeBound) {
+				window.__giscusThemeBound = true;
+				document.addEventListener("theme-change", (e) => {
+					const iframe = document.querySelector("iframe.giscus-frame");
+					if (iframe && iframe.contentWindow) {
+						iframe.contentWindow.postMessage(
+							{ giscus: { setConfig: { theme: e.detail.theme === "dark" ? "dark" : "light" } } },
+							"https://giscus.app",
+						);
+					}
+				});
+			}
+			mountGiscus();
+			document.addEventListener("astro:page-load", mountGiscus);
+		})();
 	</script>
 )}
 <script>
-	const scrollBtn = document.getElementById("to-top-btn") as HTMLButtonElement;
-	const targetHeader = document.getElementById("blog-hero") as HTMLDivElement;
+	type Cleanup = () => void;
+	let cleanups: Cleanup[] = [];
 
-	if (scrollBtn && targetHeader) {
-		function callback(entries: IntersectionObserverEntry[]) {
-			entries.forEach((entry) => {
-				scrollBtn.dataset.show = (!entry.isIntersecting).toString();
+	const setup = () => {
+		// Tear down listeners from the previous page (the IO observer holds
+		// a reference to the swapped-out hero element, etc).
+		cleanups.forEach((fn) => fn());
+		cleanups = [];
+
+		// To-top button visibility
+		const scrollBtn = document.getElementById("to-top-btn") as HTMLButtonElement | null;
+		const targetHeader = document.getElementById("blog-hero") as HTMLDivElement | null;
+		if (scrollBtn && targetHeader) {
+			const observer = new IntersectionObserver((entries) => {
+				entries.forEach((entry) => {
+					scrollBtn.dataset.show = (!entry.isIntersecting).toString();
+				});
 			});
+			observer.observe(targetHeader);
+			const onClick = () => document.documentElement.scrollTo({ behavior: "smooth", top: 0 });
+			scrollBtn.addEventListener("click", onClick);
+			cleanups.push(() => observer.disconnect());
+			cleanups.push(() => scrollBtn.removeEventListener("click", onClick));
 		}
 
-		scrollBtn.addEventListener("click", () => {
-			document.documentElement.scrollTo({ behavior: "smooth", top: 0 });
-		});
+		// Reading progress bar
+		const bar = document.getElementById("reading-progress") as HTMLElement | null;
+		if (bar) {
+			const update = () => {
+				const h = document.documentElement;
+				const max = h.scrollHeight - h.clientHeight;
+				const pct = max > 0 ? Math.min(100, (h.scrollTop / max) * 100) : 0;
+				bar.style.width = pct + "%";
+			};
+			update();
+			window.addEventListener("scroll", update, { passive: true });
+			window.addEventListener("resize", update, { passive: true });
+			cleanups.push(() => window.removeEventListener("scroll", update));
+			cleanups.push(() => window.removeEventListener("resize", update));
+		}
 
-		const observer = new IntersectionObserver(callback);
-		observer.observe(targetHeader);
-	}
-</script>
-<script>
-	// Reading progress bar
-	const bar = document.getElementById("reading-progress");
-	if (bar) {
-		const update = () => {
-			const h = document.documentElement;
-			const max = h.scrollHeight - h.clientHeight;
-			const pct = max > 0 ? Math.min(100, (h.scrollTop / max) * 100) : 0;
-			bar.style.width = pct + "%";
-		};
-		update();
-		window.addEventListener("scroll", update, { passive: true });
-		window.addEventListener("resize", update, { passive: true });
-	}
+		// Cover image fade-in (skip if cached/already complete)
+		const cover = document.querySelector<HTMLImageElement>(".post-cover img");
+		if (cover && !(cover.complete && cover.naturalWidth > 0)) {
+			cover.style.opacity = "0";
+			cover.style.transition = "opacity 320ms ease";
+			const show = () => { cover.style.opacity = "1"; };
+			cover.addEventListener("load", show, { once: true });
+		}
+	};
+	setup();
+	document.addEventListener("astro:page-load", setup);
 </script>
