@@ -199,107 +199,6 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 	.writing {
 		margin-bottom: 96px;
 	}
-	.timeline {
-		display: grid;
-		grid-template-columns: var(--rail-width) 1fr;
-		column-gap: var(--rail-gap);
-		position: relative;
-	}
-	.timeline::before {
-		content: "";
-		position: absolute;
-		left: calc(var(--rail-width) - 0.5px);
-		top: 6px;
-		bottom: 6px;
-		width: 1px;
-		background-color: var(--hairline);
-		transition: background-color 0.35s ease;
-	}
-	.post {
-		display: contents;
-	}
-	.post-rail {
-		position: relative;
-		--rail-pad-top: 4px;
-		--rail-date-size: 11.5px;
-		--rail-date-lh: 1.4;
-		padding-top: var(--rail-pad-top);
-		padding-right: 18px;
-		text-align: right;
-	}
-	.post-date {
-		font-family: var(--font-mono);
-		font-size: var(--rail-date-size);
-		color: hsl(var(--theme-text) / 0.6);
-		letter-spacing: -0.01em;
-		line-height: var(--rail-date-lh);
-		white-space: nowrap;
-		font-weight: 500;
-		font-variant-numeric: tabular-nums;
-		font-feature-settings: "tnum";
-		transition: color 0.2s ease;
-	}
-	/* Dot center sits on the rail's right edge (line) and the date's
-	   first-line midline. Resize via --rail-dot-size only. */
-	.post-dot {
-		--rail-dot-size: 9px;
-		position: absolute;
-		right: calc(-0.5 * var(--rail-dot-size));
-		top: calc(var(--rail-pad-top) + 0.5lh);
-		font-size: var(--rail-date-size);
-		line-height: var(--rail-date-lh);
-		transform: translateY(-50%);
-		width: var(--rail-dot-size);
-		height: var(--rail-dot-size);
-		border-radius: 50%;
-		background: hsl(var(--theme-bg));
-		border: 1.5px solid var(--faint);
-		transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-		z-index: 1;
-	}
-	.post-body {
-		padding-bottom: 38px;
-	}
-	.post-title {
-		font-family: var(--font-serif);
-		font-weight: 500;
-		color: hsl(var(--theme-text));
-		line-height: 1.3;
-		letter-spacing: -0.012em;
-		margin: 0 0 6px;
-		text-wrap: balance;
-		word-wrap: break-word;
-		overflow-wrap: anywhere;
-		transition: color 0.2s ease;
-	}
-	.post:hover .post-title {
-		color: hsl(var(--theme-accent));
-	}
-	.post:hover .post-dot {
-		border-color: hsl(var(--theme-accent));
-		background: hsl(var(--theme-accent));
-		box-shadow: 0 0 0 3px hsl(var(--theme-bg));
-	}
-	.post:hover .post-date {
-		color: hsl(var(--theme-text-muted));
-	}
-	.post:not(.featured) .post-title {
-		font-size: 18.5px;
-	}
-	.post-preview {
-		font-size: 16px;
-		line-height: 1.55;
-		color: hsl(var(--theme-text) / 0.6);
-		margin: 0;
-		max-width: 58ch;
-		word-wrap: break-word;
-		overflow-wrap: anywhere;
-		display: -webkit-box;
-		-webkit-line-clamp: 1;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-	}
-
 	/* ---------- Featured post ---------- */
 	.post.featured .post-body {
 		padding-bottom: 56px;
@@ -369,83 +268,10 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 		text-decoration-color: hsl(var(--theme-accent));
 	}
 
-	/* ---------- Work / showcase ---------- */
 	.work {
 		margin-bottom: 88px;
 	}
-	ul.work-list {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-	ul.work-list li {
-		padding: 22px 0;
-		border-top: 1px solid var(--hairline);
-		transition: border-color 0.35s ease;
-	}
-	ul.work-list li:last-child {
-		border-bottom: 1px solid var(--hairline);
-	}
-	ul.work-list a {
-		text-decoration: none;
-		color: inherit;
-		display: block;
-	}
-	ul.work-list .head {
-		display: flex;
-		align-items: baseline;
-		gap: 14px;
-		flex-wrap: wrap;
-		margin-bottom: 6px;
-	}
-	ul.work-list .name {
-		font-family: var(--font-serif);
-		font-size: 21px;
-		font-weight: 600;
-		letter-spacing: -0.012em;
-		color: hsl(var(--theme-text));
-		transition: color 0.2s ease;
-		word-wrap: break-word;
-		overflow-wrap: anywhere;
-	}
-	ul.work-list a:hover .name,
-	ul.work-list a:focus-visible .name {
-		color: hsl(var(--theme-accent));
-	}
-	ul.work-list .stack {
-		font-family: var(--font-mono);
-		font-size: 11px;
-		color: hsl(var(--theme-text) / 0.6);
-		font-variant-numeric: tabular-nums;
-		font-feature-settings: "tnum";
-	}
-	ul.work-list .badge {
-		font-family: var(--font-mono);
-		font-size: 10px;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		color: hsl(var(--theme-accent));
-		background: var(--accent-soft);
-		padding: 2px 8px;
-		border-radius: 2px;
-		margin-left: auto;
-	}
-	ul.work-list p {
-		font-size: 16px;
-		color: hsl(var(--theme-text-muted));
-		margin: 6px 0 0;
-		line-height: 1.55;
-		word-wrap: break-word;
-		overflow-wrap: anywhere;
-	}
 
-	/* ---------- Focus states ---------- */
-	.post:focus-visible,
-	ul.work-list a:focus-visible {
-		outline: 2px solid hsl(var(--theme-accent));
-		outline-offset: 4px;
-		border-radius: 4px;
-	}
 	.socials a:focus-visible,
 	.archive-link a:focus-visible {
 		outline: 2px solid hsl(var(--theme-accent));
@@ -453,33 +279,12 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 		border-radius: 3px;
 	}
 
-	/* ---------- Mobile breakpoints ---------- */
 	@media (max-width: 720px) {
 		.hero {
 			margin-bottom: 64px;
 		}
 		.hero p {
 			font-size: 18px;
-		}
-		.timeline {
-			display: block;
-		}
-		.timeline::before {
-			display: none;
-		}
-		.post {
-			display: block;
-			padding-bottom: 32px;
-		}
-		.post-rail {
-			text-align: left;
-			padding: 0 0 6px 0;
-		}
-		.post-dot {
-			display: none;
-		}
-		.post-body {
-			padding-bottom: 0;
 		}
 		.post.featured .post-rail {
 			display: none;
@@ -530,23 +335,8 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 		.post.featured .post-excerpt {
 			font-size: 15px;
 		}
-		.post:not(.featured) .post-title {
-			font-size: 17px;
-		}
-		.post-preview {
-			font-size: 15px;
-		}
-		.post-date {
-			font-size: 11px;
-		}
 		.work {
 			margin-bottom: 56px;
-		}
-		ul.work-list .name {
-			font-size: 17.5px;
-		}
-		ul.work-list p {
-			font-size: 15px;
 		}
 	}
 </style>
