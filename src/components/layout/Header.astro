@@ -87,7 +87,11 @@ const navIcons: Record<string, string> = {
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
-		transition: color 0.2s ease, border-color 0.2s ease;
+		/* Reserve space for the active-indicator on every item so the row
+		   doesn't shift vertically when one becomes active. */
+		border-bottom: 1px solid transparent;
+		padding-bottom: 2px;
+		transition: color 0.2s ease;
 	}
 	.nav a svg {
 		width: 14px;
@@ -100,8 +104,7 @@ const navIcons: Record<string, string> = {
 	}
 	.nav a.active {
 		color: hsl(var(--theme-text));
-		border-bottom: 1px solid hsl(var(--theme-accent));
-		padding-bottom: 2px;
+		border-bottom-color: hsl(var(--theme-accent));
 	}
 
 	@media (max-width: 720px) {
@@ -127,10 +130,9 @@ const navIcons: Record<string, string> = {
 			justify-content: flex-start;
 		}
 		.nav a {
-			padding: 6px 0;
-		}
-		.nav a.active {
-			padding-bottom: 4px;
+			/* Maintain top tap padding while keeping the reserved indicator
+			   space below from the desktop rule (1px border + 2px padding). */
+			padding-top: 6px;
 		}
 		.nav a svg {
 			width: 13px;

@@ -1,6 +1,6 @@
 <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">
-	<span class="icon" aria-hidden="true">☾</span>
-	<span class="label">Dark</span>
+	<span class="icon" aria-hidden="true"></span>
+	<span class="label"></span>
 </button>
 
 <style is:global>
@@ -23,33 +23,48 @@
 		background: var(--accent-soft-strong);
 		color: hsl(var(--theme-accent));
 	}
-	.theme-toggle .icon {
-		font-size: 13px;
-		line-height: 1;
-	}
 	.theme-toggle:focus-visible {
 		outline: 2px solid hsl(var(--theme-accent));
 		outline-offset: 3px;
 	}
+
+	/* Icon + label use grid-stacking: both states occupy the same cell,
+	   the cell sizes to the larger glyph/word, only the active one is
+	   visible. Switching theme can't cause width or height shift. */
+	.theme-toggle .icon,
+	.theme-toggle .label {
+		display: inline-grid;
+		grid-template-areas: "stack";
+	}
+	.theme-toggle .icon::before,
+	.theme-toggle .icon::after,
+	.theme-toggle .label::before,
+	.theme-toggle .label::after {
+		grid-area: stack;
+	}
+	.theme-toggle .icon {
+		font-size: 13px;
+		line-height: 1;
+	}
+	.theme-toggle .icon::before { content: "☾"; }
+	.theme-toggle .icon::after { content: "☀"; visibility: hidden; }
+	.theme-toggle .label::before { content: "Dark"; }
+	.theme-toggle .label::after { content: "Light"; visibility: hidden; }
+
+	[data-theme="dark"] .theme-toggle .icon::before,
+	[data-theme="dark"] .theme-toggle .label::before { visibility: hidden; }
+	[data-theme="dark"] .theme-toggle .icon::after,
+	[data-theme="dark"] .theme-toggle .label::after { visibility: visible; }
 </style>
 
 <script>
 	const r = document.documentElement;
 	const btn = document.getElementById("theme-toggle") as HTMLButtonElement | null;
 	if (btn) {
-		const iconEl = btn.querySelector(".icon") as HTMLElement | null;
-		const labelEl = btn.querySelector(".label") as HTMLElement | null;
-		const sync = () => {
-			const isDark = r.dataset.theme === "dark";
-			if (labelEl) labelEl.textContent = isDark ? "Light" : "Dark";
-			if (iconEl) iconEl.textContent = isDark ? "☀" : "☾";
-		};
-		sync();
 		btn.addEventListener("click", () => {
 			const next = r.dataset.theme === "dark" ? "light" : "dark";
 			r.dataset.theme = next;
 			try { localStorage.setItem("theme", next); } catch {}
-			sync();
 			document.dispatchEvent(new CustomEvent("theme-change", { detail: { theme: next } }));
 		});
 	}
