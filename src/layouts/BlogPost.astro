@@ -98,6 +98,7 @@ const readingTime: string =
 						alt={coverImage.alt}
 						loading="eager"
 						fetchpriority="high"
+						decoding="async"
 						widths={[480, 720, 960, 1280]}
 						sizes="(max-width: 720px) 92vw, 696px"
 					/>
@@ -594,6 +595,59 @@ const readingTime: string =
 		border: 1px solid var(--hairline);
 		background: var(--paper);
 	}
+	@media (prefers-reduced-motion: no-preference) {
+		.post-article img[loading="lazy"]:not([data-in]) {
+			opacity: 0;
+		}
+		.post-article img[loading="lazy"][data-in] {
+			opacity: 1;
+			transition: opacity 360ms ease;
+		}
+	}
+
+	.post-article h2,
+	.post-article h3 {
+		position: relative;
+	}
+	.post-article .heading-anchor {
+		position: absolute;
+		left: -1.25em;
+		top: 0;
+		bottom: 0;
+		display: inline-flex;
+		align-items: center;
+		font-family: var(--font-mono);
+		font-size: 0.7em;
+		color: hsl(var(--theme-accent));
+		opacity: 0;
+		transition: opacity 0.18s ease;
+		text-decoration: none;
+		padding: 0 0.4em;
+		background: transparent;
+		border: 0;
+		cursor: pointer;
+	}
+	@media (hover: hover) {
+		.post-article h2:hover .heading-anchor,
+		.post-article h3:hover .heading-anchor,
+		.post-article .heading-anchor:focus-visible {
+			opacity: 1;
+		}
+	}
+	@media (hover: none) {
+		.post-article .heading-anchor {
+			opacity: 0.35;
+			position: static;
+			margin-left: 0.4em;
+		}
+	}
+	@media (max-width: 720px) {
+		.post-article .heading-anchor {
+			position: static;
+			margin-left: 0.4em;
+			opacity: 0.35;
+		}
+	}
 	.post-article figure img {
 		width: 100%;
 	}
@@ -681,6 +735,8 @@ const readingTime: string =
 {comments && (
 	<script is:inline define:vars={{ comments }}>
 		document.addEventListener("DOMContentLoaded", () => {
+			const mount = document.getElementById("comments");
+			if (!mount) return;
 			const theme = document.documentElement.getAttribute("data-theme");
 			const script = document.createElement("script");
 			script.src = "https://giscus.app/client.js";
@@ -697,58 +753,100 @@ const readingTime: string =
 			script.setAttribute("data-lang", "en");
 			script.setAttribute("crossorigin", "anonymous");
 			script.async = true;
+			mount.appendChild(script);
+
+			// Keep the iframe theme in sync when the toggle is clicked.
 			document.addEventListener("theme-change", (e) => {
 				const iframe = document.querySelector("iframe.giscus-frame");
 				if (iframe && iframe.contentWindow) {
 					iframe.contentWindow.postMessage(
-						{
-							giscus: {
-								setConfig: {
-									theme: e.detail.theme === "dark" ? "dark" : "light",
-								},
-							},
-						},
+						{ giscus: { setConfig: { theme: e.detail.theme === "dark" ? "dark" : "light" } } },
 						"https://giscus.app",
 					);
 				}
 			});
-
-			const mount = document.getElementById("comments") || document.body;
-			mount.appendChild(script);
 		});
 	</script>
 )}
 <script>
-	const scrollBtn = document.getElementById("to-top-btn") as HTMLButtonElement;
-	const targetHeader = document.getElementById("blog-hero") as HTMLDivElement;
-
-	if (scrollBtn && targetHeader) {
-		function callback(entries: IntersectionObserverEntry[]) {
+	const scrollBtn = document.getElementById("to-top-btn") as HTMLButtonElement | null;
+	const heroEl = document.getElementById("blog-hero") as HTMLDivElement | null;
+	if (scrollBtn && heroEl) {
+		new IntersectionObserver((entries) => {
 			entries.forEach((entry) => {
 				scrollBtn.dataset.show = (!entry.isIntersecting).toString();
 			});
-		}
-
-		scrollBtn.addEventListener("click", () => {
-			document.documentElement.scrollTo({ behavior: "smooth", top: 0 });
-		});
-
-		const observer = new IntersectionObserver(callback);
-		observer.observe(targetHeader);
+		}).observe(heroEl);
+		scrollBtn.addEventListener("click", () =>
+			document.documentElement.scrollTo({ behavior: "smooth", top: 0 }),
+		);
 	}
-</script>
-<script>
-	// Reading progress bar
-	const bar = document.getElementById("reading-progress");
-	if (bar) {
+
+	const progressBar = document.getElementById("reading-progress") as HTMLElement | null;
+	if (progressBar) {
 		const update = () => {
 			const h = document.documentElement;
 			const max = h.scrollHeight - h.clientHeight;
 			const pct = max > 0 ? Math.min(100, (h.scrollTop / max) * 100) : 0;
-			bar.style.width = pct + "%";
+			progressBar.style.width = pct + "%";
 		};
 		update();
 		window.addEventListener("scroll", update, { passive: true });
 		window.addEventListener("resize", update, { passive: true });
 	}
+
+	// Skip the fade if the image is already cached so we don't delay LCP.
+	const cover = document.querySelector<HTMLImageElement>(".post-cover img");
+	if (cover && !(cover.complete && cover.naturalWidth > 0)) {
+		cover.style.opacity = "0";
+		cover.style.transition = "opacity 320ms ease";
+		cover.addEventListener("load", () => { cover.style.opacity = "1"; }, { once: true });
+	}
+
+	const lazyImgs = document.querySelectorAll<HTMLImageElement>(
+		'.post-article img[loading="lazy"]',
+	);
+	if (lazyImgs.length && "IntersectionObserver" in window) {
+		const io = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((e) => {
+					if (e.isIntersecting) {
+						(e.target as HTMLElement).dataset.in = "1";
+						io.unobserve(e.target);
+					}
+				});
+			},
+			{ rootMargin: "120px 0px" },
+		);
+		lazyImgs.forEach((img) => io.observe(img));
+	}
+
+	const slugify = (s: string) =>
+		s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+	const usedIds = new Set<string>();
+	document
+		.querySelectorAll<HTMLHeadingElement>(".post-article h2, .post-article h3")
+		.forEach((h) => {
+			const baseId = h.id || slugify(h.textContent ?? "");
+			if (!baseId) return;
+			let id = baseId;
+			for (let n = 2; usedIds.has(id); n++) id = `${baseId}-${n}`;
+			usedIds.add(id);
+			if (!h.id) h.id = id;
+
+			const btn = document.createElement("button");
+			btn.type = "button";
+			btn.className = "heading-anchor";
+			btn.setAttribute("aria-label", `Copy link to ${h.textContent ?? "section"}`);
+			btn.textContent = "#";
+			btn.addEventListener("click", async () => {
+				const url = `${location.origin}${location.pathname}#${id}`;
+				try {
+					await navigator.clipboard.writeText(url);
+					btn.textContent = "✓";
+					setTimeout(() => (btn.textContent = "#"), 1200);
+				} catch {}
+			});
+			h.prepend(btn);
+		});
 </script>

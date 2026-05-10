@@ -1,7 +1,5 @@
 import { siteConfig } from "@/site-config";
 
-// Date formatters used across pages — built once at module scope, reused.
-
 const dateFormat = new Intl.DateTimeFormat(siteConfig.date.locale, siteConfig.date.options);
 
 const railFormatter = new Intl.DateTimeFormat("en-US", {
@@ -26,7 +24,6 @@ const eyebrowFormatter = new Intl.DateTimeFormat("en-US", {
 	year: "numeric",
 });
 
-/** Format a date using the site-config locale + options (overrideable). */
 export function getFormattedDate(
 	date: string | number | Date,
 	options?: Intl.DateTimeFormatOptions,

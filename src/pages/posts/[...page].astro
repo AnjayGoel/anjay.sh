@@ -46,8 +46,13 @@ const totalCount = page.total;
 		<div class="section-label" id="writing-label">Writing · {totalCount} posts</div>
 		<div class="timeline">
 			{
-				page.data.map((p) => (
-					<a class="post" data-astro-prefetch href={`/posts/${p.id}/`}>
+				page.data.map((p, idx) => (
+					<a
+						class="post"
+						data-astro-prefetch
+						href={`/posts/${p.id}/`}
+						style={`--i: ${idx}`}
+					>
 						<div class="post-rail">
 							<time class="post-date" datetime={getPostSortDate(p).toISOString()}>
 								{formatRailDate(getPostSortDate(p))}
@@ -86,101 +91,6 @@ const totalCount = page.total;
 		margin-bottom: 96px;
 	}
 
-	.timeline {
-		display: grid;
-		grid-template-columns: var(--rail-width) 1fr;
-		column-gap: var(--rail-gap);
-		position: relative;
-	}
-	.timeline::before {
-		content: "";
-		position: absolute;
-		left: var(--rail-width);
-		top: 6px;
-		bottom: 6px;
-		width: 1px;
-		background-color: var(--hairline);
-		transition: background-color 0.35s ease;
-	}
-	.post {
-		display: contents;
-	}
-	.post-rail {
-		position: relative;
-		padding-top: 4px;
-		text-align: right;
-		padding-right: 18px;
-	}
-	.post-date {
-		font-family: var(--font-mono);
-		font-size: 11.5px;
-		color: hsl(var(--theme-text) / 0.6);
-		letter-spacing: -0.01em;
-		line-height: 1.4;
-		white-space: nowrap;
-		font-weight: 500;
-		font-variant-numeric: tabular-nums;
-		font-feature-settings: "tnum";
-		transition: color 0.2s ease;
-	}
-	.post-dot {
-		position: absolute;
-		right: -4px;
-		top: 11px;
-		width: 9px;
-		height: 9px;
-		border-radius: 50%;
-		background: hsl(var(--theme-bg));
-		border: 1.5px solid var(--faint);
-		transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-		z-index: 1;
-	}
-	.post-body {
-		padding-bottom: 38px;
-	}
-	.post-title {
-		font-family: var(--font-serif);
-		font-weight: 500;
-		font-size: 18.5px;
-		color: hsl(var(--theme-text));
-		line-height: 1.3;
-		letter-spacing: -0.012em;
-		margin: 0 0 6px;
-		text-wrap: balance;
-		word-wrap: break-word;
-		overflow-wrap: anywhere;
-		transition: color 0.2s ease;
-	}
-	.post:hover .post-title {
-		color: hsl(var(--theme-accent));
-	}
-	.post:hover .post-dot {
-		border-color: hsl(var(--theme-accent));
-		background: hsl(var(--theme-accent));
-		box-shadow: 0 0 0 3px hsl(var(--theme-bg));
-	}
-	.post:hover .post-date {
-		color: hsl(var(--theme-text-muted));
-	}
-	.post-preview {
-		font-size: 16px;
-		line-height: 1.55;
-		color: hsl(var(--theme-text) / 0.6);
-		margin: 0;
-		max-width: 58ch;
-		word-wrap: break-word;
-		overflow-wrap: anywhere;
-		display: -webkit-box;
-		-webkit-line-clamp: 1;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-	}
-	.post:focus-visible {
-		outline: 2px solid hsl(var(--theme-accent));
-		outline-offset: 4px;
-		border-radius: 4px;
-	}
-
 	.pagination {
 		grid-column: 2;
 		margin-top: 8px;
@@ -190,6 +100,8 @@ const totalCount = page.total;
 		justify-content: space-between;
 	}
 	.pag-link {
+		display: inline-block;
+		padding: 8px 4px;
 		font-family: var(--font-mono);
 		font-size: 11.5px;
 		letter-spacing: 0.04em;
@@ -218,26 +130,6 @@ const totalCount = page.total;
 	}
 
 	@media (max-width: 720px) {
-		.timeline {
-			display: block;
-		}
-		.timeline::before {
-			display: none;
-		}
-		.post {
-			display: block;
-			padding-bottom: 32px;
-		}
-		.post-rail {
-			text-align: left;
-			padding: 0 0 6px 0;
-		}
-		.post-dot {
-			display: none;
-		}
-		.post-body {
-			padding-bottom: 0;
-		}
 		.pagination {
 			margin-top: 16px;
 		}
@@ -246,15 +138,6 @@ const totalCount = page.total;
 	@media (max-width: 420px) {
 		.writing {
 			margin-bottom: 64px;
-		}
-		.post-title {
-			font-size: 17px;
-		}
-		.post-preview {
-			font-size: 15px;
-		}
-		.post-date {
-			font-size: 11px;
 		}
 	}
 </style>

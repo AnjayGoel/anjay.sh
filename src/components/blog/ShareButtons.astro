@@ -1,6 +1,4 @@
 ---
-// X / LinkedIn / Copy-link share row for the foot of a post.
-
 interface Props {
 	title: string;
 	url: string;
@@ -167,8 +165,7 @@ const linkedinHref = `https://www.linkedin.com/sharing/share-offsite/?url=${enco
 </style>
 
 <script>
-	const buttons = document.querySelectorAll<HTMLButtonElement>("[data-share-copy]");
-	buttons.forEach((btn) => {
+	document.querySelectorAll<HTMLButtonElement>("[data-share-copy]").forEach((btn) => {
 		const label = btn.querySelector<HTMLElement>(".share-copy-label");
 		const original = label?.textContent ?? "Copy link";
 		const originalAria = btn.getAttribute("aria-label") ?? "Copy link";
@@ -178,7 +175,6 @@ const linkedinHref = `https://www.linkedin.com/sharing/share-offsite/?url=${enco
 			try {
 				await navigator.clipboard.writeText(url);
 			} catch {
-				// Fallback: select via temporary input.
 				const input = document.createElement("input");
 				input.value = url;
 				document.body.appendChild(input);

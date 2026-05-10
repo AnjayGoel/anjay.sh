@@ -34,32 +34,23 @@
 </style>
 
 <script>
-	(() => {
-		const r = document.documentElement;
-		const btn = document.getElementById("theme-toggle");
-		if (!btn) return;
+	const r = document.documentElement;
+	const btn = document.getElementById("theme-toggle") as HTMLButtonElement | null;
+	if (btn) {
 		const iconEl = btn.querySelector(".icon") as HTMLElement | null;
 		const labelEl = btn.querySelector(".label") as HTMLElement | null;
-		const upd = () => {
+		const sync = () => {
 			const isDark = r.dataset.theme === "dark";
 			if (labelEl) labelEl.textContent = isDark ? "Light" : "Dark";
 			if (iconEl) iconEl.textContent = isDark ? "☀" : "☾";
 		};
-		upd();
+		sync();
 		btn.addEventListener("click", () => {
 			const next = r.dataset.theme === "dark" ? "light" : "dark";
 			r.dataset.theme = next;
-			try {
-				localStorage.setItem("theme", next);
-			} catch (e) {}
-			upd();
-			// notify ThemeProvider so meta theme-color stays in sync
-			document.dispatchEvent(
-				new CustomEvent("theme-change", { detail: { theme: next } }),
-			);
+			try { localStorage.setItem("theme", next); } catch {}
+			sync();
+			document.dispatchEvent(new CustomEvent("theme-change", { detail: { theme: next } }));
 		});
-
-		// keep icon/label in sync after view transitions
-		document.addEventListener("astro:after-swap", upd);
-	})();
+	}
 </script>

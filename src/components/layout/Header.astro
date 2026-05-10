@@ -106,22 +106,32 @@ const navIcons: Record<string, string> = {
 
 	@media (max-width: 720px) {
 		.site-header {
-			margin-bottom: 48px;
-			flex-wrap: wrap;
-			gap: 14px;
+			margin-bottom: 36px;
+			display: grid;
+			grid-template-columns: 1fr auto;
+			grid-template-areas:
+				"wordmark theme"
+				"nav nav";
+			align-items: center;
+			column-gap: 14px;
+			row-gap: 14px;
 		}
-		.header-right {
-			flex-wrap: wrap;
-			gap: 14px;
-		}
+		.wordmark { grid-area: wordmark; }
+		.header-right { display: contents; }
+		.theme-toggle { grid-area: theme; justify-self: end; }
 		.nav {
-			gap: 16px;
+			grid-area: nav;
+			gap: 22px;
 			font-size: 13px;
 			flex-wrap: wrap;
+			justify-content: flex-start;
 		}
-	}
-
-	@media (max-width: 720px) {
+		.nav a {
+			padding: 6px 0;
+		}
+		.nav a.active {
+			padding-bottom: 4px;
+		}
 		.nav a svg {
 			width: 13px;
 			height: 13px;
@@ -130,17 +140,14 @@ const navIcons: Record<string, string> = {
 
 	@media (max-width: 420px) {
 		.site-header {
-			margin-bottom: 36px;
-			gap: 14px;
+			margin-bottom: 28px;
+			row-gap: 12px;
 		}
 		.wordmark {
 			font-size: 16px;
 		}
-		.header-right {
-			gap: 10px;
-		}
 		.nav {
-			gap: 12px;
+			gap: 18px;
 			font-size: 12.5px;
 		}
 		.nav a svg {
