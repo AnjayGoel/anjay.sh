@@ -7,22 +7,22 @@
 <script>(()=>{try{const s=localStorage.getItem("anjay-theme");const d=window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=s||(d?"dark":"light");}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --serif: "Newsreader", Georgia, "Times New Roman", serif;
-    --sans: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+    --sans: "Inter", -apple-system, system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   }
   :root[data-theme="light"] {
-    --bg: #f5f1e8; --ink: #1c1814; --ink-2: #4a4239; --muted: #807769;
-    --faint: #b8ad9b; --hairline: #d8d0bd; --dot-faint: #c5b89e;
-    --accent: #6b3a1f; --selection: #e6dcc4;
+    --bg: #f6f1e6; --paper: #fbf6ec; --ink: #25201b; --ink-2: #4a4239; --muted: #807769;
+    --faint: #b8ad9b; --hairline: #d9cfb9; --dot-faint: #c5b89e;
+    --accent: #8a4423; --selection: #e6dcc4;
     --code-bg: #ece4d0;
   }
   :root[data-theme="dark"] {
-    --bg: #14110d; --ink: #e8e1d2; --ink-2: #b1a994; --muted: #807665;
-    --faint: #4a4438; --hairline: #2a2519; --dot-faint: #3a3424;
+    --bg: #131110; --paper: #1a1715; --ink: #f4f0e3; --ink-2: #c8c1ae; --muted: #807a6d;
+    --faint: #4f4a42; --hairline: #2a2622; --dot-faint: #3a3424;
     --accent: #c89761; --selection: #2e271a;
     --code-bg: #1d1a13;
   }
@@ -74,18 +74,29 @@
   .post-title {
     font-family: var(--serif); font-weight: 500;
     font-size: clamp(28px, 5.5vw, 46px);
-    letter-spacing: -0.018em; line-height: 1.12;
+    letter-spacing: -0.022em; line-height: 1.08;
     color: var(--ink); margin: 0 0 18px;
     word-wrap: break-word; overflow-wrap: break-word;
+  }
+  .post-title em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
   }
 
   .byline {
     font-family: var(--serif); font-style: italic;
     font-size: 16.5px; color: var(--ink-2);
-    margin: 0 0 32px;
+    margin: 0 0 14px;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
   }
-  .byline .filed { color: var(--muted); }
-  .byline .tag { color: var(--ink-2); }
+  .byline .sep { color: var(--faint); margin: 0 6px; font-style: normal; }
+  .post-tags {
+    font-family: var(--mono); font-size: 11.5px;
+    color: var(--muted); letter-spacing: 0.02em;
+    margin-bottom: 32px; word-break: break-word;
+  }
 
   .rule {
     height: 1px; background: var(--hairline); border: 0; margin: 0 0 44px;
@@ -96,6 +107,17 @@
   article p {
     font-size: 17.5px; line-height: 1.75; color: var(--ink);
     margin: 0 0 24px; max-width: 64ch;
+  }
+  article p:first-of-type::first-letter {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 500;
+    color: var(--accent);
+    float: left;
+    font-size: 3.6em;
+    line-height: 0.92;
+    padding: 4px 10px 0 0;
+    margin-top: 4px;
   }
   article p em, article em { font-style: italic; }
   article p strong, article strong { font-weight: 500; color: var(--ink); }
@@ -331,25 +353,18 @@
       </div>
     </header>
 
+    <div class="post-header">
+      <div class="post-eyebrow">Posts · May 2026</div>
+
+      <h1 class="post-title">Letting Claude Code Run <em>Wild</em> For A Few Days</h1>
+
+      <p class="byline">By Anjay Goel<span class="sep">·</span>2 May 2026<span class="sep">·</span>9 min read</p>
+      <div class="post-tags">claude · agents · mobile · programming · opinion</div>
+    </div>
+
+    <hr class="rule" />
+
     <article>
-      <div class="post-eyebrow">
-        <span>Post</span><span class="sep">·</span>
-        <span>2026.05.02</span><span class="sep">·</span>
-        <span>9 min</span>
-      </div>
-
-      <h1 class="post-title">Letting Claude Code Run Wild For A Few Days</h1>
-
-      <p class="byline">
-        Anjay Goel <span class="filed">· Filed under:</span>
-        <span class="tag">programming</span>,
-        <span class="tag">opinion</span>,
-        <span class="tag">claude</span>,
-        <span class="tag">agents</span>
-      </p>
-
-      <hr class="rule" />
-
       <p>Late last Sunday night, I'd just wrapped up some work, and in my half-sleepy state I got an itch to do something <em>"fun"</em>. While it's not unusual to feel that way from time to time, what's changed is that putting together a shabby piece of code that just works is a single prompt away now. So I decided to do something I'd been wanting to do for a while: migrating our entire <a href="https://play.google.com/store/apps/details?id=com.dashtoon.video.shortfree&amp;hl=en_IN">app</a> from Flutter to KMP.</p>
 
       <p>To give a bit of context, when we started three years ago, Flutter fit our use case very well. Over time, we launched a few more apps. Our requirements &amp; constraints changed and Flutter didn't feel like the best fit anymore, but it stuck. Switching would have meant learning a framework and rebuilding an entire app under a short deadline, which was too expensive to justify.</p>
@@ -417,7 +432,7 @@
       <p>But it should still force us to take a hard look at how engineering decisions are made and executed. The whole reason we stuck with Flutter is that switching was too expensive to justify. Once you factor in LLMs/Coding Assistants, calls like that don't look the same anymore, and most of the processes built around the old answers don't either.</p>
 
       <div class="post-end">
-        <a href="/preview-10.html">← Earlier in the archive</a>
+        <a href="/preview-10.html">← All posts</a>
       </div>
     </article>
 
