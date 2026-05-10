@@ -18,7 +18,7 @@ A minimal Astro blog template with serif typography, dark mode, RSS, OG images, 
 - RSS feed, sitemap, robots.txt, web manifest
 - Full-text search index built at deploy via [Pagefind](https://pagefind.app)
 - Optional [Giscus](https://giscus.app) comments with custom matched themes
-- Optional GA4 and Goatcounter analytics, both loaded via [Partytown](https://partytown.builder.io) so they run on a worker thread
+- Optional GA4 and Goatcounter analytics, both loaded via [Partytown](https://partytown.qwik.dev/) so they run on a worker thread
 - Optional [webmentions](https://webmention.io), fetched at build and cached locally
 - Lighthouse 100 / 100 / 100 / 100
 

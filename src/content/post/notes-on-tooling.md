@@ -40,7 +40,7 @@ enable. Custom themes live at `public/giscus-{light,dark}.css`.
 ## Analytics
 
 Both [GA4](https://analytics.google.com) and [Goatcounter](https://www.goatcounter.com) are pre-wired and load
-via [Partytown](https://partytown.builder.io) so they run on a worker thread, not the main thread. Set the IDs in
+via [Partytown](https://partytown.qwik.dev/) so they run on a worker thread, not the main thread. Set the IDs in
 `siteConfig.analytics`. Leave them undefined to skip the scripts.
 
 ## Webmentions
