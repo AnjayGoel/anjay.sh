@@ -1,14 +1,19 @@
 ---
+import { getEntry, render } from "astro:content";
 import PageLayout from "@/layouts/Base.astro";
 import { siteConfig } from "@/site-config";
 import { Schema } from "astro-seo-schema";
+
+const entry = await getEntry("page", "about");
+if (!entry) throw new Error("Missing src/content/page/about.md");
+const { Content } = await render(entry);
 
 const profile = siteConfig.profile;
 const authorName = profile?.name ?? siteConfig.author;
 
 const meta = {
-	description: `${authorName} — about me.`,
-	title: "About",
+	description: entry.data.description ?? `${authorName} — about me.`,
+	title: entry.data.title,
 };
 
 const personSameAs = [
@@ -55,28 +60,9 @@ const avatarUrl = profile?.avatar ? new URL(profile.avatar, Astro.site).toString
 <PageLayout meta={meta}>
 	<section class="about" aria-labelledby="about-label">
 		<div class="section-label" id="about-label">About</div>
-		<ul class="bio">
-			<li>
-				🚀 Software Engineer at <a
-					href={profile?.employerUrl ?? "#"}
-					rel="noreferrer"
-					target="_blank">{profile?.employer ?? ""}</a
-				>
-			</li>
-			<li>🎓 {profile?.alumni ?? ""} graduate (2023)</li>
-			<li>📝 Occasional blogger on tech, economics, and everything in between</li>
-		</ul>
-		<p class="bio-foot">
-			You can find me on <a
-				href={profile?.github ?? "#"}
-				rel="noreferrer"
-				target="_blank">GitHub</a
-			>, <a
-				href={profile?.linkedin ?? "#"}
-				rel="noreferrer"
-				target="_blank">LinkedIn</a
-			>, or by <a href={`mailto:${profile?.email ?? ""}`}>email</a>.
-		</p>
+		<div class="bio">
+			<Content />
+		</div>
 	</section>
 </PageLayout>
 
@@ -84,35 +70,36 @@ const avatarUrl = profile?.avatar ? new URL(profile.avatar, Astro.site).toString
 	.about {
 		margin-bottom: 64px;
 	}
-	ul.bio {
-		list-style: disc;
-		list-style-position: inside;
+	.bio {
 		font-family: var(--font-serif);
 		font-size: 17.5px;
 		line-height: 1.75;
 		color: hsl(var(--theme-text));
+		max-width: var(--reading-width);
+	}
+	.bio :global(ul) {
+		list-style: disc;
+		list-style-position: inside;
 		margin: 0 0 28px;
 		padding: 0;
 	}
-	ul.bio li {
+	.bio :global(ul li) {
 		margin-bottom: 6px;
 		text-wrap: pretty;
 		word-wrap: break-word;
 		overflow-wrap: anywhere;
 	}
-	ul.bio li:last-child {
+	.bio :global(ul li:last-child) {
 		margin-bottom: 0;
 	}
-	.bio-foot {
-		font-family: var(--font-serif);
-		font-size: 17.5px;
-		line-height: 1.75;
-		color: hsl(var(--theme-text));
-		margin: 0;
-		max-width: var(--reading-width);
+	.bio :global(p) {
+		margin: 0 0 22px;
+		text-wrap: pretty;
 	}
-	.bio a,
-	.bio-foot a {
+	.bio :global(p:last-child) {
+		margin-bottom: 0;
+	}
+	.bio :global(a) {
 		color: hsl(var(--theme-text));
 		text-decoration: underline;
 		text-decoration-color: hsl(var(--theme-text) / 0.35);
@@ -120,28 +107,24 @@ const avatarUrl = profile?.avatar ? new URL(profile.avatar, Astro.site).toString
 		text-underline-offset: 3px;
 		transition: color 0.2s ease, text-decoration-color 0.2s ease;
 	}
-	.bio a:hover,
-	.bio-foot a:hover {
+	.bio :global(a:hover) {
 		color: hsl(var(--theme-accent));
 		text-decoration-color: hsl(var(--theme-accent));
 	}
-	.bio a:focus-visible,
-	.bio-foot a:focus-visible {
+	.bio :global(a:focus-visible) {
 		outline: 2px solid hsl(var(--theme-accent));
 		outline-offset: 3px;
 		border-radius: 3px;
 	}
 
 	@media (max-width: 720px) {
-		ul.bio,
-		.bio-foot {
+		.bio {
 			font-size: 17px;
 			line-height: 1.7;
 		}
 	}
 	@media (max-width: 420px) {
-		ul.bio,
-		.bio-foot {
+		.bio {
 			font-size: 16.5px;
 		}
 	}
