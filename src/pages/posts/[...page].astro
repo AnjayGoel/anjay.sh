@@ -53,7 +53,7 @@ const totalCount = page.total;
 		<div class="timeline">
 			{
 				page.data.map((p) => (
-					<a class="post" data-astro-prefetch href={`/posts/${p.slug}/`}>
+					<a class="post" data-astro-prefetch href={`/posts/${p.id}/`}>
 						<div class="post-rail">
 							<time class="post-date" datetime={getPostSortDate(p).toISOString()}>
 								{formatRailDate(getPostSortDate(p))}

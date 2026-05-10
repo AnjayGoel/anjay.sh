@@ -1,6 +1,6 @@
 <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">
 	<span class="icon" aria-hidden="true">☾</span>
-	<span class="label">dark</span>
+	<span class="label">Dark</span>
 </button>
 
 <style is:global>
@@ -42,7 +42,7 @@
 		const labelEl = btn.querySelector(".label") as HTMLElement | null;
 		const upd = () => {
 			const isDark = r.dataset.theme === "dark";
-			if (labelEl) labelEl.textContent = isDark ? "light" : "dark";
+			if (labelEl) labelEl.textContent = isDark ? "Light" : "Dark";
 			if (iconEl) iconEl.textContent = isDark ? "☀" : "☾";
 		};
 		upd();

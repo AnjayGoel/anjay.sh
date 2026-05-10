@@ -47,13 +47,7 @@ const goatcounter = analytics?.goatcounterUrl;
 {/* Fonts */}
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-{/*
-   Font weights/styles used in src/:
-     Newsreader 400, 500, 600 (regular) + 400, 500 (italic) — body, headings, drop cap, byline italic.
-     Inter      400, 500                                     — nav, labels, ThemeToggle.
-     JetBrains  400, 500                                     — eyebrows, post meta, code.
-   Keep this URL in sync with actual selector usage; trimming weights reduces transferred CSS.
-*/}
+{/* Trim weights to keep CSS payload small — keep in sync with usage. */}
 <link
     href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet"

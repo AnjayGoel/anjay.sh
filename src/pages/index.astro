@@ -89,7 +89,7 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 		<div class="timeline">
 			{
 				featured && (
-					<a class="post featured" data-astro-prefetch href={`/posts/${featured.slug}/`}>
+					<a class="post featured" data-astro-prefetch href={`/posts/${featured.id}/`}>
 						<div class="post-rail">
 							<time class="post-date" datetime={getPostSortDate(featured).toISOString()}>
 								{formatRailDate(getPostSortDate(featured))}
@@ -117,7 +117,7 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 
 			{
 				rest.map((p) => (
-					<a class="post" data-astro-prefetch href={`/posts/${p.slug}/`}>
+					<a class="post" data-astro-prefetch href={`/posts/${p.id}/`}>
 						<div class="post-rail">
 							<time class="post-date" datetime={getPostSortDate(p).toISOString()}>
 								{formatRailDate(getPostSortDate(p))}

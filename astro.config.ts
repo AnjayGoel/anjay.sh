@@ -44,19 +44,13 @@ export default defineConfig({
 		robotsTxt(),
 		webmanifest({
 			// See: https://github.com/alextim/astro-lib/blob/main/packages/astro-webmanifest/README.md
-			/**
-			 * required
-			 **/
 			name: siteConfig.title,
-			/**
-			 * optional
-			 **/
 			description: siteConfig.description,
 			lang: siteConfig.lang,
-			icon: "public/icon.png", // the source for generating favicon & icons
+			icon: "public/icon.png",
 			icons: [
 				{
-					src: "icons/apple-touch-icon.png", // used in src/components/BaseHead.astro L:26
+					src: "icons/apple-touch-icon.png",
 					sizes: "180x180",
 					type: "image/png",
 				},

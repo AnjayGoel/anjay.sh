@@ -1,5 +1,5 @@
 ---
-import type { CollectionEntry } from "astro:content";
+import { type CollectionEntry, render } from "astro:content";
 
 import WebMentions from "@/components/blog/webmentions/index.astro";
 import { siteConfig } from "@/site-config";
@@ -14,11 +14,11 @@ interface Props {
 const { post } = Astro.props;
 const {
 	data: { description, ogImage, publishDate, title, updatedDate, tags, draft },
-	slug,
+	id: slug,
 } = post;
 const socialImage = ogImage ?? `/og-image/${slug}.png`;
 const articleDate = updatedDate?.toISOString() ?? publishDate.toISOString();
-const { remarkPluginFrontmatter } = await post.render();
+const { remarkPluginFrontmatter } = await render(post);
 
 const authorName = siteConfig.profile?.name ?? siteConfig.author;
 const comments = siteConfig.comments;
