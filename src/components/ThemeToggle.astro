@@ -34,27 +34,23 @@
 </style>
 
 <script>
-	const setup = () => {
-		const r = document.documentElement;
-		const btn = document.getElementById("theme-toggle") as HTMLButtonElement | null;
-		if (!btn || btn.dataset.bound === "1") return;
-		btn.dataset.bound = "1";
+	const r = document.documentElement;
+	const btn = document.getElementById("theme-toggle") as HTMLButtonElement | null;
+	if (btn) {
 		const iconEl = btn.querySelector(".icon") as HTMLElement | null;
 		const labelEl = btn.querySelector(".label") as HTMLElement | null;
-		const upd = () => {
+		const sync = () => {
 			const isDark = r.dataset.theme === "dark";
 			if (labelEl) labelEl.textContent = isDark ? "Light" : "Dark";
 			if (iconEl) iconEl.textContent = isDark ? "☀" : "☾";
 		};
-		upd();
+		sync();
 		btn.addEventListener("click", () => {
 			const next = r.dataset.theme === "dark" ? "light" : "dark";
 			r.dataset.theme = next;
-			try { localStorage.setItem("theme", next); } catch (e) {}
-			upd();
+			try { localStorage.setItem("theme", next); } catch {}
+			sync();
 			document.dispatchEvent(new CustomEvent("theme-change", { detail: { theme: next } }));
 		});
-	};
-	setup();
-	document.addEventListener("astro:page-load", setup);
+	}
 </script>

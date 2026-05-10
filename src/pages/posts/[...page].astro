@@ -100,7 +100,6 @@ const totalCount = page.total;
 	.timeline::before {
 		content: "";
 		position: absolute;
-		/* 1px line geometrically centered on the rail's right edge */
 		left: calc(var(--rail-width) - 0.5px);
 		top: 6px;
 		bottom: 6px;
@@ -135,9 +134,7 @@ const totalCount = page.total;
 	.post-dot {
 		--rail-dot-size: 9px;
 		position: absolute;
-		/* dot center sits on the rail's right edge (the vertical line) */
 		right: calc(-0.5 * var(--rail-dot-size));
-		/* dot center sits on date's first-line midline */
 		top: calc(var(--rail-pad-top) + 0.5lh);
 		font-size: var(--rail-date-size);
 		line-height: var(--rail-date-lh);

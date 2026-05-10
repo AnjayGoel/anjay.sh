@@ -2,9 +2,7 @@
 import {siteConfig} from "@/site-config";
 import type {SiteMeta} from "@/types";
 import "../styles/global.css";
-// Vite-resolved hashed URL for the body font's primary subset — used to
-// preload the critical-render-path font file. Only Newsreader latin
-// (normal weight) is preloaded; everything else loads via @font-face.
+// Preloaded body-font subset URL; everything else loads via @font-face.
 import newsreaderLatin from "@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2?url";
 
 type Props = SiteMeta;
@@ -48,12 +46,10 @@ const goatcounter = analytics?.goatcounterUrl;
 <meta content={description} name="description"/>
 <meta content={siteConfig.author} name="author"/>
 
-{/* Fonts — self-hosted via @fontsource-variable/* (see global.css). Preload
-    only the body-text Latin subset; @font-face handles the rest. */}
+{/* Fonts */}
 <link rel="preload" as="font" type="font/woff2" href={newsreaderLatin} crossorigin />
 
-{/* Theme Colour — set a sensible default; ThemeProvider rewrites it on
-    load to the active theme's background. */}
+{/* Default theme-color; ThemeProvider rewrites it to the active theme's bg. */}
 <meta content="#f6f1e6" name="theme-color"/>
 
 {/* Open Graph / Facebook */}

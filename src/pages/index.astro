@@ -208,7 +208,6 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 	.timeline::before {
 		content: "";
 		position: absolute;
-		/* 1px line geometrically centered on the rail's right edge */
 		left: calc(var(--rail-width) - 0.5px);
 		top: 6px;
 		bottom: 6px;
@@ -240,14 +239,12 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 		font-feature-settings: "tnum";
 		transition: color 0.2s ease;
 	}
+	/* Dot center sits on the rail's right edge (line) and the date's
+	   first-line midline. Resize via --rail-dot-size only. */
 	.post-dot {
 		--rail-dot-size: 9px;
 		position: absolute;
-		/* horizontal: dot center sits on the rail's right edge (the line) */
 		right: calc(-0.5 * var(--rail-dot-size));
-		/* vertical: dot center sits on date's first-line midline.
-		   `0.5lh` = half of the dot's own line-box height, which we mirror
-		   from the date below so the math is identical regardless of size. */
 		top: calc(var(--rail-pad-top) + 0.5lh);
 		font-size: var(--rail-date-size);
 		line-height: var(--rail-date-lh);
@@ -431,8 +428,6 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 		background: var(--accent-soft);
 		padding: 2px 8px;
 		border-radius: 2px;
-		/* Anchor to the row's right edge — frees the title group on the left
-		   and lets the badge read as metadata. */
 		margin-left: auto;
 	}
 	ul.work-list p {

@@ -105,8 +105,6 @@ const navIcons: Record<string, string> = {
 	}
 
 	@media (max-width: 720px) {
-		/* Two-row grid: [wordmark | theme] on top, nav across the bottom.
-		   Flatten .header-right so its children become direct grid items. */
 		.site-header {
 			margin-bottom: 36px;
 			display: grid;
@@ -129,7 +127,6 @@ const navIcons: Record<string, string> = {
 			justify-content: flex-start;
 		}
 		.nav a {
-			/* Larger tap area without changing visual size. */
 			padding: 6px 0;
 		}
 		.nav a.active {

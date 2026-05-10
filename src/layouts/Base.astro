@@ -23,14 +23,6 @@ const {
 	<body>
 		<ThemeProvider />
 		<SkipLink />
-		<script is:inline>
-			// After the first View Transitions navigation in this session, skip
-			// the entry stagger animation so subsequent in-session navigations
-			// feel snappier. The flag persists on <html> across swaps.
-			document.addEventListener("astro:after-swap", () => {
-				document.documentElement.dataset.skipIntro = "1";
-			});
-		</script>
 		<div class="wrap">
 			<Header />
 			<main id="main">
@@ -70,8 +62,6 @@ const {
 			.wrap {
 				max-width: 760px;
 				margin: 0 auto;
-				/* Respect notch/home-indicator safe areas on iOS while keeping
-				   the original padding floor. */
 				padding: 36px max(32px, env(safe-area-inset-right))
 					max(80px, env(safe-area-inset-bottom)) max(32px, env(safe-area-inset-left));
 				min-height: 100vh;

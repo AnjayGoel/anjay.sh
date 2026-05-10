@@ -1,14 +1,8 @@
-// Single source of showcase entries — consumed by `/` and `/showcase/`.
 export interface ShowcaseItem {
-	/** Display name. */
 	name: string;
-	/** Outbound link (project page, repo, store listing, etc.). */
 	href: string;
-	/** Short tech-stack / format chip rendered next to the title. */
 	stack: string;
-	/** Optional badge (e.g. "OSS", "1M+ installs"). */
 	badge?: string;
-	/** One-sentence description shown under the title. */
 	desc: string;
 }
 
