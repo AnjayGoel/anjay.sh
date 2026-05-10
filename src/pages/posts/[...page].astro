@@ -103,14 +103,14 @@ const totalCount = page.total;
 
 	.timeline {
 		display: grid;
-		grid-template-columns: 110px 1fr;
-		column-gap: 36px;
+		grid-template-columns: var(--rail-width) 1fr;
+		column-gap: var(--rail-gap);
 		position: relative;
 	}
 	.timeline::before {
 		content: "";
 		position: absolute;
-		left: 110px;
+		left: var(--rail-width);
 		top: 6px;
 		bottom: 6px;
 		width: 1px;
@@ -210,9 +210,11 @@ const totalCount = page.total;
 		letter-spacing: 0.04em;
 		text-transform: uppercase;
 		color: hsl(var(--theme-text-muted));
-		border-bottom: 1px solid var(--hairline);
-		padding-bottom: 1px;
-		transition: color 0.2s ease, border-color 0.2s ease;
+		text-decoration: underline;
+		text-decoration-color: hsl(var(--theme-text) / 0.35);
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+		transition: color 0.2s ease, text-decoration-color 0.2s ease;
 	}
 	.pag-link.prev {
 		margin-right: auto;
@@ -222,7 +224,7 @@ const totalCount = page.total;
 	}
 	.pag-link:hover {
 		color: hsl(var(--theme-accent));
-		border-color: hsl(var(--theme-accent));
+		text-decoration-color: hsl(var(--theme-accent));
 	}
 	.pag-link:focus-visible {
 		outline: 2px solid hsl(var(--theme-accent));

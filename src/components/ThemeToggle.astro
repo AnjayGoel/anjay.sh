@@ -10,7 +10,7 @@
 		gap: 6px;
 		padding: 6px 12px;
 		border-radius: 999px;
-		background: rgba(138, 68, 35, 0.1);
+		background: var(--accent-soft);
 		color: hsl(var(--theme-text-muted));
 		border: 1px solid transparent;
 		font-family: var(--font-sans);
@@ -19,15 +19,9 @@
 		cursor: pointer;
 		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 	}
-	:root[data-theme="dark"] .theme-toggle {
-		background: rgba(200, 151, 97, 0.12);
-	}
 	.theme-toggle:hover {
-		background: rgba(138, 68, 35, 0.18);
+		background: var(--accent-soft-strong);
 		color: hsl(var(--theme-accent));
-	}
-	:root[data-theme="dark"] .theme-toggle:hover {
-		background: rgba(200, 151, 97, 0.22);
 	}
 	.theme-toggle .icon {
 		font-size: 13px;

@@ -55,7 +55,7 @@ const avatarUrl = profile?.avatar ? new URL(profile.avatar, Astro.site).toString
 <PageLayout meta={meta}>
 	<section class="about" aria-labelledby="about-label">
 		<div class="section-label" id="about-label">About</div>
-		<div class="prose">
+		<div class="bio">
 			<p>
 				I'm Anjay — a software engineer based in India. I currently work at <a
 					href={profile?.employerUrl ?? "#"}
@@ -96,38 +96,40 @@ const avatarUrl = profile?.avatar ? new URL(profile.avatar, Astro.site).toString
 		color: hsl(var(--theme-text) / 0.6);
 		margin-bottom: 36px;
 	}
-	.prose p {
+	.bio p {
 		font-family: var(--font-serif);
 		font-size: 17.5px;
 		line-height: 1.75;
 		color: hsl(var(--theme-text));
 		margin: 0 0 22px;
-		max-width: 64ch;
+		max-width: var(--reading-width);
 		text-wrap: pretty;
 		word-wrap: break-word;
 		overflow-wrap: anywhere;
 	}
-	.prose p:last-child {
+	.bio p:last-child {
 		margin-bottom: 0;
 	}
-	.prose a {
-		color: hsl(var(--theme-text-muted));
-		border-bottom: 1px solid var(--hairline);
-		padding-bottom: 1px;
-		transition: color 0.2s ease, border-color 0.2s ease;
+	.bio a {
+		color: hsl(var(--theme-text));
+		text-decoration: underline;
+		text-decoration-color: hsl(var(--theme-text) / 0.35);
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+		transition: color 0.2s ease, text-decoration-color 0.2s ease;
 	}
-	.prose a:hover {
+	.bio a:hover {
 		color: hsl(var(--theme-accent));
-		border-color: hsl(var(--theme-accent));
+		text-decoration-color: hsl(var(--theme-accent));
 	}
-	.prose a:focus-visible {
+	.bio a:focus-visible {
 		outline: 2px solid hsl(var(--theme-accent));
 		outline-offset: 3px;
 		border-radius: 3px;
 	}
 
 	@media (max-width: 720px) {
-		.prose p {
+		.bio p {
 			font-size: 17px;
 			line-height: 1.7;
 		}
@@ -136,7 +138,7 @@ const avatarUrl = profile?.avatar ? new URL(profile.avatar, Astro.site).toString
 		.section-label {
 			margin-bottom: 26px;
 		}
-		.prose p {
+		.bio p {
 			font-size: 16.5px;
 		}
 	}

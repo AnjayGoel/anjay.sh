@@ -248,7 +248,7 @@ const readingTime: string =
 	}
 
 	/* Comments container — match article body width */
-	.comments { max-width: 64ch; margin: 56px 0 32px; }
+	.comments { max-width: var(--reading-width); margin: 56px 0 32px; }
 	.comments .giscus { max-width: 100%; }
 
 	/* End-of-article back link */
@@ -263,9 +263,11 @@ const readingTime: string =
 		transition: border-color 0.35s ease;
 	}
 	.post-end a {
-		color: hsl(var(--theme-text-muted));
-		border-bottom: 1px solid var(--hairline);
-		padding-bottom: 1px;
+		color: hsl(var(--theme-text));
+		text-decoration: underline;
+		text-decoration-color: hsl(var(--theme-text) / 0.35);
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
 		display: inline-flex;
 		align-items: center;
 		gap: 4px;
@@ -355,7 +357,7 @@ const readingTime: string =
 		line-height: 1.75;
 		color: hsl(var(--theme-text));
 		margin: 0 0 24px;
-		max-width: 64ch;
+		max-width: var(--reading-width);
 		word-wrap: break-word;
 		overflow-wrap: anywhere;
 	}
@@ -415,15 +417,17 @@ const readingTime: string =
 	/* Anchor links inside body */
 	.post-article a {
 		color: hsl(var(--theme-text));
-		border-bottom: 1px solid var(--hairline);
-		padding-bottom: 1px;
+		text-decoration: underline;
+		text-decoration-color: hsl(var(--theme-text) / 0.35);
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
 		word-break: break-word;
 		overflow-wrap: anywhere;
-		transition: color 0.2s ease, border-color 0.2s ease;
+		transition: color 0.2s ease, text-decoration-color 0.2s ease;
 	}
 	.post-article a:hover {
 		color: hsl(var(--theme-accent));
-		border-color: hsl(var(--theme-accent));
+		text-decoration-color: hsl(var(--theme-accent));
 	}
 
 	/* Inline code */
@@ -470,7 +474,7 @@ const readingTime: string =
 		margin: 0 0 28px;
 		padding: 0;
 		list-style: none;
-		max-width: 64ch;
+		max-width: var(--reading-width);
 	}
 	.post-article ul li {
 		position: relative;
@@ -510,7 +514,7 @@ const readingTime: string =
 	.post-article ol {
 		margin: 0 0 28px;
 		padding-left: 22px;
-		max-width: 64ch;
+		max-width: var(--reading-width);
 	}
 	.post-article ol li {
 		font-size: 17.5px;
@@ -539,7 +543,7 @@ const readingTime: string =
 		color: hsl(var(--theme-text-muted));
 		font-size: 18px;
 		line-height: 1.65;
-		max-width: 64ch;
+		max-width: var(--reading-width);
 	}
 	.post-article blockquote p {
 		margin: 0 0 12px;
