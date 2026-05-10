@@ -37,6 +37,15 @@ const bylineDate = formatBylineDate(publishDate);
 // Reading time: prefer remark plugin's value, otherwise fall back gracefully.
 const readingTime: string =
 	(remarkPluginFrontmatter as { minutesRead?: string })?.minutesRead ?? "";
+
+// Custom giscus themes — only used in prod because the giscus iframe is
+// hosted on giscus.app and can't fetch CSS from localhost / private IPs.
+const giscusThemes = import.meta.env.PROD
+	? {
+			light: new URL("/giscus-light.css", Astro.site).toString(),
+			dark: new URL("/giscus-dark.css", Astro.site).toString(),
+		}
+	: { light: "noborder_light", dark: "noborder_dark" };
 ---
 
 <Schema
@@ -733,7 +742,7 @@ const readingTime: string =
 </style>
 
 {comments && (
-	<script is:inline define:vars={{ comments }}>
+	<script is:inline define:vars={{ comments, giscusThemes }}>
 		document.addEventListener("DOMContentLoaded", () => {
 			const mount = document.getElementById("comments");
 			if (!mount) return;
@@ -749,18 +758,17 @@ const readingTime: string =
 			script.setAttribute("data-reactions-enabled", "1");
 			script.setAttribute("data-emit-metadata", "0");
 			script.setAttribute("data-input-position", "top");
-			script.setAttribute("data-theme", theme === "dark" ? "noborder_dark" : "noborder_light");
+			script.setAttribute("data-theme", theme === "dark" ? giscusThemes.dark : giscusThemes.light);
 			script.setAttribute("data-lang", "en");
 			script.setAttribute("crossorigin", "anonymous");
 			script.async = true;
 			mount.appendChild(script);
 
-			// Keep the iframe theme in sync when the toggle is clicked.
 			document.addEventListener("theme-change", (e) => {
 				const iframe = document.querySelector("iframe.giscus-frame");
 				if (iframe && iframe.contentWindow) {
 					iframe.contentWindow.postMessage(
-						{ giscus: { setConfig: { theme: e.detail.theme === "dark" ? "dark" : "light" } } },
+						{ giscus: { setConfig: { theme: e.detail.theme === "dark" ? giscusThemes.dark : giscusThemes.light } } },
 						"https://giscus.app",
 					);
 				}
@@ -793,14 +801,6 @@ const readingTime: string =
 		update();
 		window.addEventListener("scroll", update, { passive: true });
 		window.addEventListener("resize", update, { passive: true });
-	}
-
-	// Skip the fade if the image is already cached so we don't delay LCP.
-	const cover = document.querySelector<HTMLImageElement>(".post-cover img");
-	if (cover && !(cover.complete && cover.naturalWidth > 0)) {
-		cover.style.opacity = "0";
-		cover.style.transition = "opacity 320ms ease";
-		cover.addEventListener("load", () => { cover.style.opacity = "1"; }, { once: true });
 	}
 
 	const lazyImgs = document.querySelectorAll<HTMLImageElement>(

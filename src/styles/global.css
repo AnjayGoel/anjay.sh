@@ -358,7 +358,11 @@ ul.work-list a:focus-visible {
 	.bio > li,
 	.bio-foot,
 	.hero > *,
-	.section-label {
+	.section-label,
+	.post-header > *,
+	.post-main > .share,
+	.post-main > .post-end,
+	.post-main > .comments {
 		animation: intro-fade-up 380ms cubic-bezier(0.2, 0.6, 0.2, 1) both;
 		animation-delay: calc(var(--i, 0) * 55ms);
 	}
@@ -368,6 +372,14 @@ ul.work-list a:focus-visible {
 	.bio > li:nth-child(2) { --i: 1; }
 	.bio > li:nth-child(3) { --i: 2; }
 	.bio-foot { --i: 3; }
+	.post-header > *:nth-child(1) { --i: 0; }
+	.post-header > *:nth-child(2) { --i: 1; }
+	.post-header > *:nth-child(3) { --i: 2; }
+	.post-header > *:nth-child(4) { --i: 3; }
+	.post-header > *:nth-child(5) { --i: 4; }
+	.post-main > .share { --i: 5; }
+	.post-main > .post-end { --i: 6; }
+	.post-main > .comments { --i: 7; }
 }
 
 @media (prefers-reduced-motion: reduce) {
