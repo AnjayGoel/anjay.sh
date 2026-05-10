@@ -4,6 +4,7 @@ import { Image } from "astro:assets";
 
 import ShareButtons from "@/components/blog/ShareButtons.astro";
 import WebMentions from "@/components/blog/webmentions/index.astro";
+import { getAllPosts, getPostSortDate, sortMDByDate } from "@/data/post";
 import { siteConfig } from "@/site-config";
 import { formatBylineDate, formatEyebrowDate } from "@/utils/date";
 
@@ -15,6 +16,11 @@ interface Props {
 }
 
 const { post } = Astro.props;
+
+const sortedAll = sortMDByDate(await getAllPosts());
+const idx = sortedAll.findIndex((p) => p.id === post.id);
+const newerPost = idx > 0 ? sortedAll[idx - 1] : undefined;
+const olderPost = idx >= 0 && idx < sortedAll.length - 1 ? sortedAll[idx + 1] : undefined;
 const {
 	data: { coverImage, description, ogImage, publishDate, title, updatedDate, tags, draft },
 	id: slug,
@@ -126,9 +132,22 @@ const giscusThemes = import.meta.env.PROD
 
 			<hr class="rule rule--footer" />
 
-			<div class="post-end">
-				<a href="/posts/">← All posts</a>
-			</div>
+			{(olderPost || newerPost) && (
+				<nav class="post-pager" aria-label="More posts">
+					{olderPost && (
+						<a class="pager-link prev" data-astro-prefetch href={`/posts/${olderPost.id}/`}>
+							<span class="pager-eyebrow">Older</span>
+							<span class="pager-title">{olderPost.data.title}</span>
+						</a>
+					)}
+					{newerPost && (
+						<a class="pager-link next" data-astro-prefetch href={`/posts/${newerPost.id}/`}>
+							<span class="pager-eyebrow">Newer</span>
+							<span class="pager-title">{newerPost.data.title}</span>
+						</a>
+					)}
+				</nav>
+			)}
 
 			{comments && <div class="comments" id="comments"></div>}
 		</div>
@@ -284,28 +303,73 @@ const giscusThemes = import.meta.env.PROD
 	.comments { max-width: var(--reading-width); margin: 56px 0 32px; }
 	.comments .giscus { max-width: 100%; }
 
-	/* End-of-article back link */
-	.post-end {
+	/* Prev/Next post navigation — borderless editorial layout. */
+	.post-pager {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		column-gap: 32px;
+		row-gap: 28px;
+		margin: 0 0 56px;
+		padding: 0 0 0 0;
+	}
+	.pager-link {
+		display: block;
+		text-decoration: none;
+		min-width: 0;
+		transition: transform 0.25s ease;
+	}
+	.pager-link.next {
+		text-align: right;
+	}
+	.pager-link.prev:hover { transform: translateX(-2px); }
+	.pager-link.next:hover { transform: translateX(2px); }
+	.pager-eyebrow {
+		display: block;
+		font-family: var(--font-mono);
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: hsl(var(--theme-text) / 0.72);
+		margin-bottom: 8px;
+	}
+	.pager-link.prev .pager-eyebrow::before { content: "← "; }
+	.pager-link.next .pager-eyebrow::after { content: " →"; }
+	.pager-title {
+		display: block;
 		font-family: var(--font-serif);
-		font-style: italic;
-		font-size: 15.5px;
-		color: hsl(var(--theme-text) / 0.6);
-	}
-	.post-end a {
+		font-size: 17.5px;
+		line-height: 1.3;
+		font-weight: 500;
+		letter-spacing: -0.01em;
 		color: hsl(var(--theme-text));
-		text-decoration: underline;
-		text-decoration-color: hsl(var(--theme-text) / 0.35);
-		text-decoration-thickness: 1px;
-		text-underline-offset: 3px;
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-		transition: color 0.2s ease, border-color 0.2s ease, transform 0.25s ease;
+		text-wrap: balance;
+		word-wrap: break-word;
+		overflow-wrap: anywhere;
+		transition: color 0.2s ease;
 	}
-	.post-end a:hover {
+	.pager-link:hover .pager-title {
 		color: hsl(var(--theme-accent));
-		border-color: hsl(var(--theme-accent));
-		transform: translateX(-2px);
+	}
+	/* If only one of prev/next exists, let it span the full width with its
+	   text aligned to its natural side. */
+	.post-pager:has(.pager-link.prev:only-child) .pager-link.prev,
+	.post-pager:has(.pager-link.next:only-child) .pager-link.next {
+		grid-column: 1 / -1;
+	}
+	@media (max-width: 720px) {
+		.post-pager {
+			grid-template-columns: 1fr;
+			row-gap: 22px;
+			margin-bottom: 40px;
+		}
+		.pager-link.next {
+			order: 0;
+			text-align: left;
+		}
+		.pager-link.prev {
+			order: 1;
+		}
 	}
 
 	/* Back-to-top button */
@@ -664,7 +728,7 @@ const giscusThemes = import.meta.env.PROD
 		font-family: var(--font-serif);
 		font-style: italic;
 		font-size: 14.5px;
-		color: hsl(var(--theme-text) / 0.6);
+		color: hsl(var(--theme-text) / 0.72);
 		margin-top: 12px;
 		line-height: 1.5;
 	}

@@ -115,7 +115,7 @@
 	font-weight: 500;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
-	color: hsl(var(--theme-text) / 0.6);
+	color: hsl(var(--theme-text) / 0.72);
 	margin-bottom: 36px;
 }
 
@@ -157,7 +157,7 @@
 .timeline .post-date {
 	font-family: var(--font-mono);
 	font-size: var(--rail-date-size);
-	color: hsl(var(--theme-text) / 0.6);
+	color: hsl(var(--theme-text) / 0.72);
 	letter-spacing: -0.01em;
 	line-height: var(--rail-date-lh);
 	white-space: nowrap;
@@ -212,7 +212,7 @@
 .timeline .post-preview {
 	font-size: 16px;
 	line-height: 1.55;
-	color: hsl(var(--theme-text) / 0.6);
+	color: hsl(var(--theme-text) / 0.72);
 	margin: 0;
 	max-width: 58ch;
 	word-wrap: break-word;
@@ -306,7 +306,7 @@ ul.work-list a:focus-visible .name {
 ul.work-list .stack {
 	font-family: var(--font-mono);
 	font-size: 11px;
-	color: hsl(var(--theme-text) / 0.6);
+	color: hsl(var(--theme-text) / 0.72);
 	font-variant-numeric: tabular-nums;
 	font-feature-settings: "tnum";
 }
