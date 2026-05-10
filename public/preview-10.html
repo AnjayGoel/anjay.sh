@@ -111,6 +111,11 @@
 
   /* Featured */
   .post.featured .post-body { padding-bottom: 56px; }
+  .post.featured .post-stamp {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 12px;
+  }
   .post.featured .post-title {
     font-size: 30px; line-height: 1.18; margin-bottom: 14px; letter-spacing: -0.018em;
     word-wrap: break-word; overflow-wrap: break-word;
@@ -224,16 +229,12 @@
     .post-rail { text-align: left; padding: 0 0 6px 0; }
     .post-dot { display: none; }
     .post-body { padding-bottom: 0; }
-    /* Without the timeline rail, drop the featured emphasis — read like a regular post */
-    .post.featured .post-body { padding-bottom: 0; }
-    .post.featured .post-title { font-size: 18.5px; line-height: 1.32; letter-spacing: -0.012em; margin-bottom: 6px; }
-    .post.featured .post-excerpt {
-      font-size: 16px; line-height: 1.55; color: var(--muted);
-      margin: 0; max-width: none;
-      display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
-      overflow: hidden; text-overflow: ellipsis;
-    }
-    .post.featured .post-meta { display: none; }
+    /* Featured keeps emphasis on mobile — excerpt + meta visible, larger title — like preview-4 */
+    .post.featured .post-rail { display: none; }
+    .post.featured .post-body { padding-bottom: 24px; border-bottom: 1px solid var(--hairline); margin-bottom: 4px; }
+    .post.featured .post-title { font-size: 22px; line-height: 1.2; letter-spacing: -0.015em; margin-bottom: 10px; }
+    .post.featured .post-excerpt { font-size: 15.5px; line-height: 1.55; margin: 0 0 10px; }
+    .post.featured .post-meta { font-size: 11px; }
     .work-head { gap: 10px; }
     .archive-link { margin-top: 0; }
   }
@@ -383,6 +384,7 @@
             <span class="post-dot" aria-hidden="true"></span>
           </div>
           <div class="post-body">
+            <div class="post-stamp">Latest · May 2026</div>
             <h2 class="post-title">Letting Claude Code Run Wild For A Few Days</h2>
             <p class="post-excerpt">A Claude Code loop running an agent migrated our entire app from Flutter to KMP in two days. What worked, what didn't, and what surprised me about hands-off agent coding — including the moment I realised I'd lost track of what it had changed.</p>
             <div class="post-meta">
