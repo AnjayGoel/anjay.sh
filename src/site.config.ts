@@ -103,7 +103,6 @@ export const expressiveCodeOptions: AstroExpressiveCodeOptions = {
 			const altTheme = styleVariants.find((v) => v.theme.type !== baseTheme?.type)?.theme;
 			if (theme === baseTheme || theme === altTheme) return `[data-theme='${theme.type}']`;
 		}
-		// return default selector
 		return `[data-theme="${theme.name}"]`;
 	},
 	// One dark, one light theme => https://expressive-code.com/guides/themes/#available-themes

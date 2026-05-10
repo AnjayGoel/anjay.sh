@@ -18,7 +18,6 @@
 
 @layer base {
 	:root {
-		/* Font families (preview-10 design system) */
 		--font-serif: "Newsreader", "Iowan Old Style", Georgia, serif;
 		--font-sans: "Inter", -apple-system, system-ui, sans-serif;
 		--font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;

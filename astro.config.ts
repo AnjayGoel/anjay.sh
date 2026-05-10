@@ -11,16 +11,13 @@ import { expressiveCodeOptions } from "./src/site.config";
 import { siteConfig } from "./src/site.config";
 import partytown from "@astrojs/partytown";
 
-// Remark plugins
-import remarkDirective from "remark-directive"; /* Handle ::: directives as nodes */
-import { remarkAdmonitions } from "./src/plugins/remark-admonitions"; /* Add admonitions */
+import remarkDirective from "remark-directive";
+import { remarkAdmonitions } from "./src/plugins/remark-admonitions";
 import { remarkReadingTime } from "./src/plugins/remark-reading-time";
 
-// Rehype plugins
 import rehypeExternalLinks from "rehype-external-links";
 import rehypeUnwrapImages from "rehype-unwrap-images";
 
-// https://astro.build/config
 export default defineConfig({
 	site: "https://anjay.sh",
 	image: {

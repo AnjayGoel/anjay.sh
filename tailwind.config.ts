@@ -7,7 +7,6 @@ export default {
 		"!./src/pages/og-image/[slug].png.ts",
 	],
 	corePlugins: {
-		// disable aspect ratio as per docs -> @tailwindcss/aspect-ratio (now removed)
 		aspectRatio: false,
 		borderOpacity: false,
 		fontVariantNumeric: false,
@@ -15,7 +14,6 @@ export default {
 		ringOffsetWidth: false,
 		scrollSnapType: false,
 		textOpacity: false,
-		// disable some core plugins as they are included in the css, even when unused
 		touchAction: false,
 	},
 	darkMode: ["class", '[data-theme="dark"]'],

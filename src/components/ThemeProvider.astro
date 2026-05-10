@@ -1,7 +1,6 @@
 {/* Inlined to avoid FOUC. This is a parser blocking script. */}
 <script is:inline>
 	// Initial theme application — runs synchronously before paint to avoid FOUC.
-	// Mirrors preview-10's pattern; persists under the "theme" key.
 	(() => {
 		try {
 			const s = localStorage.getItem("theme");

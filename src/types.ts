@@ -67,12 +67,6 @@ export interface SiteConfig {
 	};
 }
 
-export interface PaginationLink {
-	srLabel?: string;
-	text?: string;
-	url: string;
-}
-
 export interface SiteMeta {
 	articleDate?: string | undefined;
 	description?: string;

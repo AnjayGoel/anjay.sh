@@ -218,13 +218,6 @@ const readingTime: string =
 		margin-bottom: 32px;
 		word-break: break-word;
 	}
-	.post-tags a {
-		color: inherit;
-		transition: color 0.2s ease;
-	}
-	.post-tags a:hover {
-		color: hsl(var(--theme-accent));
-	}
 	.post-tags .sep {
 		color: var(--faint);
 		margin: 0 6px;
@@ -335,9 +328,7 @@ const readingTime: string =
 		.post-end { font-size: 14px; }
 	}
 
-	/* Focus-visible accent outline */
 	.post-end a:focus-visible,
-	.post-tags a:focus-visible,
 	.to-top-btn:focus-visible {
 		outline: 2px solid hsl(var(--theme-accent));
 		outline-offset: 3px;
@@ -346,7 +337,6 @@ const readingTime: string =
 </style>
 
 <style is:global>
-	/* ---------- Article body styling (preview-10) ---------- */
 	.post-article {
 		font-family: var(--font-serif);
 		color: hsl(var(--theme-text));
