@@ -106,7 +106,6 @@ export default defineConfig({
 	},
 	// https://docs.astro.build/en/guides/prefetch/
 	prefetch: true,
-	// ! Please remember to replace the following site property with your own domain
 	vite: {
 		optimizeDeps: {
 			exclude: ["@resvg/resvg-js"],

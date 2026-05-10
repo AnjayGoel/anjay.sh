@@ -2,24 +2,28 @@
 import type { CollectionEntry } from "astro:content";
 
 import WebMentions from "@/components/blog/webmentions/index.astro";
+import { siteConfig } from "@/site-config";
 
 import BaseLayout from "./Base.astro";
 import { Schema } from "astro-seo-schema";
 
 interface Props {
 	post: CollectionEntry<"post">;
-	prevPost?: CollectionEntry<"post">;
-	nextPost?: CollectionEntry<"post">;
 }
 
-const { post, prevPost, nextPost } = Astro.props;
+const { post } = Astro.props;
 const {
 	data: { description, ogImage, publishDate, title, updatedDate, tags, draft },
 	slug,
 } = post;
 const socialImage = ogImage ?? `/og-image/${slug}.png`;
 const articleDate = updatedDate?.toISOString() ?? publishDate.toISOString();
-const { headings, remarkPluginFrontmatter } = await post.render();
+const { remarkPluginFrontmatter } = await post.render();
+
+const authorName = siteConfig.profile?.name ?? siteConfig.author;
+const comments = siteConfig.comments;
+const postUrl = new URL(`/posts/${slug}`, Astro.site).toString();
+const socialImageAbsolute = new URL(socialImage, Astro.site).toString();
 
 // Eyebrow: "Posts · Month YYYY"
 const eyebrowDate = publishDate.toLocaleDateString("en-US", {
@@ -46,11 +50,11 @@ const readingTime: string =
 		headline: title,
 		datePublished: articleDate,
 		dateModified: updatedDate?.toISOString(),
-		url: `https://anjay.sh/posts/${slug}`,
-		image: `https://anjay.sh${socialImage}`,
+		url: postUrl,
+		image: socialImageAbsolute,
 		author: {
 			"@type": "Person",
-			name: "Anjay Goel",
+			name: authorName,
 		},
 		description: description,
 	}}
@@ -67,7 +71,7 @@ const readingTime: string =
 				{draft && <span class="draft-flag">(Draft)</span>}
 				<h1 class="post-title">{title}</h1>
 				<p class="byline">
-					By Anjay Goel<span class="sep">·</span>{bylineDate}{readingTime && (
+					{authorName && <>By {authorName}<span class="sep">·</span></>}{bylineDate}{readingTime && (
 						<>
 							<span class="sep">·</span>{readingTime}
 						</>
@@ -103,7 +107,7 @@ const readingTime: string =
 
 			<WebMentions />
 
-			<div class="comments" id="comments"></div>
+			{comments && <div class="comments" id="comments"></div>}
 
 			<div class="post-end">
 				<a href="/posts/">← All posts</a>
@@ -559,8 +563,6 @@ const readingTime: string =
 		display: block;
 		width: 100%;
 		height: auto;
-		aspect-ratio: 16 / 9;
-		object-fit: cover;
 		border: 1px solid var(--hairline);
 		background: var(--paper);
 		transition: border-color 0.35s ease;
@@ -656,51 +658,46 @@ const readingTime: string =
 	}
 </style>
 
-<script>
-	document.addEventListener("DOMContentLoaded", (_) => {
-		const theme = document.documentElement.getAttribute("data-theme");
-		const script = document.createElement("script");
-		script.src = "https://giscus.app/client.js";
-		script.setAttribute("data-repo", "anjaygoel/anjay.sh");
-		script.setAttribute("data-repo-id", "MDEwOlJlcG9zaXRvcnkzNzY2MjI0MjY=");
-		script.setAttribute("data-category", "General");
-		script.setAttribute("data-category-id", "DIC_kwDOFnLNWs4CQ8t3");
-		script.setAttribute("data-mapping", "title");
-		script.setAttribute("data-strict", "0");
-		script.setAttribute("data-reactions-enabled", "1");
-		script.setAttribute("data-emit-metadata", "0");
-		script.setAttribute("data-input-position", "top");
-		script.setAttribute("data-theme", theme === "dark" ? "noborder_dark" : "noborder_light");
-		script.setAttribute("data-lang", "en");
-		script.setAttribute("crossorigin", "anonymous");
-		script.async = true;
-		document.addEventListener("theme-change", (e) => {
-			const iframe = document.querySelector("iframe.giscus-frame") as HTMLIFrameElement;
-			if (iframe && iframe.contentWindow) {
-				iframe.contentWindow.postMessage(
-					{
-						giscus: {
-							setConfig: {
-								theme:
-									(
-										e as CustomEvent<{
-											theme: string;
-										}>
-									).detail.theme === "dark"
-										? "dark"
-										: "light",
+{comments && (
+	<script is:inline define:vars={{ comments }}>
+		document.addEventListener("DOMContentLoaded", () => {
+			const theme = document.documentElement.getAttribute("data-theme");
+			const script = document.createElement("script");
+			script.src = "https://giscus.app/client.js";
+			script.setAttribute("data-repo", comments.repo);
+			script.setAttribute("data-repo-id", comments.repoId);
+			script.setAttribute("data-category", comments.category);
+			script.setAttribute("data-category-id", comments.categoryId);
+			script.setAttribute("data-mapping", "title");
+			script.setAttribute("data-strict", "0");
+			script.setAttribute("data-reactions-enabled", "1");
+			script.setAttribute("data-emit-metadata", "0");
+			script.setAttribute("data-input-position", "top");
+			script.setAttribute("data-theme", theme === "dark" ? "noborder_dark" : "noborder_light");
+			script.setAttribute("data-lang", "en");
+			script.setAttribute("crossorigin", "anonymous");
+			script.async = true;
+			document.addEventListener("theme-change", (e) => {
+				const iframe = document.querySelector("iframe.giscus-frame");
+				if (iframe && iframe.contentWindow) {
+					iframe.contentWindow.postMessage(
+						{
+							giscus: {
+								setConfig: {
+									theme: e.detail.theme === "dark" ? "dark" : "light",
+								},
 							},
 						},
-					},
-					"https://giscus.app",
-				);
-			}
-		});
+						"https://giscus.app",
+					);
+				}
+			});
 
-		const mount = document.getElementById("comments") || document.body;
-		mount.appendChild(script);
-	});
-</script>
+			const mount = document.getElementById("comments") || document.body;
+			mount.appendChild(script);
+		});
+	</script>
+)}
 <script>
 	const scrollBtn = document.getElementById("to-top-btn") as HTMLButtonElement;
 	const targetHeader = document.getElementById("blog-hero") as HTMLDivElement;

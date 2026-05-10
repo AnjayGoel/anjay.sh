@@ -1,11 +1,24 @@
 ---
 import PageLayout from "@/layouts/Base.astro";
+import { siteConfig } from "@/site-config";
 import { Schema } from "astro-seo-schema";
 
+const profile = siteConfig.profile;
+const authorName = profile?.name ?? siteConfig.author;
+
 const meta = {
-	description: "Anjay Goel — software engineer. About me.",
+	description: `${authorName} — about me.`,
 	title: "About",
 };
+
+const personSameAs = [
+	profile?.linkedin,
+	profile?.github,
+	profile?.twitter,
+	profile?.mastodon,
+].filter((s): s is string => Boolean(s));
+
+const avatarUrl = profile?.avatar ? new URL(profile.avatar, Astro.site).toString() : undefined;
 ---
 
 <Schema
@@ -14,18 +27,27 @@ const meta = {
 		"@type": "ProfilePage",
 		mainEntity: {
 			"@type": "Person",
-			name: "Anjay Goel",
-			image: "https://anjay.sh/avatar.png",
-			jobTitle: "Software Engineer",
-			worksFor: {
-				"@type": "Organization",
-				name: "Dashtoon",
-			},
-			alumniOf: {
-				"@type": "CollegeOrUniversity",
-				name: "IIT Kharagpur",
-			},
-			sameAs: ["https://www.linkedin.com/in/anjaygoel/", "https://github.com/anjaygoel"],
+			name: authorName,
+			...(avatarUrl ? { image: avatarUrl } : {}),
+			...(profile?.jobTitle ? { jobTitle: profile.jobTitle } : {}),
+			...(profile?.employer
+				? {
+						worksFor: {
+							"@type": "Organization",
+							name: profile.employer,
+							...(profile.employerUrl ? { url: profile.employerUrl } : {}),
+						},
+					}
+				: {}),
+			...(profile?.alumni
+				? {
+						alumniOf: {
+							"@type": "CollegeOrUniversity",
+							name: profile.alumni,
+						},
+					}
+				: {}),
+			...(personSameAs.length ? { sameAs: personSameAs } : {}),
 		},
 	}}
 />
@@ -36,10 +58,10 @@ const meta = {
 		<div class="prose">
 			<p>
 				I'm Anjay — a software engineer based in India. I currently work at <a
-					href="https://www.linkedin.com/company/dashtoon/"
+					href={profile?.employerUrl ?? "#"}
 					rel="noreferrer"
-					target="_blank">Dashtoon</a
-				> on backend &amp; mobile systems. Before that, I graduated from IIT Kharagpur in 2023.
+					target="_blank">{profile?.employer ?? ""}</a
+				> on backend &amp; mobile systems. Before that, I graduated from {profile?.alumni ?? ""} in 2023.
 			</p>
 			<p>
 				I write here, occasionally, about software internals — containers, async I/O, debugging — with
@@ -48,14 +70,14 @@ const meta = {
 			</p>
 			<p>
 				You can find me on <a
-					href="https://github.com/anjaygoel"
+					href={profile?.github ?? "#"}
 					rel="noreferrer"
 					target="_blank">GitHub</a
 				>, <a
-					href="https://www.linkedin.com/in/anjaygoel/"
+					href={profile?.linkedin ?? "#"}
 					rel="noreferrer"
 					target="_blank">LinkedIn</a
-				>, or by <a href="mailto:anjay.goel@gmail.com">email</a>.
+				>, or by <a href={`mailto:${profile?.email ?? ""}`}>email</a>.
 			</p>
 		</div>
 	</section>

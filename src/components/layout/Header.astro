@@ -1,8 +1,9 @@
 ---
-import { menuLinks } from "@/site-config";
+import { menuLinks, siteConfig } from "@/site-config";
 import ThemeToggle from "../ThemeToggle.astro";
 
 const url = new URL(Astro.request.url);
+const wordmark = siteConfig.title;
 
 const isActive = (path: string) => {
 	if (path === "/") return url.pathname === "/";
@@ -21,7 +22,7 @@ const navIcons: Record<string, string> = {
 ---
 
 <header class="site-header" id="main-header">
-	<a href="/" class="wordmark">Anjay Goel</a>
+	<a href="/" class="wordmark">{wordmark}</a>
 	<div class="header-right">
 		<nav class="nav" aria-label="Primary">
 			{

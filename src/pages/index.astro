@@ -1,5 +1,6 @@
 ---
 import { getAllPosts, getPostSortDate, sortMDByDate } from "@/data/post";
+import { showcase } from "@/data/showcase";
 import PageLayout from "@/layouts/Base.astro";
 import { siteConfig } from "@/site-config";
 import { Schema } from "astro-seo-schema";
@@ -26,46 +27,8 @@ const stampFormatter = new Intl.DateTimeFormat("en-US", {
 const formatRailDate = (date: Date) => railFormatter.format(date);
 const formatStampDate = (date: Date) => stampFormatter.format(date);
 
-// Showcase entries (sourced from /showcase.astro)
-const showcase: {
-	name: string;
-	href: string;
-	stack: string;
-	badge?: string;
-	desc: string;
-}[] = [
-	{
-		name: "RedScout",
-		href: "https://github.com/AnjayGoel/RedScout",
-		stack: "Go · Redis · CLI",
-		badge: "OSS",
-		desc:
-			"Namespace-level Redis monitoring — breaks memory, TTLs, and ops/sec down by logical key prefix instead of server-wide aggregates.",
-	},
-	{
-		name: "DashReels",
-		href: "https://play.google.com/store/apps/details?id=com.dashtoon.video.reels&hl=en_IN",
-		stack: "Android · Kotlin",
-		badge: "1M+ installs",
-		desc:
-			"Short-form video Android app — free dramas across genres, personalised recommendations, low-latency playback over a flaky last mile.",
-	},
-	{
-		name: "DashToon",
-		href: "https://play.google.com/store/apps/details?id=com.dashtoon.app&hl=en_IN",
-		stack: "Android · Kotlin",
-		desc:
-			"Comics & webtoons reader app — fluid panel-by-panel reading experience for vertical and traditional layouts.",
-	},
-	{
-		name: "Stable Roommate (Generalised)",
-		href: "https://github.com/AnjayGoel/stable-roommate-generalised",
-		stack: "Python · Algorithms",
-		badge: "OSS",
-		desc:
-			"Algorithm + small webapp grouping people into optimal teams. Generalises Irving's stable roommate matching to k-sized groups.",
-	},
-];
+const profile = siteConfig.profile;
+const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 ---
 
 <Schema
@@ -77,19 +40,19 @@ const showcase: {
 				"@type": "ListItem",
 				position: 1,
 				name: "Home",
-				item: "https://anjay.sh",
+				item: siteUrl("/"),
 			},
 			{
 				"@type": "ListItem",
 				position: 2,
 				name: "About",
-				item: "https://anjay.sh/about",
+				item: siteUrl("/about"),
 			},
 			{
 				"@type": "ListItem",
 				position: 3,
 				name: "Posts",
-				item: "https://anjay.sh/posts",
+				item: siteUrl("/posts"),
 			},
 		],
 	}}
@@ -99,12 +62,24 @@ const showcase: {
 	<section class="hero">
 		<p>{siteConfig.description}</p>
 		<div class="socials">
-			<a href="https://github.com/anjaygoel" rel="noreferrer" target="_blank">GitHub</a><span
-				class="sep">·</span
-			>
-			<a href="https://www.linkedin.com/in/anjaygoel/" rel="noreferrer" target="_blank">LinkedIn</a
-			><span class="sep">·</span>
-			<a href="mailto:anjay.goel@gmail.com">Email</a><span class="sep">·</span>
+			{profile?.github && (
+				<>
+					<a href={profile.github} rel="noreferrer" target="_blank">GitHub</a>
+					<span class="sep">·</span>
+				</>
+			)}
+			{profile?.linkedin && (
+				<>
+					<a href={profile.linkedin} rel="noreferrer" target="_blank">LinkedIn</a>
+					<span class="sep">·</span>
+				</>
+			)}
+			{profile?.email && (
+				<>
+					<a href={`mailto:${profile.email}`}>Email</a>
+					<span class="sep">·</span>
+				</>
+			)}
 			<a href="/rss.xml">RSS</a>
 		</div>
 	</section>
@@ -125,15 +100,16 @@ const showcase: {
 							<div class="post-stamp">Latest · {formatStampDate(getPostSortDate(featured))}</div>
 							<h2 class="post-title">{featured.data.title}</h2>
 							<p class="post-excerpt">{featured.data.description}</p>
-							<div class="post-meta">
-								<span class="tag">9 min read</span>
-								{featured.data.tags.map((t) => (
-									<Fragment>
-										<span class="dot">·</span>
-										<span>{t}</span>
-									</Fragment>
-								))}
-							</div>
+							{!!featured.data.tags?.length && (
+								<div class="post-meta">
+									{featured.data.tags.map((t, i) => (
+										<Fragment>
+											{i > 0 && <span class="dot">·</span>}
+											<span>{t}</span>
+										</Fragment>
+									))}
+								</div>
+							)}
 						</div>
 					</a>
 				)
@@ -165,7 +141,7 @@ const showcase: {
 	</section>
 
 	<section class="work" aria-labelledby="work-label">
-		<div class="section-label" id="work-label">Personal Showcase</div>
+		<div class="section-label" id="work-label">Showcase</div>
 		<ul class="work-list">
 			{
 				showcase.map((item) => (

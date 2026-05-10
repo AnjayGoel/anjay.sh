@@ -1,46 +1,9 @@
 ---
+import { showcase } from "@/data/showcase";
 import PageLayout from "@/layouts/Base.astro";
 import { Schema } from "astro-seo-schema";
 
-const showcase: {
-	name: string;
-	href: string;
-	stack: string;
-	badge?: string;
-	desc: string;
-}[] = [
-	{
-		name: "RedScout",
-		href: "https://github.com/AnjayGoel/RedScout",
-		stack: "Go · Redis · CLI",
-		badge: "OSS",
-		desc:
-			"Namespace-level Redis monitoring — breaks memory, TTLs, and ops/sec down by logical key prefix instead of server-wide aggregates.",
-	},
-	{
-		name: "DashReels",
-		href: "https://play.google.com/store/apps/details?id=com.dashtoon.video.reels&hl=en_IN",
-		stack: "Android · Kotlin",
-		badge: "1M+ installs",
-		desc:
-			"Short-form video Android app — free dramas across genres, personalised recommendations, low-latency playback over a flaky last mile.",
-	},
-	{
-		name: "DashToon",
-		href: "https://play.google.com/store/apps/details?id=com.dashtoon.app&hl=en_IN",
-		stack: "Android · Kotlin",
-		desc:
-			"Comics & webtoons reader app — fluid panel-by-panel reading experience for vertical and traditional layouts.",
-	},
-	{
-		name: "Stable Roommate (Generalised)",
-		href: "https://github.com/AnjayGoel/stable-roommate-generalised",
-		stack: "Python · Algorithms",
-		badge: "OSS",
-		desc:
-			"Algorithm + small webapp grouping people into optimal teams. Generalises Irving's stable roommate matching to k-sized groups.",
-	},
-];
+const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 ---
 
 <Schema
@@ -52,13 +15,13 @@ const showcase: {
 				"@type": "ListItem",
 				position: 1,
 				name: "Home",
-				item: "https://anjay.sh",
+				item: siteUrl("/"),
 			},
 			{
 				"@type": "ListItem",
 				position: 2,
 				name: "Showcase",
-				item: "https://anjay.sh/showcase",
+				item: siteUrl("/showcase"),
 			},
 		],
 	}}
@@ -68,8 +31,7 @@ const showcase: {
 	<section class="work" aria-labelledby="work-label">
 		<div class="section-label" id="work-label">Showcase</div>
 		<p class="intro">
-			A handful of projects I've built — open source tools, mobile apps shipped to millions, and the
-			occasional algorithmic detour.
+			A handful of projects I've built.
 		</p>
 		<ul class="work-list">
 			{
