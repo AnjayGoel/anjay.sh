@@ -8,6 +8,10 @@
 		} catch {}
 	})();
 
+	addEventListener("DOMContentLoaded", () => {
+		requestAnimationFrame(() => document.documentElement.classList.add("theme-ready"));
+	});
+
 	const lightModePref = window.matchMedia("(prefers-color-scheme: light)");
 
 	function setTheme(newTheme) {

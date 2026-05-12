@@ -18,10 +18,10 @@ const {
 
 <html class="scroll-smooth" lang={siteConfig.lang}>
 	<head>
+		<ThemeProvider />
 		<BaseHead articleDate={articleDate} description={description} ogImage={ogImage} title={title} />
 	</head>
 	<body>
-		<ThemeProvider />
 		<SkipLink />
 		<div class="wrap">
 			<Header />
@@ -48,9 +48,11 @@ const {
 				-webkit-font-smoothing: antialiased;
 				-moz-osx-font-smoothing: grayscale;
 				text-rendering: optimizeLegibility;
-				transition: background-color 0.35s ease, color 0.35s ease;
 				min-height: 100vh;
 				min-height: 100dvh;
+			}
+			html.theme-ready body {
+				transition: background-color 0.35s ease, color 0.35s ease;
 			}
 			a {
 				color: inherit;
