@@ -354,9 +354,9 @@ ul.work-list a:focus-visible {
 	.timeline > .post .post-body,
 	.timeline > .archive-link,
 	.timeline > .pagination,
+	.work > .intro,
 	ul.work-list > li,
-	.bio > li,
-	.bio-foot,
+	.bio > *,
 	.hero > *,
 	.section-label,
 	.post-header > *,
@@ -368,10 +368,17 @@ ul.work-list a:focus-visible {
 	}
 	.hero > *:nth-child(1) { --i: 0; }
 	.hero > *:nth-child(2) { --i: 1; }
-	.bio > li:nth-child(1) { --i: 0; }
-	.bio > li:nth-child(2) { --i: 1; }
-	.bio > li:nth-child(3) { --i: 2; }
-	.bio-foot { --i: 3; }
+	.bio > *:nth-child(1) { --i: 0; }
+	.bio > *:nth-child(2) { --i: 1; }
+	.bio > *:nth-child(3) { --i: 2; }
+	.bio > *:nth-child(4) { --i: 3; }
+	.bio > *:nth-child(5) { --i: 4; }
+	.work > .intro { --i: 0; }
+	ul.work-list > li:nth-child(1) { --i: 1; }
+	ul.work-list > li:nth-child(2) { --i: 2; }
+	ul.work-list > li:nth-child(3) { --i: 3; }
+	ul.work-list > li:nth-child(4) { --i: 4; }
+	ul.work-list > li:nth-child(5) { --i: 5; }
 	.post-header > *:nth-child(1) { --i: 0; }
 	.post-header > *:nth-child(2) { --i: 1; }
 	.post-header > *:nth-child(3) { --i: 2; }
