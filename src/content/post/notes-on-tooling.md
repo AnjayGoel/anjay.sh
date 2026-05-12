@@ -2,7 +2,7 @@
 title: "Notes on the tooling"
 publishDate: 2026-01-25
 description: "What's underneath this template — Astro, Pagefind, Giscus, KaTeX — and why each piece is here."
-tags: [ meta, tooling ]
+tags: [ tooling, internals, astro ]
 ---
 
 A short tour of the moving parts so you know what to keep and what to rip out. Most of the integrations below are
