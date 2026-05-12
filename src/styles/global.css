@@ -360,8 +360,11 @@ ul.work-list a:focus-visible {
 	.hero > *,
 	.section-label,
 	.post-header > *,
+	.post-main > .post-cover,
+	.post-main > .rule:not(.rule--footer),
+	.post-main > .post-article,
 	.post-main > .share,
-	.post-main > .post-end,
+	.post-main > .post-pager,
 	.post-main > .comments {
 		animation: intro-fade-up 380ms cubic-bezier(0.2, 0.6, 0.2, 1) both;
 		animation-delay: calc(var(--i, 0) * 55ms);
@@ -384,9 +387,12 @@ ul.work-list a:focus-visible {
 	.post-header > *:nth-child(3) { --i: 2; }
 	.post-header > *:nth-child(4) { --i: 3; }
 	.post-header > *:nth-child(5) { --i: 4; }
-	.post-main > .share { --i: 5; }
-	.post-main > .post-end { --i: 6; }
-	.post-main > .comments { --i: 7; }
+	.post-main > .post-cover,
+	.post-main > .rule:not(.rule--footer),
+	.post-main > .post-article { --i: 5; }
+	.post-main > .share { --i: 6; }
+	.post-main > .post-pager { --i: 7; }
+	.post-main > .comments { --i: 8; }
 }
 
 @media (prefers-reduced-motion: reduce) {
