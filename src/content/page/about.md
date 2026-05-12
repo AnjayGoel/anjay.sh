@@ -1,14 +1,10 @@
 ---
 title: About
-description: A short introduction. Replace this in src/content/page/about.md.
+description: Anjay Goel — about me.
 ---
 
-This is the About page. It's a markdown file at `src/content/page/about.md` — edit it freely. The shape is intentionally unstructured so you can write a paragraph, a list, a CV, or whatever fits.
+- 🚀 Software Engineer at [Dashtoon](https://www.linkedin.com/company/dashtoon/)
+- 🎓 IIT Kharagpur graduate (2023)
+- 📝 Occasional blogger on tech, economics, and everything in between
 
-A few example bullets to get going:
-
-- 👋 One-line intro — what you do, where, since when.
-- 🛠 The tools you reach for first.
-- 📝 What you tend to write about here.
-
-Find me on [GitHub](https://github.com/example), [LinkedIn](https://www.linkedin.com/in/example/), or by [email](mailto:john@example.com).
+You can find me on [GitHub](https://github.com/anjaygoel), [LinkedIn](https://www.linkedin.com/in/anjaygoel/), or by [email](mailto:anjay.goel@gmail.com).

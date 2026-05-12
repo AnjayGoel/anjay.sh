@@ -2,7 +2,7 @@ import type { SiteConfig } from "@/types";
 import type { AstroExpressiveCodeOptions } from "astro-expressive-code";
 
 export const siteConfig: SiteConfig = {
-	author: "Your Name",
+	author: "Anjay Goel",
 	date: {
 		locale: "en-US",
 		options: {
@@ -12,35 +12,33 @@ export const siteConfig: SiteConfig = {
 		},
 	},
 	description:
-		"A minimal personal blog & writing space, built with Astro. Notes on whatever I happen to be thinking about — usually some mix of code, design, and the occasional half-formed idea. Replace this paragraph in src/site.config.ts to make the site your own.",
+		"Hi!\nI am Anjay. I love to write about software development, technology and occasionally other stuff like economics & finance. I hope you find something interesting here.",
 	lang: "en-US",
 	ogLocale: "en_US",
 	sortPostsByUpdatedDate: false,
-	title: "Astro Sienna",
-	hideThemeCredit: false,
+	title: "Anjay Goel",
+	hideThemeCredit: true,
 	profile: {
-		name: "John Doe",
-		email: "john@example.com",
-		github: "https://github.com/example",
-		linkedin: "https://www.linkedin.com/in/example/",
+		name: "Anjay Goel",
+		email: "anjay.goel@gmail.com",
+		github: "https://github.com/anjaygoel",
+		linkedin: "https://www.linkedin.com/in/anjaygoel/",
 		jobTitle: "Software Engineer",
-		employer: "Example Inc.",
-		employerUrl: "https://example.com",
-		alumni: "Example University",
+		employer: "Dashtoon",
+		employerUrl: "https://www.linkedin.com/company/dashtoon/",
+		alumni: "IIT Kharagpur",
 		avatar: "/avatar.png",
 	},
-	// Uncomment and fill in to enable Giscus comments on every post.
-	// comments: {
-	// 	repo: "your-handle/your-repo",
-	// 	repoId: "...",
-	// 	category: "General",
-	// 	categoryId: "...",
-	// },
-	// Uncomment to enable analytics. Both providers load via Partytown.
-	// analytics: {
-	// 	googleAnalyticsId: "G-XXXXXXX",
-	// 	goatcounterUrl: "https://your-handle.goatcounter.com/count",
-	// },
+	comments: {
+		repo: "anjaygoel/anjay.sh",
+		repoId: "MDEwOlJlcG9zaXRvcnkzNzY2MjI0MjY=",
+		category: "General",
+		categoryId: "DIC_kwDOFnLNWs4CQ8t3",
+	},
+	analytics: {
+		googleAnalyticsId: "G-YMCFXDNKXR",
+		goatcounterUrl: "https://anjaygoel.goatcounter.com/count",
+	},
 };
 
 export const menuLinks: { path: string; title: string }[] = [

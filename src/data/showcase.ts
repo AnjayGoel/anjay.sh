@@ -8,23 +8,31 @@ export interface ShowcaseItem {
 
 export const showcase: ShowcaseItem[] = [
 	{
-		name: "Sample Project",
-		href: "https://github.com/example/sample",
-		stack: "TypeScript · CLI",
+		name: "RedScout",
+		href: "https://github.com/AnjayGoel/RedScout",
+		stack: "Redis · Monitoring · CLI",
 		badge: "OSS",
-		desc: "A short, plain description of what the project does and why it's interesting. One or two sentences is plenty — keep the prose tight so the row stays scannable.",
+		desc: "A Redis monitoring tool that provides namespace-level insights into your Redis database. Unlike traditional tools, It breaks down memory usage, key TTLs, and operations per second by logical namespaces.",
 	},
 	{
-		name: "Another Thing",
-		href: "https://example.com",
-		stack: "Web App · Realtime",
-		badge: "Live",
-		desc: "Use the badge slot for a status hint — installs, stars, version, or just an OSS / Closed marker. Leave the field undefined and the badge disappears.",
+		name: "DashReels",
+		href: "https://play.google.com/store/apps/details?id=com.dashtoon.video.reels&hl=en_IN",
+		stack: "App ·  Short Videos",
+		badge: "20M+ installs",
+		desc: "A mobile entertainment app offering short-form video content across multiple genres. Features include free short dramas, a personalized recommendation system, and an engaging, user-friendly experience.",
 	},
 	{
-		name: "Research Note",
-		href: "https://github.com/example/paper",
+		name: "DashToon",
+		href: "https://play.google.com/store/apps/details?id=com.dashtoon.app&hl=en_IN",
+		stack: "App · Comics",
+		badge: "1M+ installs",
+		desc: "A mobile application focused on comics and webtoons. Provides users with access to a wide variety of digital comics and manga content with an intuitive reading experience.",
+	},
+	{
+		name: "Generalised Stable Roommate",
+		href: "https://github.com/AnjayGoel/stable-roommate-generalised",
 		stack: "Python · Algorithms",
-		desc: "Showcase entries don't have to be products — a write-up, a paper repo, a one-off experiment all fit. The list is rendered in order; reorder to taste.",
+		badge: "OSS",
+		desc: "An algorithm & webapp to automatically group people into optimal teams based on their individual preferences.",
 	},
 ];
