@@ -10,6 +10,7 @@ analytics.
 ## Features
 
 - Astro 6 with content collections (posts and pages, both validated by Zod)
+- MDX support — embed Astro/JSX components, imports, and JS expressions inside posts
 - Light and dark mode with a CSS-only theme toggle
 - Self-hosted serif body font ([Newsreader](https://github.com/productiontype/Newsreader)) and mono (JetBrains Mono)
 - Code blocks via [astro-expressive-code](https://expressive-code.com): themes, copy button, terminal frames, line

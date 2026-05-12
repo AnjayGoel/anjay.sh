@@ -9,7 +9,7 @@ function removeDupsAndLowerCase(array: string[]) {
 }
 
 const post = defineCollection({
-	loader: glob({ pattern: "**/*.md", base: "./src/content/post" }),
+	loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/post" }),
 	schema: ({ image }) =>
 		z.object({
 			coverImage: z

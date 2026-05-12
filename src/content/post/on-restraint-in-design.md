@@ -1,12 +1,12 @@
 ---
 title: "On restraint in design"
-publishDate: 2026-02-08
+publishDate: 2026-01-15
 description: "A short note on the editorial choices behind this template — and why most things are quiet on purpose."
 tags: [ design, opinion ]
 ---
 
-A blog template can do almost anything. Carousel covers, animated landing pages, sparkle cursors, full-screen modal
-search. Most of those are tools that, deployed wholesale, end up shouting at the reader.
+A blog template can do almost anything: carousel covers, animated landing pages, sparkle cursors, full-screen modal
+search. Most of those compete for the reader's attention rather than serving it.
 
 The defaults here lean the other direction.
 
@@ -25,8 +25,7 @@ The defaults here lean the other direction.
 - Drop cap on the first paragraph of every post.
 - Code blocks in a warm cream / near-black with syntax highlighting.
 
-That's most of it. The hierarchy of attention is: body text first, then code/quotes, then metadata. Everything else
-fades into the page.
+The hierarchy of attention is: body text first, then code/quotes, then metadata. Everything else fades into the page.
 
 ## Why
 

@@ -1,13 +1,12 @@
 ---
 title: "Notes on the tooling"
-publishDate: 2026-02-22
+publishDate: 2026-01-25
 description: "What's underneath this template — Astro, Pagefind, Giscus, KaTeX — and why each piece is here."
 tags: [ meta, tooling ]
 ---
 
-A short tour of the moving parts so you know what to keep and what to rip out. Most of the integrations here are
-optional, leave the relevant config field undefined and the corresponding script, button, or section disappears
-site-wide.
+A short tour of the moving parts so you know what to keep and what to rip out. Most of the integrations below are
+optional, leave the config field undefined and the script never loads.
 
 ## Astro
 
@@ -47,5 +46,3 @@ via [Partytown](https://partytown.qwik.dev/) so they run on a worker thread, not
 
 Optional. Set `siteConfig.webmentions.link` and add a `WEBMENTION_API_KEY` to `.env`. Mentions are fetched
 from [webmention.io](https://webmention.io) at build time and cached locally.
-
-That's most of the surface. Each integration is independent — leave the config field undefined and it disappears.
