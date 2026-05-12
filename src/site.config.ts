@@ -17,6 +17,7 @@ export const siteConfig: SiteConfig = {
 	ogLocale: "en_US",
 	sortPostsByUpdatedDate: false,
 	title: "Astro Sienna",
+	hideThemeCredit: false,
 	profile: {
 		name: "John Doe",
 		email: "john@example.com",
