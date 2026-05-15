@@ -21,7 +21,8 @@ import rehypeKatex from "rehype-katex";
 import rehypeUnwrapImages from "rehype-unwrap-images";
 
 export default defineConfig({
-	site: "https://example.com",
+	site: "https://anjaygoel.github.io",
+	base: "/astro-sienna",
 	image: {
 		domains: ["webmention.io"],
 	},
