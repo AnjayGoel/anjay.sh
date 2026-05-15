@@ -3,7 +3,7 @@
 A minimal Astro blog template with serif typography, dark mode, RSS, OG images, and optional Giscus comments and
 analytics.
 
-**Live demo:** [anjay.sh](https://anjay.sh)
+**Live demo:** [Github Pages](https://anjaygoel.github.io/astro-sienna)
 
 ![Astro Sienna home page in dark and light themes](.github/assets/preview.png)
 
