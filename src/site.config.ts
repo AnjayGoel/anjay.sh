@@ -29,7 +29,7 @@ export const siteConfig: SiteConfig = {
 		alumni: "Example University",
 		avatar: "/avatar.png",
 	},
-	// Uncomment and fill in to enable Giscus comments on every post.
+	// Uncomment & fill in to enable Giscus comments on every post.
 	// comments: {
 	// 	repo: "your-handle/your-repo",
 	// 	repoId: "...",

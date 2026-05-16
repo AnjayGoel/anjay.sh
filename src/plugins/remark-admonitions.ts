@@ -8,15 +8,12 @@ import { toString as mdastToString } from "mdast-util-to-string";
 import type { Plugin } from "unified";
 import { visit } from "unist-util-visit";
 
-// Supported admonition types
 const Admonitions = new Set<AdmonitionType>(["tip", "note", "important", "caution", "warning"]);
 
-/** Checks if a string is a supported admonition type. */
 function isAdmonition(s: string): s is AdmonitionType {
 	return Admonitions.has(s as AdmonitionType);
 }
 
-/** Checks if a node is a directive. */
 function isNodeDirective(node: Node): node is Directives {
 	return (
 		node.type === "containerDirective" ||
@@ -25,10 +22,7 @@ function isNodeDirective(node: Node): node is Directives {
 	);
 }
 
-/**
- * From Astro Starlight:
- * Transforms directives not supported back to original form as it can break user content and result in 'broken' output.
- */
+/** Revert unsupported directives to source markdown so they don't break user content (from Astro Starlight). */
 function transformUnhandledDirective(
 	node: LeafDirective | TextDirective,
 	index: number,
@@ -48,7 +42,7 @@ function transformUnhandledDirective(
 	}
 }
 
-/** From Astro Starlight: Function that generates an mdast HTML tree ready for conversion to HTML by rehype. */
+/** Builds an mdast HTML node for rehype to render (from Astro Starlight). */
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 function h(el: string, attrs: Properties = {}, children: any[] = []): P {
 	const { properties, tagName } = _h(el, attrs);
@@ -73,7 +67,6 @@ export const remarkAdmonitions: Plugin<[], Root> = () => (tree) => {
 		let title: string = admonitionType;
 		let titleNode: PhrasingContent[] = [{ type: "text", value: title }];
 
-		// Check if there's a custom title
 		const firstChild = node.children[0];
 		if (
 			firstChild?.type === "paragraph" &&
@@ -83,11 +76,11 @@ export const remarkAdmonitions: Plugin<[], Root> = () => (tree) => {
 		) {
 			titleNode = firstChild.children;
 			title = mdastToString(firstChild.children);
-			// The first paragraph contains a custom title, we can safely remove it.
+			// First paragraph is the custom title; drop it from the body.
 			node.children.splice(0, 1);
 		}
 
-		// Do not change prefix to AD, ADM, or similar, adblocks will block the content inside.
+		// Keep the `aside-` prefix: `ad`/`adm` class names get blocked by adblockers.
 		const aside = h("aside", { "aria-label": title, class: `aside aside-${admonitionType}` }, [
 			h("p", { class: "aside-title", "aria-hidden": "true" }, [...titleNode]),
 			h("div", { class: "aside-content" }, node.children),

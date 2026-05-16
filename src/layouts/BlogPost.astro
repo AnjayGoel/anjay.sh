@@ -7,6 +7,7 @@ import WebMentions from "@/components/blog/webmentions/index.astro";
 import { getAllPosts, getPostSortDate, sortMDByDate } from "@/data/post";
 import { siteConfig } from "@/site-config";
 import { formatBylineDate, formatEyebrowDate } from "@/utils/date";
+import { absoluteUrl, withBase } from "@/utils/path";
 
 import BaseLayout from "./Base.astro";
 import { Schema } from "astro-seo-schema";
@@ -31,21 +32,20 @@ const { remarkPluginFrontmatter } = await render(post);
 
 const authorName = siteConfig.profile?.name ?? siteConfig.author;
 const comments = siteConfig.comments;
-const postUrl = new URL(`/posts/${slug}`, Astro.site).toString();
-const socialImageAbsolute = new URL(socialImage, Astro.site).toString();
+const postUrl = absoluteUrl(`/posts/${slug}/`, Astro.site);
+const socialImageAbsolute = absoluteUrl(socialImage, Astro.site);
 
-// Eyebrow: "Posts · Month YYYY"
+// "Posts · Month YYYY"
 const eyebrowDate = formatEyebrowDate(publishDate);
 
-// Byline date: "2 May 2026"
+// "2 May 2026"
 const bylineDate = formatBylineDate(publishDate);
 
-// Reading time: prefer remark plugin's value, otherwise fall back gracefully.
+// Prefer remark plugin's value; fall back to "".
 const readingTime: string =
 	(remarkPluginFrontmatter as { minutesRead?: string })?.minutesRead ?? "";
 
-// Custom giscus themes — only used in prod because the giscus iframe is
-// hosted on giscus.app and can't fetch CSS from localhost / private IPs.
+// Custom giscus themes only in prod: the giscus.app iframe can't fetch CSS from localhost / private IPs.
 const giscusThemes = import.meta.env.PROD
 	? {
 			light: new URL("/giscus-light.css", Astro.site).toString(),
@@ -135,13 +135,13 @@ const giscusThemes = import.meta.env.PROD
 			{(olderPost || newerPost) && (
 				<nav class="post-pager" aria-label="More posts">
 					{olderPost && (
-						<a class="pager-link prev" data-astro-prefetch href={`/posts/${olderPost.id}/`}>
+						<a class="pager-link prev" data-astro-prefetch href={withBase(`/posts/${olderPost.id}/`)}>
 							<span class="pager-eyebrow">Older</span>
 							<span class="pager-title">{olderPost.data.title}</span>
 						</a>
 					)}
 					{newerPost && (
-						<a class="pager-link next" data-astro-prefetch href={`/posts/${newerPost.id}/`}>
+						<a class="pager-link next" data-astro-prefetch href={withBase(`/posts/${newerPost.id}/`)}>
 							<span class="pager-eyebrow">Newer</span>
 							<span class="pager-title">{newerPost.data.title}</span>
 						</a>
@@ -176,7 +176,6 @@ const giscusThemes = import.meta.env.PROD
 <style>
 	.post-shell { display: block; position: relative; }
 
-	/* Reading progress bar (top of viewport) */
 	.reading-progress {
 		position: fixed;
 		top: 0;
@@ -189,7 +188,6 @@ const giscusThemes = import.meta.env.PROD
 		transition: width 0.05s linear;
 	}
 
-	/* Article header — cover image */
 	.post-cover {
 		margin: 0 0 36px;
 		padding: 0;
@@ -205,7 +203,6 @@ const giscusThemes = import.meta.env.PROD
 		background: var(--paper);
 	}
 
-	/* Article header */
 	.post-eyebrow {
 		font-family: var(--font-mono);
 		font-size: 11.5px;
@@ -293,17 +290,16 @@ const giscusThemes = import.meta.env.PROD
 		margin: 0 0 44px;
 		transition: background-color 0.35s ease;
 	}
-	/* Footer-area separator — gives breathing room around stacked footer blocks
-	   (post-end link, comments) so each rule reads as intentional. */
+	/* Extra spacing so stacked footer blocks (post-end link, comments) read as intentional. */
 	.rule--footer {
 		margin: 56px 0 28px;
 	}
 
-	/* Comments container — match article body width */
+	/* Match article body width */
 	.comments { max-width: var(--reading-width); margin: 56px 0 32px; }
 	.comments .giscus { max-width: 100%; }
 
-	/* Prev/Next post navigation — borderless editorial layout. */
+	/* Prev/Next post navigation */
 	.post-pager {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
@@ -351,8 +347,7 @@ const giscusThemes = import.meta.env.PROD
 	.pager-link:hover .pager-title {
 		color: hsl(var(--theme-accent));
 	}
-	/* If only one of prev/next exists, let it span the full width with its
-	   text aligned to its natural side. */
+	/* Lone prev/next spans full width, text on its natural side. */
 	.post-pager:has(.pager-link.prev:only-child) .pager-link.prev,
 	.post-pager:has(.pager-link.next:only-child) .pager-link.next {
 		grid-column: 1 / -1;
@@ -372,7 +367,6 @@ const giscusThemes = import.meta.env.PROD
 		}
 	}
 
-	/* Back-to-top button */
 	.to-top-btn {
 		position: fixed;
 		bottom: 32px;
@@ -413,7 +407,6 @@ const giscusThemes = import.meta.env.PROD
 		}
 	}
 
-	/* Mobile article header */
 	@media (max-width: 720px) {
 		.post-title { font-size: 30px; line-height: 1.15; }
 		.byline { font-size: 15.5px; }
@@ -504,7 +497,6 @@ const giscusThemes = import.meta.env.PROD
 		margin: 30px 0 12px;
 	}
 
-	/* Anchor links inside body */
 	.post-article a {
 		color: hsl(var(--theme-text));
 		text-decoration: underline;
@@ -520,7 +512,6 @@ const giscusThemes = import.meta.env.PROD
 		text-decoration-color: hsl(var(--theme-accent));
 	}
 
-	/* Inline code */
 	.post-article :not(pre) > code {
 		font-family: var(--font-mono);
 		font-size: 14.5px;
@@ -534,7 +525,6 @@ const giscusThemes = import.meta.env.PROD
 		transition: background-color 0.35s ease, border-color 0.35s ease;
 	}
 
-	/* Code blocks */
 	.post-article pre {
 		background: var(--paper);
 		border: 1px solid var(--hairline);
@@ -559,7 +549,6 @@ const giscusThemes = import.meta.env.PROD
 		margin: 28px 0;
 	}
 
-	/* Lists */
 	.post-article ul {
 		margin: 0 0 28px;
 		padding: 0;
@@ -624,7 +613,6 @@ const giscusThemes = import.meta.env.PROD
 		display: inline;
 	}
 
-	/* Blockquote */
 	.post-article blockquote {
 		margin: 28px 0;
 		padding: 4px 0 4px 22px;
@@ -647,7 +635,7 @@ const giscusThemes = import.meta.env.PROD
 		all: unset;
 	}
 
-	/* Figure / video / images — predictable sizing prevents CLS */
+	/* Predictable sizing prevents CLS */
 	.post-article figure {
 		margin: 36px 0;
 		padding: 0;
@@ -742,7 +730,6 @@ const giscusThemes = import.meta.env.PROD
 		margin-right: 8px;
 	}
 
-	/* Tables */
 	.post-article table {
 		width: 100%;
 		max-width: 100%;
@@ -769,7 +756,6 @@ const giscusThemes = import.meta.env.PROD
 		margin: 40px 0;
 	}
 
-	/* Mobile body */
 	@media (max-width: 720px) {
 		.post-article > p,
 		.post-article ul li,
@@ -797,7 +783,6 @@ const giscusThemes = import.meta.env.PROD
 		.post-article figcaption { font-size: 13.5px; }
 	}
 
-	/* Body anchor focus */
 	.post-article a:focus-visible {
 		outline: 2px solid hsl(var(--theme-accent));
 		outline-offset: 3px;

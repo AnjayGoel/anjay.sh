@@ -57,7 +57,7 @@ optional. Leave any of `email`, `github`, `linkedin`, `employer`, `alumni`, or `
 link is hidden site-wide. Same for `comments` and `analytics`: undefined means the script never loads.
 
 **`astro.config.ts`** is where you set `site` to your final domain (used for canonical URLs, sitemap, RSS, and OG image
-URLs).
+URLs). The base path is handled automatically — see [Deploying](#deploying); you normally don't touch it.
 
 Replace these assets in `public/`:
 
@@ -126,6 +126,15 @@ Code-block themes are configured separately in `expressiveCodeOptions` in `site.
 
 Output is a static `dist/` directory that deploys anywhere serving files: Cloudflare Pages, Netlify, Vercel, GitHub
 Pages, S3 + CloudFront. Build command: `pnpm build`. Output directory: `dist`.
+
+### Base path
+
+Defaults to root (`/`) — no config needed for local dev, Netlify, Vercel, Cloudflare Pages, a custom domain, or a
+GitHub Pages **user** site. The whole site (links, assets, feeds, OG/canonical, manifest, Markdown links) is base-aware.
+
+For a GitHub Pages **project** site (served from `/repo/`), the bundled `.github/workflows/deploy.yml` detects the
+subpath and configures it automatically; the only manual step is **Settings → Pages → Source: GitHub Actions**. For a
+subpath on any other host, build with `BASE_PATH=/sub pnpm build`.
 
 ## Pulling theme updates
 

@@ -4,6 +4,7 @@ import { showcase } from "@/data/showcase";
 import PageLayout from "@/layouts/Base.astro";
 import { siteConfig } from "@/site-config";
 import { formatRailDate, formatStampDate } from "@/utils/date";
+import { absoluteUrl, withBase } from "@/utils/path";
 import { Schema } from "astro-seo-schema";
 
 const allPosts = await getAllPosts();
@@ -15,7 +16,7 @@ const rest = timelinePosts.slice(1);
 const archiveCount = allPosts.length;
 
 const profile = siteConfig.profile;
-const siteUrl = (path: string) => new URL(path, Astro.site).toString();
+const siteUrl = (path: string) => absoluteUrl(path, Astro.site);
 ---
 
 <Schema
@@ -67,7 +68,7 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 					<span class="sep">·</span>
 				</>
 			)}
-			<a href="/rss.xml">RSS</a>
+			<a href={withBase("/rss.xml")}>RSS</a>
 		</div>
 	</section>
 
@@ -79,7 +80,7 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 					<a
 						class="post featured"
 						data-astro-prefetch
-						href={`/posts/${featured.id}/`}
+						href={withBase(`/posts/${featured.id}/`)}
 						style="--i: 0"
 					>
 						<div class="post-rail">
@@ -112,7 +113,7 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 					<a
 						class="post"
 						data-astro-prefetch
-						href={`/posts/${p.id}/`}
+						href={withBase(`/posts/${p.id}/`)}
 						style={`--i: ${idx + 1}`}
 					>
 						<div class="post-rail">
@@ -130,7 +131,7 @@ const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 			}
 
 			<div class="archive-link" style={`--i: ${rest.length + 1}`}>
-				<a data-astro-prefetch href="/posts/"
+				<a data-astro-prefetch href={withBase("/posts/")}
 					>View all {archiveCount} posts →</a
 				>
 			</div>

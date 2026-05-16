@@ -13,6 +13,7 @@ import partytown from "@astrojs/partytown";
 
 import remarkDirective from "remark-directive";
 import remarkMath from "remark-math";
+import { rehypeBasePath } from "./src/plugins/rehype-base-path";
 import { remarkAdmonitions } from "./src/plugins/remark-admonitions";
 import { remarkReadingTime } from "./src/plugins/remark-reading-time";
 
@@ -20,9 +21,14 @@ import rehypeExternalLinks from "rehype-external-links";
 import rehypeKatex from "rehype-katex";
 import rehypeUnwrapImages from "rehype-unwrap-images";
 
+// Defaults to root; the deploy workflow sets BASE_PATH for subpath hosts
+// (GitHub Pages project sites). See "Base path" in the README.
+const BASE_PATH = process.env.BASE_PATH || "/";
+const START_URL = BASE_PATH.endsWith("/") ? BASE_PATH : `${BASE_PATH}/`;
+
 export default defineConfig({
 	site: "https://anjaygoel.github.io",
-	base: "/astro-sienna",
+	base: BASE_PATH,
 	image: {
 		domains: ["webmention.io"],
 	},
@@ -71,7 +77,7 @@ export default defineConfig({
 					type: "image/png",
 				},
 			],
-			start_url: "/",
+			start_url: START_URL,
 			background_color: "#1d1f21",
 			theme_color: "#2bbc8a",
 			display: "standalone",
@@ -86,6 +92,7 @@ export default defineConfig({
 	markdown: {
 		rehypePlugins: [
 			rehypeUnwrapImages,
+			[rehypeBasePath, { base: BASE_PATH }],
 			// rehype-katex must run before rehype-external-links so the latter
 			// doesn't rewrite anchors inside katex's emitted DOM.
 			rehypeKatex,

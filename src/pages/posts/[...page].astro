@@ -3,6 +3,7 @@ import type { CollectionEntry } from "astro:content";
 import { getAllPosts, getPostSortDate, sortMDByDate } from "@/data/post";
 import PageLayout from "@/layouts/Base.astro";
 import { formatRailDate } from "@/utils/date";
+import { withBase } from "@/utils/path";
 import type { GetStaticPaths, Page } from "astro";
 
 export const getStaticPaths = (async ({ paginate }) => {
@@ -50,7 +51,7 @@ const totalCount = page.total;
 					<a
 						class="post"
 						data-astro-prefetch
-						href={`/posts/${p.id}/`}
+						href={withBase(`/posts/${p.id}/`)}
 						style={`--i: ${idx}`}
 					>
 						<div class="post-rail">

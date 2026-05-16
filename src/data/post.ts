@@ -15,7 +15,7 @@ export function getPostSortDate(post: CollectionEntry<"post">): Date {
 		: new Date(post.data.publishDate);
 }
 
-/** Sort posts in descending order by `getPostSortDate` (newest first). Mutates and returns. */
+/** Sort by `getPostSortDate`, newest first. Mutates input. */
 export function sortMDByDate(posts: CollectionEntry<"post">[]): CollectionEntry<"post">[] {
 	return posts.sort((a, b) => {
 		const aDate = getPostSortDate(a).valueOf();

@@ -1,6 +1,7 @@
 ---
 import { showcase } from "@/data/showcase";
 import { menuLinks, siteConfig } from "@/site-config";
+import { withBase } from "@/utils/path";
 import ThemeToggle from "../ThemeToggle.astro";
 
 const url = new URL(Astro.request.url);
@@ -12,8 +13,9 @@ const visibleMenuLinks = menuLinks.filter((link) => {
 });
 
 const isActive = (path: string) => {
-	if (path === "/") return url.pathname === "/";
-	return url.pathname === path || url.pathname.startsWith(path);
+	const target = withBase(path);
+	if (path === "/") return url.pathname === target;
+	return url.pathname === target || url.pathname.startsWith(target);
 };
 
 const navIcons: Record<string, string> = {
@@ -28,7 +30,7 @@ const navIcons: Record<string, string> = {
 ---
 
 <header class="site-header" id="main-header">
-	<a href="/" class="wordmark">{wordmark}</a>
+	<a href={withBase("/")} class="wordmark">{wordmark}</a>
 	<div class="header-right">
 		<nav class="nav" aria-label="Primary">
 			{
@@ -37,7 +39,7 @@ const navIcons: Record<string, string> = {
 						aria-current={isActive(link.path) ? "page" : false}
 						class:list={[{ active: isActive(link.path) }]}
 						data-astro-prefetch
-						href={link.path}
+						href={withBase(link.path)}
 					>
 						<svg
 							aria-hidden="true"
@@ -96,8 +98,7 @@ const navIcons: Record<string, string> = {
 		padding-bottom: 3px;
 		transition: color 0.2s ease;
 	}
-	/* Indicator extends a small buffer past the text on each side so the
-	   underline doesn't feel abrupt against the word. */
+	/* Indicator overhangs the text slightly so the underline isn't abrupt. */
 	.nav a::after {
 		content: "";
 		position: absolute;
@@ -148,8 +149,7 @@ const navIcons: Record<string, string> = {
 			justify-content: flex-start;
 		}
 		.nav a {
-			/* Maintain top tap padding while keeping the reserved indicator
-			   space below from the desktop rule (1px border + 2px padding). */
+			/* Add top tap padding; desktop rule keeps the indicator space below. */
 			padding-top: 6px;
 		}
 		.nav a svg {
