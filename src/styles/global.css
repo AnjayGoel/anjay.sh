@@ -4,10 +4,9 @@
 @import "@fontsource-variable/inter/wght.css";
 @import "@fontsource-variable/jetbrains-mono/wght.css";
 @import "katex/dist/katex.min.css";
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@config "../../tailwind.config.ts";
 
 @layer base {
 	html {
@@ -52,6 +51,13 @@
 		--faint: #b8ad9b;
 		--accent-soft: rgba(138, 68, 35, 0.1);
 		--accent-soft-strong: rgba(138, 68, 35, 0.18);
+
+		/* Callout accents — hues spread for distinguishability, kept muted for the theme */
+		--aside-note: 212deg 20% 46%;       /* dusty blue */
+		--aside-tip: 96deg 32% 33%;         /* green */
+		--aside-important: 284deg 26% 48%;  /* plum */
+		--aside-caution: 40deg 78% 40%;     /* amber */
+		--aside-warning: 7deg 66% 45%;      /* red */
 	}
 
 	:root[data-theme="dark"] {
@@ -69,6 +75,12 @@
 		--faint: #4f4a42;
 		--accent-soft: rgba(200, 151, 97, 0.12);
 		--accent-soft-strong: rgba(200, 151, 97, 0.22);
+
+		--aside-note: 212deg 28% 68%;       /* dusty blue */
+		--aside-tip: 96deg 30% 62%;         /* green */
+		--aside-important: 284deg 34% 74%;  /* plum */
+		--aside-caution: 42deg 72% 62%;     /* amber */
+		--aside-warning: 9deg 68% 66%;      /* red */
 	}
 }
 
@@ -341,6 +353,59 @@ ul.work-list a:focus-visible {
 	}
 	ul.work-list p {
 		font-size: 15px;
+	}
+}
+
+/* Admonitions from remark-admonitions (<aside class="aside aside-{type}">). */
+.aside {
+	--aside-accent: var(--theme-text-muted);
+	margin: 28px 0;
+	max-width: var(--reading-width);
+	padding: 14px 18px 16px;
+	background: var(--paper);
+	border: 1px solid var(--hairline);
+	border-left: 3px solid hsl(var(--aside-accent));
+	border-radius: 4px;
+	transition: background-color 0.35s ease, border-color 0.35s ease;
+}
+.aside-title {
+	font-family: var(--font-sans);
+	font-size: 11.5px;
+	font-weight: 600;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: hsl(var(--aside-accent));
+	margin: 0 0 8px;
+}
+.aside-content {
+	color: hsl(var(--theme-text) / 0.9);
+}
+.aside-content > :first-child {
+	margin-top: 0;
+}
+.aside-content > :last-child {
+	margin-bottom: 0;
+}
+
+.aside-note {
+	--aside-accent: var(--aside-note);
+}
+.aside-tip {
+	--aside-accent: var(--aside-tip);
+}
+.aside-important {
+	--aside-accent: var(--aside-important);
+}
+.aside-caution {
+	--aside-accent: var(--aside-caution);
+}
+.aside-warning {
+	--aside-accent: var(--aside-warning);
+}
+@media (max-width: 420px) {
+	.aside {
+		margin: 24px 0;
+		padding: 12px 14px 14px;
 	}
 }
 

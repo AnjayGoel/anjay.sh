@@ -1,7 +1,7 @@
 export interface ProfileConfig {
-	/** Display name of the site author. Used in bylines, schema markup, and OG images. */
+	/** Author display name; used in bylines, schema, OG images. */
 	name: string;
-	/** Optional contact email used on the About page socials list. Leave empty to omit. */
+	/** Contact email shown in About-page socials. Omit to hide. */
 	email?: string;
 	/** Profile URL on GitHub. Leave empty to hide. */
 	github?: string;
@@ -19,7 +19,7 @@ export interface ProfileConfig {
 	employerUrl?: string;
 	/** Schema.org Person.alumniOf.name. */
 	alumni?: string;
-	/** Public-facing avatar/photo URL (absolute) used in Schema markup. */
+	/** Absolute avatar/photo URL used in schema markup. */
 	avatar?: string;
 }
 
@@ -27,7 +27,7 @@ export interface ProfileConfig {
 export interface CommentsConfig {
 	/** GitHub repository hosting the discussions, e.g. "user/repo". */
 	repo: string;
-	/** GitHub repo node id (data-repo-id from the giscus config wizard). */
+	/** GitHub repo node id (data-repo-id from the giscus wizard). */
 	repoId: string;
 	/** Discussion category name. */
 	category: string;
@@ -44,7 +44,7 @@ export interface AnalyticsConfig {
 }
 
 export interface SiteConfig {
-	/** Author / display name shown across the site. Also used as a fallback profile.name. */
+	/** Site-wide display name; fallback for profile.name. */
 	author: string;
 	date: {
 		locale: string | string[] | undefined;
@@ -55,11 +55,11 @@ export interface SiteConfig {
 	ogLocale: string;
 	sortPostsByUpdatedDate: boolean;
 	title: string;
-	/** Author / personal info used by the About page, schema, byline, etc. */
+	/** Personal info for About page, schema, byline. */
 	profile?: ProfileConfig;
-	/** Optional Giscus comments configuration. Comments are skipped if absent. */
+	/** Giscus comments; skipped if absent. */
 	comments?: CommentsConfig;
-	/** Optional analytics configuration. Each provider is opt-in. */
+	/** Analytics; each provider opt-in. */
 	analytics?: AnalyticsConfig;
 	webmentions?: {
 		link: string;

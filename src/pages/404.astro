@@ -1,5 +1,6 @@
 ---
 import PageLayout from "@/layouts/Base.astro";
+import { withBase } from "@/utils/path";
 
 const meta = {
 	description: "The page you were looking for doesn't exist.",
@@ -13,8 +14,8 @@ const meta = {
 		<h1>This page wandered off.</h1>
 		<p>
 			The page you were looking for doesn't exist. It may have been moved, renamed,
-			or just isn't there yet. Try the <a href="/">home</a> page, or browse the
-			<a href="/posts/">writing</a>.
+			or just isn't there yet. Try the <a href={withBase("/")}>home</a> page, or browse the
+			<a href={withBase("/posts/")}>writing</a>.
 		</p>
 	</section>
 </PageLayout>

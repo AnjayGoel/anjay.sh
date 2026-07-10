@@ -1,5 +1,6 @@
 import { getAllPosts } from "@/data/post";
 import { siteConfig } from "@/site-config";
+import { absoluteUrl } from "@/utils/path";
 import rss from "@astrojs/rss";
 
 export const GET = async () => {
@@ -8,12 +9,12 @@ export const GET = async () => {
 	return rss({
 		title: siteConfig.title,
 		description: siteConfig.description,
-		site: import.meta.env.SITE,
+		site: absoluteUrl("/", import.meta.env.SITE),
 		items: posts.map((post) => ({
 			title: post.data.title,
 			description: post.data.description,
 			pubDate: post.data.publishDate,
-			link: `posts/${post.id}`,
+			link: `posts/${post.id}/`,
 		})),
 	});
 };
