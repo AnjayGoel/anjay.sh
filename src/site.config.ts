@@ -21,7 +21,7 @@ export const siteConfig: SiteConfig = {
 	profile: {
 		name: "Anjay Goel",
 		email: "anjay.goel@gmail.com",
-		github: "https://github.com/anjaygoel",
+		github: "https://github.com/anjay-goel",
 		linkedin: "https://www.linkedin.com/in/anjaygoel/",
 		jobTitle: "Software Engineer",
 		employer: "Dashtoon",
@@ -30,7 +30,7 @@ export const siteConfig: SiteConfig = {
 		avatar: "/avatar.png",
 	},
 	comments: {
-		repo: "anjaygoel/anjay.sh",
+		repo: "anjay-goel/anjay.sh",
 		repoId: "MDEwOlJlcG9zaXRvcnkzNzY2MjI0MjY=",
 		category: "General",
 		categoryId: "DIC_kwDOFnLNWs4CQ8t3",

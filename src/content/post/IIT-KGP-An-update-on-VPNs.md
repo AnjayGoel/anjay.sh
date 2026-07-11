@@ -8,7 +8,7 @@ slug: IIT-KGP-An-update-on-VPNs
 <!--end_excerpt-->
 **Update (9th May 2023)**: As pointed out in the comments, use port 123 for UDP as 19302 no longer works. For future reference, use nmap to find open ports.
 
-I wrote [this blog](https://anjaygoel.github.io/posts/IIT-KGP-Bypass-Internet-Restrictions/) a while ago describing how to host your own VPN server using GitHub student pack freebies to bypass the institute's network restrictions. But it didn't solve all my problems. Two major issues that I have since come to realize with this workaround are:
+I wrote [this blog](https://anjay.sh/posts/IIT-KGP-Bypass-Internet-Restrictions/) a while ago describing how to host your own VPN server using GitHub student pack freebies to bypass the institute's network restrictions. But it didn't solve all my problems. Two major issues that I have since come to realize with this workaround are:
 
 * Using your organization's VPN on the campus WiFi/LAN during the summers / while interning.
 * Using UDP-based VPNs ( who doesn't want to squeeze every bit of speed from the high-speed Internet. )

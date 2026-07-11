@@ -11,7 +11,7 @@ coverImage:
 <!--end_excerpt-->
 
 **Update: 4th June '21**: Checkout the code
-used [here](https://github.com/AnjayGoel/Covid-19-Death-Registration-Trends).
+used [here](https://github.com/anjay-goel/Covid-19-Death-Registration-Trends).
 
 **TL;DR**: You can [skip to the visualisations](#chennai) if you don't wanna read my ramblings.
 

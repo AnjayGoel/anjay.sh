@@ -7,4 +7,4 @@ description: Anjay Goel — about me.
 - 🎓 IIT Kharagpur graduate (2023)
 - 📝 Occasional blogger on tech, economics, and everything in between
 
-You can find me on [GitHub](https://github.com/anjaygoel), [LinkedIn](https://www.linkedin.com/in/anjaygoel/), or by [email](mailto:anjay.goel@gmail.com).
+You can find me on [GitHub](https://github.com/anjay-goel), [LinkedIn](https://www.linkedin.com/in/anjaygoel/), or by [email](mailto:anjay.goel@gmail.com).

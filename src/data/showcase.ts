@@ -9,7 +9,7 @@ export interface ShowcaseItem {
 export const showcase: ShowcaseItem[] = [
 	{
 		name: "RedScout",
-		href: "https://github.com/AnjayGoel/RedScout",
+		href: "https://github.com/anjay-goel/RedScout",
 		stack: "Redis · Monitoring · CLI",
 		badge: "OSS",
 		desc: "A Redis monitoring tool that provides namespace-level insights into your Redis database. Unlike traditional tools, It breaks down memory usage, key TTLs, and operations per second by logical namespaces.",
@@ -30,7 +30,7 @@ export const showcase: ShowcaseItem[] = [
 	},
 	{
 		name: "Generalised Stable Roommate",
-		href: "https://github.com/AnjayGoel/stable-roommate-generalised",
+		href: "https://github.com/anjay-goel/stable-roommate-generalised",
 		stack: "Python · Algorithms",
 		badge: "OSS",
 		desc: "An algorithm & webapp to automatically group people into optimal teams based on their individual preferences.",
