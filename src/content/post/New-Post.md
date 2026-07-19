@@ -94,8 +94,11 @@ raising a
 ReadTimeout indicating that it was the server that failed to respond in time (From its perspective, its completely
 correct), and the fixes that didn't address the root cause like moving to a streaming response seemed to work (reducing
 time to first byte/token), further
-validating my belief that it was indeed an issue with the calls being too heavy for Gemini to process in time & sending
+validating my belief that it was indeed an issue with the calls being too heavy for Gemini to process & sending
 me off in the wrong direction. While this behaviour of NAT Gateways & the use of TCP keepalive probes for the same seems
 to be well documented, I doubt, it would be on anyone's list of possible root cause unless they have
 experienced it earlier, Especially when working on a far distant domain like I was. If I didn't have claude, I am not
-sure if I would have ever been able to pinpoint this issue. 
+sure if I would have ever been able to pinpoint this issue. On the bright sider, most LLM providers have (very recently)
+started providing some sort of polling/offloading capabilities for heavy jobs, like Gemini's [background
+execution](https://ai.google.dev/gemini-api/docs/background-execution),
+OpenAI's [background mode](https://developers.openai.com/api/docs/guides/background) etc.
