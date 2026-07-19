@@ -31,18 +31,18 @@ expect an API running trillion-parameter models to work perfectly every time, th
 right? So I did, wrapping every Gemini call in a tenacity retry decorator. And it worked, the success rate shot
 up.
 
-### Progressive decline
+### Death by a thousand retries
 
-Over the course of a month or two, the quality of results improved, and with that the requirements expanded
-as well. This forced me to introduce a few steps in the pipeline that would call Gemini to understand & respond using a
-video often reaching upto two hours!, using hacks like speeding up the video, reducing resolution etc. Most of these
-calls were timing out, throwing `ReadTimeout`. But it worked or at-least it worked once given the absurd no of retires I
-had to put in place. With these retries, the account would hit the rate-limits more often. So naturally, the next thing
-I did was to add exponential backoff, increase the timeouts etc. Also switched to "generateContentStream" with
-includeThoughts set to true. This worked
-for a while, but now, a job that can complete under an hour took hours, sometimes a day to process. Clearly it was my
-fault for borderline abusing the Gemini API. A while after that, I am not sure what happened, but Gemini completely
-started failing, no amount of retries would help it.
+Over a month or two, the quality of the results improved, and with it the requirements grew. This forced me to add a few
+pipeline steps that fed Gemini a whole video at once, often up to two hours long. To make that fit, I leaned on hacks
+like speeding the video up and dropping the `MediaResolution`. Most of these calls timed out, throwing a `ReadTimeout`.
+But it worked, or at least it worked *once*, given the absurd number of retries I had put in place. Those retries
+also made the account hit rate-limits more often, so naturally the next thing I did was to add exponential backoff, bump
+up the client timeouts even further, etc. But now a job that could finish in under an hour
+sometimes took a full day. Since it was a `ReadTimeout`, I also switched to `generate_content_stream` with
+`include_thoughts` set to true. And it worked, reducing the number of retries needed. Clearly it was my fault for
+borderline abusing the Gemini API. A while later, I'm not sure what happened, but Gemini calls started failing outright;
+no amount of retries would save them.
 
 ### Attempts at a fix
 
