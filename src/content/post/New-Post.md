@@ -2,7 +2,7 @@
 title: "When the stack trace lies"
 publishDate: 2026-07-16 01:30:47 +0530
 tags: [ programming ]
-description: "The story of a bug that hid behind a perfectly normal-looking failure for months"
+description: "A bug that hid behind a perfectly normal-looking failure for months"
 ---
 
 In the past, I have written a few posts about interesting RCAs I have done/encountered. They are pretty fun to write
