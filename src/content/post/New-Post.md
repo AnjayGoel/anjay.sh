@@ -1,14 +1,14 @@
 ---
-title: "TBD"
+title: "When the stack trace lies"
 publishDate: 2026-07-16 01:30:47 +0530
 tags: [ programming ]
-description: "TBD"
+description: "The story of a bug that hid behind a perfectly normal-looking failure for months"
 ---
 
 In the past, I have written a few posts about interesting RCAs I have done/encountered. They are pretty fun to write
 about, take a look back & to tell the whole story. This is one of them. What's interesting about this is how long it
 took me to figure out that there is an issue in the first place. The bug masked itself behind a perfectly normal failure
-mode. It silently kept impacting a lot of architectural decisions I made. And, it got progressively worse over time.
+mode. It silently influenced a lot of architectural decisions I made. And, it got progressively worse over time.
 
 ### The background story
 
