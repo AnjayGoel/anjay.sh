@@ -82,9 +82,24 @@ experience so far perfectly well. This would also explain why moving to streamin
 true helped a bit. Anyway, The NAT gateway's idle-timeout was indeed the default 4 mins. But it still seemed too good to
 be true. If so, how was it working till now! How did no one else know or tell me this? It means all the tweaks I was
 doing with timeouts, setting it beyond 15-20mins were completely useless, since the connection was already broken at 4
-mins mark anyway! To fully convince myself, I wrote a test script & ran it on my production pods, and indeed this was
-the issue. The keepalive socket options worked perfectly. The success rate reached almost 100% & the jobs that sometime
-took over a day, are all now completing within a couple of hours.
+mins mark anyway!
+
+To fully convince myself, I wrote a test script to test with & without the keepalive socket options (mentioned below) &
+ran it on the production environment.
+
+```python
+# probe every ~60s (< the NAT's 4 min idle timeout) to keep the mapping alive
+opts = [(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)]
+opts += [
+    (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 60),
+    (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 15),
+    (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 4),
+]
+transport = httpx.HTTPTransport(socket_options=opts)
+```
+
+And indeed did it confirmed the issue! The keepalive socket options worked perfectly. With the fix, the success rate
+reached almost 100% & the jobs that sometimes took over a day, are all now completing within a couple of hours.
 
 ### <END TITLE>
 
