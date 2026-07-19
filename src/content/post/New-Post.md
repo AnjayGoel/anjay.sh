@@ -16,19 +16,20 @@ Early this year, I started working on something new, quite different from my day
 project relied heavily on multimodal LLMs, particularly Gemini 3.1, which unfortunately is still the best model for
 analysing large videos. Until this point, I'd had fairly limited experience working with these LLM APIs. All I'd done
 was use them for small bits of a larger system: summarising text, generating embeddings, ranking documents etc.
-Nothing where they were the core of the system, nothing that pushed them to the limits of their context windows & thinking levels.
+Nothing where they were the core of the system, nothing that pushed them to the limits of their context windows &
+thinking levels.
 
-### The abysmal success rate
+### Just add retries!
 
-Anyway, withing a few weeks, I had a POC, and in a month I had deployed it to production (although pretty primitive &
-shabby). The initial version of the pipeline had a less than 70% success rate. While over time, I fixed most of the
-issues, what remained were issues with the Gemini client (<insert-sdk-here>) calls failing for various reasons. I didn't really
-have ideas of how to fix it, so I asked around, asked people in my team who had much more experience with LLMs. And I
-got quite useful tips like "add timeout to gemini client", "use vertex-ai=True", set a proper thinking config, validate
-the outputs etc. And what if it still fails? Just add retries! And this was a good advice. You can't expect an API
-running trillion parameter models behind the scene to always work perfectly, surely they are bound to fail sometimes,
-right! So I did, just like other repos in the org. All my gemini calls were now wrapped in a tenacity retry decorator.
-And it worked, the success rate improved drastically.
+Within a few weeks I had a POC, and within a month it was in production. The initial version was primitive & shabby,
+with a success rate (% of the batch jobs that actually completed and produced outputs) well under 70%. While I
+chipped away at most of the failures over time, one category stuck around: the Gemini API calls failing, for all sorts
+of reasons: rate-limits, timeouts, valid but incorrect structured responses. I asked folks in the company with far more
+LLM experience than me. The advice was reasonable: add a timeout to the client, set `vertexai=True`, add a proper
+`ThinkingConfig`, validate the json outputs. And if it still fails? Just add retries! And it was good advice, you can't
+expect an API running trillion-parameter models to work perfectly every time, they're bound to glitch once in a while,
+right? So I did, wrapping every Gemini call in a tenacity retry decorator. And it worked, the success rate shot
+up.
 
 ### Progressive decline
 
