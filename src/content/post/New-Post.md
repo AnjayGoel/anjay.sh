@@ -37,7 +37,7 @@ And it worked, the success rate improved drastically.
 Over the course of a month or two, the quality of results improved, and with that the requirements expanded
 as well. This forced me to introduce a few steps in the pipeline that would call Gemini to understand & respond using a
 video often reaching upto two hours!, using hacks like speeding up the video, reducing resolution etc. Most of these
-calls were timing out, throwing "ReadTimeout". But it worked or at-least it worked once given the absurd no of retires I
+calls were timing out, throwing `ReadTimeout`. But it worked or at-least it worked once given the absurd no of retires I
 had to put in place. With these retries, the account would hit the rate-limits more often. So naturally, the next thing
 I did was to add exponential backoff, increase the timeouts etc. Also switched to "generateContentStream" with
 includeThoughts set to true. This worked
@@ -51,7 +51,7 @@ So I decided to do the long pending thing, fix my own code. Instead of throwing 
 parts, process them, & reconcile/merge the data later. The reconciliation was a much harder task, with its output being
 not as good as just throwing the whole video in, but it was what needed to be done. It took me time but the outcome was
 good. This worked pretty well (at least in all the test runs done on my PC). But once it hit production, I will start
-seeing the same issue again. While the probability of these "ReadTimeout" reduced, more chunks meant more single point
+seeing the same issue again. While the probability of these `ReadTimeout` reduced, more chunks meant more single point
 of failures. Ultimately this didn't help much with the issue. While it was an architecturally sound decision to make,
 one that would help us scale beyond just two hours of input,it just didn't help. At this point, I could sense something
 was wrong. I had always felt that the pipeline worked better on my local setup somehow. All the testing I was doing on
@@ -75,7 +75,7 @@ making sense. It said, that since I was deploying the job in a k8s cluster on a 
 NAT gateway & the NAT gateways typically
 have an idle-timeout that would close connections that have been idle for a while. Indeed, I was behind a NAT gateway. I
 knew it, but I never thought of them having an idle-timeout. On second though, it made sense, why wouldn't they? But
-apparently, most often, they do so silently, i.e. without sending any RST/FIN to either the client or the server! This
+apparently, most often, they do so silently, i.e. without sending any `RST`/`FIN` to either the client or the server! This
 means the client won't know the connection is broken at all! And the way around this idle timeout is to set TCP
 keepalive socket options. Again something I have read about but never though of. This seemed to explain all my issues &
 experience so far perfectly well. This would also explain why moving to streaming response with include thoughts set to
@@ -106,7 +106,7 @@ reached almost 100% & the jobs that sometimes took over a day, are all now compl
 The most annoying thing about this is how silent the failure. I don't mind things failing, but they should fail loudly!
 The NAT Gateways dropped the connection silently (I am sure its by design for a good reason, but still), the client
 raising a
-ReadTimeout indicating that it was the server that failed to respond in time (From its perspective, its completely
+`ReadTimeout` indicating that it was the server that failed to respond in time (From its perspective, its completely
 correct), and the fixes that didn't address the root cause like moving to a streaming response seemed to work (reducing
 time to first byte/token), further
 validating my belief that it was indeed an issue with the calls being too heavy for Gemini to process & sending
