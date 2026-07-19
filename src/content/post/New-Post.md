@@ -5,10 +5,10 @@ tags: [ programming ]
 description: "A bug that hid behind a perfectly normal-looking failure for months"
 ---
 
-In the past, I have written a few posts about interesting RCAs I have done/encountered. They are pretty fun to write
-about, take a look back & to tell the whole story. This is one of them. What's interesting about this is how long it
-took me to figure out that there is an issue in the first place. The bug masked itself behind a perfectly normal failure
-mode. It silently influenced a lot of architectural decisions I made. And, it got progressively worse over time.
+I've written a few RCA-themed posts here in the past. They're pretty fun to write about & a chance to look back and tell
+the whole story. This is one of them. What makes this one interesting is how long it took me to even realize there *was*
+an issue in the first place. The bug masked itself behind a perfectly normal failure mode, silently influencing a lot of
+the architectural decisions I made along the way. And it got progressively worse over time.
 
 ### The background story
 
