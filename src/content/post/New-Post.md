@@ -22,7 +22,8 @@ them to max of their context windows & thinking levels.
 ### The abysmal success rate
 
 Anyway, withing a few weeks, I had a POC, and in a month I had deployed it to production (although pretty primitive &
-shabby). The initial version of the pipeline had a less than 70% success rate. While over time, I fixed most of issues,
+shabby). The initial version of the pipeline had a less than 70% success rate. While over time, I fixed most of the
+issues,
 what remained were issues with the Gemini client (<insert-sdk-here>) calls failing for various reasons. I didn't really
 have ideas of how to fix it, so I asked around, asked people in my team who had much more experience with LLMs. And I
 got quite useful tips like "add timeout to gemini client", "use vertex-ai=True", set a proper thinking config, validate
@@ -35,8 +36,24 @@ And it worked, the success rate improved drastically.
 
 Over the course of a month or two, the quality of results improved, and with that the requirements expanded
 as well. This forced me to introduce a few steps in the pipeline that would call Gemini to understand & respond using a
-video often reaching upto two hours! Also using hacks like speeding up the video. But it worked or at-least it worked
-once
-given the decent no of retires we had in place. With these retries, we would hit the rate-limits more often. So
-naturally,
-the next thing was to add backoff to retries, increase the timeouts etc.
+video often reaching upto two hours!, using hacks like speeding up the video, reducing resolution etc. Most of these
+calls were timing out, throwing "ReadTimeout". But it worked or at-least it worked once given the absurd no of retires I
+had to put in place. With these retries, the account would hit the rate-limits more often. So naturally, the next thing
+I did was to add exponential backoff, increase the timeouts etc. Also switched to "generateContentStream" with
+includeThoughts set to true. This worked
+for a while, but now, a job that can complete under an hour took hours, sometimes a day to process. Clearly it was my
+fault for borderline abusing the Gemini API. A while after that, I am not sure what happened, but Gemini completely
+started failing, no amount of retries would help it.
+
+### Attempts at a fix
+
+So I decided to do the long pending thing, fix my own code. Instead of throwing the whole video, I will break it down to
+parts, process them, & reconcile/merge the data later. The reconciliation was a much harder task, with its output being
+not as good as just throwing the whole video in, but it was what needed to be done. It took me time but the outcome was
+good. This worked pretty well (at least in all the test runs done on my PC). But once it hit production, I will start
+seeing the same issue again. While the probability of these "ReadTimeout" reduced, more chunks meant more single point
+of failures. Ultimately this didn't help much with the issue. While it was an architecturally sound decision to make,
+one that would help us scale beyond just two hours of input,it just didn't help. At this point, I could sense something
+was wrong. I had always felth that the pipeline worked better on my local setup somehow. All the testing I was doing on
+my local worked perfectly fine, and it took considerably less time (aka retries) on my local setup as well. Now that
+feeling was too strong. Clearly, there was a mismatch in my local vs production.
