@@ -75,7 +75,8 @@ making sense. It said, that since I was deploying the job in a k8s cluster on a 
 NAT gateway & the NAT gateways typically
 have an idle-timeout that would close connections that have been idle for a while. Indeed, I was behind a NAT gateway. I
 knew it, but I never thought of them having an idle-timeout. On second though, it made sense, why wouldn't they? But
-apparently, most often, they do so silently, i.e. without sending any `RST`/`FIN` to either the client or the server! This
+apparently, most often, they do so silently, i.e. without sending any `RST`/`FIN` to either the client or the server!
+This
 means the client won't know the connection is broken at all! And the way around this idle timeout is to set TCP
 keepalive socket options. Again something I have read about but never though of. This seemed to explain all my issues &
 experience so far perfectly well. This would also explain why moving to streaming response with include thoughts set to
@@ -101,14 +102,14 @@ transport = httpx.HTTPTransport(socket_options=opts)
 And indeed did it confirmed the issue! The keepalive socket options worked perfectly. With the fix, the success rate
 reached almost 100% & the jobs that sometimes took over a day, are all now completing within a couple of hours.
 
-### <END TITLE>
+### Failing Loudly!
 
 The most annoying thing about this is how silent the failure. I don't mind things failing, but they should fail loudly!
 The NAT Gateways dropped the connection silently (I am sure its by design for a good reason, but still), the client
-raising a
-`ReadTimeout` indicating that it was the server that failed to respond in time (From its perspective, its completely
-correct), and the fixes that didn't address the root cause like moving to a streaming response seemed to work (reducing
-time to first byte/token), further
+raising a `ReadTimeout` indicating that it was the server that failed to respond in time (From its perspective, its
+completely
+correct), and the fixes that didn't address the root cause: retries masked the errors & increased processing time,
+streaming response seemed to work (reducing time to first byte/token)  further
 validating my belief that it was indeed an issue with the calls being too heavy for Gemini to process & sending
 me off in the wrong direction. While this behaviour of NAT Gateways & the use of TCP keepalive probes for the same seems
 to be well documented, I doubt, it would be on anyone's list of possible root cause unless they have
