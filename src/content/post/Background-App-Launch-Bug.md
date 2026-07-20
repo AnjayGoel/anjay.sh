@@ -1,7 +1,7 @@
 ---
 title: "A Bug That Drove a 10x Surge in Concurrent Users"
 publishDate: 2025-01-16 01:50:00 +0530
-tags: [ programming ]
+tags: [ programming, rca ]
 description: "A unique bug where receiving push notifications triggered background app launches"
 coverImage:
   src: '../../assets/images/background-app-launch/cover.webp'
