@@ -8,7 +8,7 @@ description: "RCA of a bug that hid behind a perfectly normal-looking failure fo
 I've written a few RCA-themed posts here in the past. They're pretty fun to write about & give a chance to look back and
 tell the whole story. This is one of them. What makes this one interesting is how long it took to even realize there
 *was* an issue in the first place. The bug masked itself behind a perfectly normal failure mode, silently influencing a
-lot of the architectural decisions and got progressively worse over time.
+lot of the architectural decisions, and got progressively worse over time.
 
 ## The backstory
 
