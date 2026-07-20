@@ -5,19 +5,18 @@ tags: [ programming, rca ]
 description: "RCA of a bug that hid behind a perfectly normal-looking failure for months"
 ---
 
-I've written a few RCA-themed posts here in the past. They're pretty fun to write about & give a chance to look back and
-tell the whole story. This is one of them. What makes this one interesting is how long it took to even realize there
-*was* an issue in the first place. The bug masked itself behind a perfectly normal failure mode, silently influencing a
-lot of the architectural decisions, and got progressively worse over time.
+I've written a few of these RCA posts before, they're a fun chance to look back & tell the whole story. This one's
+interesting for a slightly different reason though: how long it took to even realize there *was* a bug in the first
+place. It hid behind a perfectly normal-looking failure mode, silently influenced a bunch of the architectural
+decisions, and just kept getting worse the whole time.
 
 ## The backstory
 
 Early this year, I started working on something new, quite different from my day-to-day work on our consumer apps. The
 project relied heavily on multimodal LLMs, particularly Gemini 3.1, which unfortunately is still the best model for
-analysing large videos. Until this point, my experience with these LLM APIs had been fairly limited. All I'd done
-was use them for small bits of a larger system: summarising text, generating embeddings, ranking documents etc.
-Nothing where they were the core of the system, nothing that pushed them to the limits of their context windows &
-thinking levels.
+analysing large videos. Until this point, my experience with these LLM APIs had been limited to using them in small bits
+of a larger system: summarising text, generating embeddings, ranking documents, etc. Nothing where they were the core, nothing that
+pushed them to the limits of their context windows & thinking levels.
 
 ## Just add retries!
 
@@ -128,7 +127,9 @@ handle.
 Apparently, this behaviour of NAT gateways, and the use of TCP keepalive probes for the same seems to be well
 documented. But it's unlikely to be on anyone's shortlist of possible causes unless they've experienced it before,
 especially when the bug sits so far from the domain you're actually working in. I'm not sure if I'd
-ever have pinpointed it without Claude's help. On the bright side, most LLM providers have (very recently) started
+ever have pinpointed it without Claude's help.
+
+On the bright side, most LLM providers have (very recently) started
 moving away from the ancient 2023-style synchronous chat-completion focused APIs to more agent-friendly APIs with
 some sort of polling/offloading for heavy jobs, like
 Gemini's [background execution](https://ai.google.dev/gemini-api/docs/background-execution) and
