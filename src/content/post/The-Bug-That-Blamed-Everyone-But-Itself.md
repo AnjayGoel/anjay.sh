@@ -85,12 +85,17 @@ connection silently, without sending an `RST` or `FIN` to either side, so the cl
 dead. To avoid the idle-timeouts, one needs to enable TCP keepalive socket options. Again, something I'd read about but
 never had a reason to use.
 
-This explained everything. It even explained why switching to a streaming response with `include_thoughts` had helped a
-little: the stream kept sending data over the connection, so it never sat idle long enough to get dropped. So I went and
-checked our NAT gateway's config, and sure enough, its idle-timeout was set to the default 4 minutes. It almost seemed
-too good to be true. If this was really it, how did it work at all till now? And how did no one else know, or tell me?
-It also meant all the tweaks we had done, cranking the timeout up past 15-20 minutes, were pointless, the connection was
-already dead at the 4-minute mark regardless!
+This explained everything. The TCP connection was dying mid-call, while Gemini was still thinking, long before the
+client's own timeout kicked in. But the client had no way to know that; it would keep waiting until its timeout finally
+expired and then raise a `ReadTimeout`. That's also why forcing a fresh connection per call did nothing: the
+connection wasn't dying between calls from being reused, it was dying mid-call, so a brand-new one met the same fate. And
+it's why switching to a streaming response helped a little, the stream kept data flowing, so the connection never sat
+idle long enough to get dropped.
+
+So I went and checked our NAT gateway's config, and sure enough, its idle-timeout was set to the default 4 minutes. It
+almost seemed too good to be true. If this was really it, how did it work at all till now? And how did no one else know,
+or tell me? It also meant all the tweaks we had done, cranking the timeout up past 15-20 minutes, were pointless, the
+connection was already dead at the 4-minute mark regardless!
 
 To fully convince myself, I wrote a test script that ran on the same production environment, with & without the
 keepalive socket options (see below).
