@@ -91,9 +91,7 @@ const giscusThemes = import.meta.env.PROD
 				{!!tags?.length && (
 					<div class="post-tags">
 						{tags.map((tag, i) => (
-							<>
-								<a class="tag-link" data-pagefind-filter="tag" href={withBase(`/tags/${encodeURIComponent(tag)}/`)}>{tag}</a>{i < tags.length - 1 && <span class="sep">·</span>}
-							</>
+							<><a class="tag-link" data-pagefind-filter="tag" href={withBase(`/tags/${encodeURIComponent(tag)}/`)}>{tag}</a>{i < tags.length - 1 && <span class="sep">·</span>}</>
 						))}
 					</div>
 				)}

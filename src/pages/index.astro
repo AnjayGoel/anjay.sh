@@ -96,10 +96,7 @@ const siteUrl = (path: string) => absoluteUrl(path, Astro.site);
 							{!!featured.data.tags?.length && (
 								<div class="post-meta">
 									{featured.data.tags.map((t, i) => (
-										<Fragment>
-											{i > 0 && <span class="dot">·</span>}
-											<a class="tag" href={withBase(`/tags/${encodeURIComponent(t)}/`)}>{t}</a>
-										</Fragment>
+										<Fragment>{i > 0 && <span class="dot">·</span>}<a class="tag" href={withBase(`/tags/${encodeURIComponent(t)}/`)}>{t}</a></Fragment>
 									))}
 								</div>
 							)}
