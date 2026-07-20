@@ -51,9 +51,9 @@ started failing outright; no amount of retries would save them.
 Now, we decided to do the long-pending thing: fixing our own code. Instead of feeding the whole video to Gemini, we'd
 split it into chunks, process each, & reconcile the results later. Reconciliation was the harder task, and the merged
 output was never quite as good as one-shotting the whole video, but it was what needed to be done. This change worked
-pretty well in all the test runs on my PC. But once it hit production, we started seeing the same issue again. The
-`ReadTimeout`s got less frequent, but more chunks just meant more single points of failure. Ultimately it didn't help
-much. It was an architecturally sound decision, one that would let us scale beyond just two hours of input, it just
+pretty well in all the test runs on my PC. But once it hit production, we started seeing the same `ReadTimeout` failures
+again. The timeouts got less frequent, but more chunks just meant more single points of failure. Ultimately it didn't
+help much. It was an architecturally sound decision, one that would let us scale beyond just two hours of input, it just
 didn't fix the actual problem.
 
 At this point I could sense something was wrong. The inputs now being fed to Gemini were well within its capabilities;
@@ -85,12 +85,11 @@ dead. To avoid the idle-timeouts, one needs to enable TCP keepalive socket optio
 never had a reason to use.
 
 This explained almost everything. The TCP connection was dying mid-call, while Gemini was still thinking, long before
-the
-client's own timeout kicked in. But the client had no way to know that; it would keep waiting until its timeout finally
-expired and then raise a `ReadTimeout`. That's also why forcing a fresh connection per call did nothing. The
+the client's own timeout kicked in. But the client had no way to know that; it would keep waiting until its timeout
+finally expired and then raise a `ReadTimeout`. That's also why forcing a fresh connection per call did nothing. The
 connection wasn't dying between calls; it was dying mid-call, going idle while Gemini thought. A
-brand-new one would just meet the same fate. And it's also why switching to a streaming response helped a little, the stream
-kept data flowing, so the connection never sat idle long enough to get dropped.
+brand-new one would just meet the same fate. And it's also why switching to a streaming response helped a little, the
+stream kept data flowing, so the connection never sat idle long enough to get dropped.
 
 So I went and checked our NAT gateway's config, and sure enough, its idle-timeout was set to the default 4 minutes. It
 almost seemed too good to be true. If this was really it, how did it work at all till now? And how did no one else know,
