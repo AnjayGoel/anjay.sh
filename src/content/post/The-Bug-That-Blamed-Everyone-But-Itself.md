@@ -27,11 +27,10 @@ chipped away at most of the failures over time, one category stuck around: the G
 of reasons: rate-limits, timeouts, valid but incorrect structured responses.
 
 So I turned to folks in the company with far more LLM experience than me. The advice was reasonable: add a timeout to
-the client, set `vertexai=True`, add
-a proper `ThinkingConfig`, validate the JSON outputs. And if it still fails? Just add retries! And it was good advice,
-you can't expect an API running trillion-parameter models to work perfectly every time, they're bound to glitch once in
-a while, right? So every Gemini call went behind a tenacity retry decorator. And it worked, the success rate shot
-up.
+the client, set `vertexai=True`, add a proper `ThinkingConfig`, validate the JSON outputs. And if it still fails? Just
+add retries! And it was good advice, you can't expect an API running trillion-parameter models to work perfectly every
+time, they're bound to glitch once in a while, right? So every Gemini call went behind a tenacity retry decorator. And
+it worked, the success rate shot up.
 
 ## Death by a thousand retries
 
@@ -85,10 +84,12 @@ connection silently, without sending an `RST` or `FIN` to either side, so the cl
 dead. To avoid the idle-timeouts, one needs to enable TCP keepalive socket options. Again, something I'd read about but
 never had a reason to use.
 
-This explained almost everything. The TCP connection was dying mid-call, while Gemini was still thinking, long before the
+This explained almost everything. The TCP connection was dying mid-call, while Gemini was still thinking, long before
+the
 client's own timeout kicked in. But the client had no way to know that; it would keep waiting until its timeout finally
 expired and then raise a `ReadTimeout`. That's also why forcing a fresh connection per call did nothing: the
-connection wasn't dying between calls from being reused, it was dying mid-call, so a brand-new one met the same fate. And
+connection wasn't dying between calls from being reused, it was dying mid-call, so a brand-new one met the same fate.
+And
 it's why switching to a streaming response helped a little, the stream kept data flowing, so the connection never sat
 idle long enough to get dropped.
 
