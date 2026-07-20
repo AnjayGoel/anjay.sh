@@ -34,10 +34,11 @@ it worked, the success rate shot up.
 
 ## Death by a thousand retries
 
-Over a month or two, the quality of the results improved, and with it the requirements grew. This forced me to add a few
-pipeline steps that fed Gemini a whole video at once, often up to two hours long. To make that fit, I leaned on hacks
-like speeding the video up and dropping the `MediaResolution`, etc. Many of these calls timed out by throwing a
-`ReadTimeout`. But it worked, or at least it worked *once*, given the absurd number of retries in place.
+Over a month or two, the quality of the results improved, and with it the requirements (and the team) grew. This forced
+me (now us) to add a few pipeline steps that fed Gemini a whole video at once, often up to two hours long. To make that
+fit, we leaned on hacks like speeding the video up and dropping the `MediaResolution`, etc. Many of these calls timed
+out by throwing a `ReadTimeout`. But it worked, or at least it worked *once*, given the absurd number of retries in
+place.
 
 Those retries also made the account hit rate-limits more often, so naturally the next step was to add exponential
 backoff, bump up the client timeouts even further, etc. But now a job that could finish in under an hour
@@ -87,11 +88,10 @@ never had a reason to use.
 This explained almost everything. The TCP connection was dying mid-call, while Gemini was still thinking, long before
 the
 client's own timeout kicked in. But the client had no way to know that; it would keep waiting until its timeout finally
-expired and then raise a `ReadTimeout`. That's also why forcing a fresh connection per call did nothing: the
-connection wasn't dying between calls from being reused, it was dying mid-call, so a brand-new one met the same fate.
-And
-it's why switching to a streaming response helped a little, the stream kept data flowing, so the connection never sat
-idle long enough to get dropped.
+expired and then raise a `ReadTimeout`. That's also why forcing a fresh connection per call did nothing. The
+connection wasn't dying between calls; it was dying mid-call, going idle while Gemini thought. A
+brand-new one would just meet the same fate. And it's also why switching to a streaming response helped a little, the stream
+kept data flowing, so the connection never sat idle long enough to get dropped.
 
 So I went and checked our NAT gateway's config, and sure enough, its idle-timeout was set to the default 4 minutes. It
 almost seemed too good to be true. If this was really it, how did it work at all till now? And how did no one else know,
@@ -121,7 +121,7 @@ The most annoying thing about this whole fiasco is how every layer seems to have
 connection silently (surely by design for a good reason, but still). The client raised a `ReadTimeout`, pinning
 the blame on the server for failing to respond in time (from its perspective, completely correct). And none of our "
 fixes" addressed the root cause, yet each seemed to help just enough to keep us looking in the wrong place: retries
-masked the errors (at the cost of processing time), and switching to a streaming response genuinely sped things up (
+masked the errors (at the cost of processing time), and switching to a streaming response actually sped things up (
 lower time to first byte), further convincing us the real problem was that the calls were simply too heavy for Gemini to
 handle.
 
