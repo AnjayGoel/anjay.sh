@@ -129,7 +129,7 @@ especially when the bug sits so far from the domain you're actually working in. 
 ever have pinpointed it without Claude's help.
 
 On the bright side, most LLM providers have (very recently) started
-moving away from the ancient 2023-style synchronous chat-completion focused APIs to more agent-friendly APIs with
+moving away from the ancient 2023-style synchronous chat-completion focused APIs to more "agent-friendly" APIs with
 some sort of polling/offloading for heavy jobs, like
 Gemini's [background execution](https://ai.google.dev/gemini-api/docs/background-execution) and
 OpenAI's [background mode](https://developers.openai.com/api/docs/guides/background).
