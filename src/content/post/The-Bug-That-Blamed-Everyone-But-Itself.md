@@ -24,9 +24,11 @@ thinking levels.
 Within a few weeks I had a POC, and within a month it was in production. The initial version was primitive & shabby,
 with a success rate (the % of jobs that ran end to end and produced usable output) well under 70%. While I
 chipped away at most of the failures over time, one category stuck around: the Gemini API calls failing, for all sorts
-of reasons: rate-limits, timeouts, valid but incorrect structured responses. So I turned to folks in the company with
-far more LLM experience than me. The advice was reasonable: add a timeout to the client, set `vertexai=True`, add
-a proper`ThinkingConfig`, validate the json outputs. And if it still fails? Just add retries! And it was good advice,
+of reasons: rate-limits, timeouts, valid but incorrect structured responses.
+
+So I turned to folks in the company with far more LLM experience than me. The advice was reasonable: add a timeout to
+the client, set `vertexai=True`, add
+a proper `ThinkingConfig`, validate the JSON outputs. And if it still fails? Just add retries! And it was good advice,
 you can't expect an API running trillion-parameter models to work perfectly every time, they're bound to glitch once in
 a while, right? So every Gemini call went behind a tenacity retry decorator. And it worked, the success rate shot
 up.
@@ -47,25 +49,25 @@ started failing outright; no amount of retries would save them.
 
 ## Fixing the wrong things
 
-Now, we decided to do the long-pending thing: fixing our own code. Instead of feeding the whole video to Gemini, lets
+Now, we decided to do the long-pending thing: fixing our own code. Instead of feeding the whole video to Gemini, we'd
 split it into chunks, process each, & reconcile the results later. Reconciliation was the harder task, and the merged
 output was never quite as good as one-shotting the whole video, but it was what needed to be done. This change worked
-pretty well in all the test runs on my PC. But once it hit production, We started seeing the same issue again. The
+pretty well in all the test runs on my PC. But once it hit production, we started seeing the same issue again. The
 `ReadTimeout`s got less frequent, but more chunks just meant more single points of failure. Ultimately it didn't help
 much. It was an architecturally sound decision, one that would let us scale beyond just two hours of input, it just
 didn't fix the actual problem.
 
 At this point I could sense something was wrong. The inputs now being fed to Gemini were well within its capabilities;
 it shouldn't have been timing out at all. And I'd always had a nagging feeling that somehow the pipeline ran better on
-my local
-setup, all my local testing worked perfectly and took few to no retries. Now that feeling was too strong to ignore:
-clearly, there was a mismatch between the local and production environments. I searched online, found a single
+my local setup, all my local testing worked perfectly and took few to no retries. Now that feeling was too strong to
+ignore: clearly, there was a mismatch between the local and production environments.
+
+I searched online, found a single
 possibly-related [Github Issue](https://github.com/googleapis/python-genai/issues/1893), tried its solutions in vain.
 After brainstorming, I came up with a few ideas of my own (
 btw, claude didn't like most of them): setting `max_keepalive_connections` to 0 to force a new connection every time,
-initialising a fresh client per call, etc. The idea/hypothesis being: if this is an issue with a stale client or a
-pooled connection
-gone bad, forcing a brand-new connection each time might fix it. As claude expected, this didn't work at all.
+initialising a fresh client per call, etc. The hypothesis: if this was an issue with a stale client or a pooled
+connection gone bad, forcing a brand-new connection each time might fix it. As claude expected, this didn't work at all.
 
 ## The smoking gun
 
@@ -88,8 +90,7 @@ This explained everything. It even explained why switching to a streaming respon
 little: the stream kept sending data over the connection, so it never sat idle long enough to get dropped. So I went and
 checked our NAT gateway's config, and sure enough, its idle-timeout was set to the default 4 minutes. It almost seemed
 too good to be true. If this was really it, how did it work at all till now? And how did no one else know, or tell me?
-It
-also meant all the tweaks we had done, cranking the timeout up past 15-20 minutes were pointless, the connection was
+It also meant all the tweaks we had done, cranking the timeout up past 15-20 minutes, were pointless, the connection was
 already dead at the 4-minute mark regardless!
 
 To fully convince myself, I wrote a test script that ran on the same production environment, with & without the
