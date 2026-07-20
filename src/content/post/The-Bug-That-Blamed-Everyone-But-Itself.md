@@ -6,7 +6,7 @@ description: "RCA of a bug that hid behind a perfectly normal-looking failure fo
 ---
 
 I've written a few RCA-themed posts here in the past. They're pretty fun to write about & give a chance to look back and
-tell the whole story. This is one of them. What makes this one interesting is how long it took me to even realize there
+tell the whole story. This is one of them. What makes this one interesting is how long it took to even realize there
 *was* an issue in the first place. The bug masked itself behind a perfectly normal failure mode, silently influencing a
 lot of the architectural decisions and got progressively worse over time.
 
@@ -14,7 +14,7 @@ lot of the architectural decisions and got progressively worse over time.
 
 Early this year, I started working on something new, quite different from my day-to-day work on our consumer apps. The
 project relied heavily on multimodal LLMs, particularly Gemini 3.1, which unfortunately is still the best model for
-analysing large videos. Until this point, I'd had fairly limited experience working with these LLM APIs. All I'd done
+analysing large videos. Until this point, my experience with these LLM APIs had been fairly limited. All I'd done
 was use them for small bits of a larger system: summarising text, generating embeddings, ranking documents etc.
 Nothing where they were the core of the system, nothing that pushed them to the limits of their context windows &
 thinking levels.
@@ -25,10 +25,10 @@ Within a few weeks I had a POC, and within a month it was in production. The ini
 with a success rate (the % of jobs that ran end to end and produced usable output) well under 70%. While I
 chipped away at most of the failures over time, one category stuck around: the Gemini API calls failing, for all sorts
 of reasons: rate-limits, timeouts, valid but incorrect structured responses. So I turned to folks in the company with
-far more LLM experience than me. The advice I got was reasonable: add a timeout to the client, set `vertexai=True`, add
+far more LLM experience than me. The advice was reasonable: add a timeout to the client, set `vertexai=True`, add
 a proper`ThinkingConfig`, validate the json outputs. And if it still fails? Just add retries! And it was good advice,
 you can't expect an API running trillion-parameter models to work perfectly every time, they're bound to glitch once in
-a while, right? So I did, wrapping every Gemini call in a tenacity retry decorator. And it worked, the success rate shot
+a while, right? So every Gemini call went behind a tenacity retry decorator. And it worked, the success rate shot
 up.
 
 ## Death by a thousand retries
@@ -36,33 +36,32 @@ up.
 Over a month or two, the quality of the results improved, and with it the requirements grew. This forced me to add a few
 pipeline steps that fed Gemini a whole video at once, often up to two hours long. To make that fit, I leaned on hacks
 like speeding the video up and dropping the `MediaResolution`, etc. Many of these calls timed out by throwing a
-`ReadTimeout`. But it worked, or at least it worked *once*, given the absurd number of retries I had put in
-place.
+`ReadTimeout`. But it worked, or at least it worked *once*, given the absurd number of retries in place.
 
-Those retries also made the account hit rate-limits more often, so naturally the next thing I did was to add exponential
+Those retries also made the account hit rate-limits more often, so naturally the next step was to add exponential
 backoff, bump up the client timeouts even further, etc. But now a job that could finish in under an hour
-sometimes took a full day. Since it was a `ReadTimeout`, I also switched to `generate_content_stream` with
+sometimes took a full day. Since it was a `ReadTimeout`, we also switched to `generate_content_stream` with
 `include_thoughts` set to true, which bought a little breathing room and cut down the number of retries needed. Clearly
 it was my fault for pushing Gemini past its limits. A while later, Gemini tipped over for good, most if not all calls
 started failing outright; no amount of retries would save them.
 
 ## Fixing the wrong things
 
-Now, I decided to do the long-pending thing: fix my own code. Instead of feeding Gemini the whole video, I'd split it
+Now, we decided to do the long-pending thing: fixing our own code. Instead of feeding the whole video to Gemini, lets split it
 into chunks, process each, & reconcile the results later. Reconciliation was the harder task, and the merged output was
 never quite as good as one-shotting the whole video, but it was what needed to be done. This change worked pretty well
-in all the test runs on my PC. But once it hit production, I started seeing the same issue again. The `ReadTimeout`s got
+in all the test runs on my PC. But once it hit production, We started seeing the same issue again. The `ReadTimeout`s got
 less frequent, but more chunks just meant more single points of failure. Ultimately it didn't help much. It was an
 architecturally sound decision, one that would let us scale beyond just two hours of input, it just didn't fix the
 actual problem.
 
-At this point I could sense something was wrong. The inputs I was feeding Gemini were now well within its capabilities;
+At this point I could sense something was wrong. The inputs now being fed to Gemini were well within its capabilities;
 it shouldn't have been timing out at all. And I'd always had a nagging feeling the pipeline ran better on my local
 setup, all my local testing worked perfectly and took few to no retries. Now that feeling was too strong to ignore:
 clearly, there was a mismatch between the local and production environments. I searched online, found a single
 possibly-related [Github Issue](https://github.com/googleapis/python-genai/issues/1893), tried its solutions in vain. After brainstorming, I came up with a few ideas of my own (
 btw, claude didn't like most of them): setting `max_keepalive_connections` to 0 to force a new connection every time,
-initialising a fresh client per call, etc. My idea being: if this is an issue with a stale client or a pooled connection
+initialising a fresh client per call, etc. The idea/hypothesis being: if this is an issue with a stale client or a pooled connection
 gone bad, forcing a brand-new connection each time might fix it. As claude expected, this didn't work at all.
 
 ## The smoking gun
