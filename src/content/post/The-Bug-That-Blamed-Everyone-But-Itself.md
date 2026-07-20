@@ -15,8 +15,8 @@ decisions, and just kept getting worse the whole time.
 Early this year, I started working on something new, quite different from my day-to-day work on our consumer apps. The
 project relied heavily on multimodal LLMs, particularly Gemini 3.1, which unfortunately is still the best model for
 analysing large videos. Until this point, my experience with these LLM APIs had been limited to using them in small bits
-of a larger system: summarising text, generating embeddings, ranking documents, etc. Nothing where they were the core, nothing that
-pushed them to the limits of their context windows & thinking levels.
+of a larger system: summarising text, generating embeddings, ranking documents, etc. Nothing where they were the core,
+nothing that pushed them to the limits of their context windows & thinking levels.
 
 ## Just add retries!
 
@@ -63,10 +63,10 @@ ignore: clearly, there was a mismatch between the local and production environme
 
 I searched online, found a single
 possibly-related [Github Issue](https://github.com/googleapis/python-genai/issues/1893), tried its solutions in vain.
-After brainstorming, I came up with a few ideas of my own (
-btw, claude didn't like most of them): setting `max_keepalive_connections` to 0 to force a new connection every time,
-initialising a fresh client per call, etc. The hypothesis: if this was an issue with a stale client or a pooled
-connection gone bad, forcing a brand-new connection each time might fix it. As claude expected, this didn't work at all.
+After brainstorming, I came up with a few ideas of my own (btw, claude didn't like most of them): setting
+`max_keepalive_connections` to 0 to force a new connection every time, initialising a fresh client per call, etc. The
+hypothesis: if this was an issue with a stale client or a pooled connection gone bad, forcing a brand-new connection
+each time might fix it. As claude expected, this didn't work at all.
 
 ## The smoking gun
 
@@ -77,7 +77,8 @@ a bug, someone would've found it by now.
 
 Anyway, having eliminated everything else, I finally read what claude was saying properly. The more I read, the more it
 made sense. Its argument: since the job ran in a k8s cluster on the cloud, the egress almost certainly went out through
-a NAT gateway, and NAT gateways usually have an idle-timeout that drops connections after they've been idle for a while.
+a NAT gateway, and NAT gateways usually have a `TCP idle-timeout` that drops connections after they've been idle for a
+while.
 Sure enough, our egress did go through a NAT gateway; I knew that. But it had never occurred to me that they'd have an
 idle-timeout. On second thought, of course they do, why wouldn't they? The catch though is, they usually drop the
 connection silently, without sending an `RST` or `FIN` to either side, so the client has no idea the connection is even
@@ -128,8 +129,7 @@ documented. But it's unlikely to be on anyone's shortlist of possible causes unl
 especially when the bug sits so far from the domain you're actually working in. I'm not sure if I'd
 ever have pinpointed it without Claude's help.
 
-On the bright side, most LLM providers have (very recently) started
-moving away from the ancient 2023-style synchronous chat-completion focused APIs to more "agent-friendly" APIs with
-some sort of polling/offloading for heavy jobs, like
+On the bright side, most LLM providers have (very recently) started moving away from the ancient 2023-style synchronous
+chat-completion focused APIs to more "agent-friendly" APIs with some sort of polling/offloading for heavy jobs, like
 Gemini's [background execution](https://ai.google.dev/gemini-api/docs/background-execution) and
 OpenAI's [background mode](https://developers.openai.com/api/docs/guides/background).
