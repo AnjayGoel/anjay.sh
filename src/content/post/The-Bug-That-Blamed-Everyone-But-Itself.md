@@ -85,7 +85,7 @@ connection silently, without sending an `RST` or `FIN` to either side, so the cl
 dead. To avoid the idle-timeouts, one needs to enable TCP keepalive socket options. Again, something I'd read about but
 never had a reason to use.
 
-This explained everything. The TCP connection was dying mid-call, while Gemini was still thinking, long before the
+This explained almost everything. The TCP connection was dying mid-call, while Gemini was still thinking, long before the
 client's own timeout kicked in. But the client had no way to know that; it would keep waiting until its timeout finally
 expired and then raise a `ReadTimeout`. That's also why forcing a fresh connection per call did nothing: the
 connection wasn't dying between calls from being reused, it was dying mid-call, so a brand-new one met the same fate. And
