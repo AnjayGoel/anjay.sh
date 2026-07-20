@@ -68,35 +68,34 @@ gone bad, forcing a brand-new connection each time might fix it. As claude expec
 
 ## The gotcha
 
-Defeated, I went back to claude. One of the things it kept persistently telling me to try was to set some socket options
-in the underlying code. I hadn't given it a proper read, because blaming it on the client was already ridiculous; going
-down to TCP-level options to fix it felt absurd, to say the least. Surely it can't be the client? Millions of people
-must be using it, if there was an issue, someone would have found it by now.
+Defeated, I went back to claude. One thing it kept pushing me to try was setting some socket options on the client's
+underlying HTTP transport. I'd been putting it off: blaming the client was already a stretch, and going all the way
+down to TCP-level options felt absurd. Surely it can't be the client? Millions of people must be using it; if there were
+a bug, someone would've found it by now.
 
-Anyway, after eliminating all other options, I finally gave what claude was saying a proper read. The more I read, the
-more it made sense. It said that since I was deploying the job in a k8s cluster on a cloud, my egress was most likely
-via
-a NAT gateway, and NAT gateways typically have an idle-timeout that closes connections that have been idle for a while.
-Indeed, I was behind a NAT gateway. I knew that, but I'd never thought of them having an idle-timeout. On second
-thought,
-it made sense, why wouldn't they? But apparently, most often, they do it silently, i.e. without sending any `RST`/`FIN`
-to either the client or the server! This means the client has no idea the connection is broken at all! And the way
-around it is to set TCP keepalive socket options. Again, something I'd read about but never thought to use.
+Anyway, having eliminated everything else, I finally read what claude was saying properly. The more I read, the more it
+made sense. Its argument: since the job ran in a k8s cluster on the cloud, my egress almost certainly went out through a
+NAT gateway, and NAT gateways usually have an idle-timeout that drops connections after they've been idle for a while.
+Sure enough, our egress did go through a NAT gateway, I knew that. But it had never occurred to me, that they'd have an
+idle-timeout. On second thought, of course they do, why wouldn't they? The catch though is, they usually drop the
+connection silently, without sending an `RST` or `FIN` to either side, so the client has no idea the connection is even
+dead. To avoid the idle-timeouts, one needs to enable TCP keepalive socket options. Again, something I'd read about but
+never had a reason to use.
 
-This seemed to explain all my issues perfectly. It would also explain why moving to a streaming response with
-`include_thoughts` set to true had helped a bit. And indeed, the NAT gateway's idle-timeout was the default 4 minutes.
-But it still seemed too good to be true. If this was it, how was it working at all until now? How did no one else know,
-or tell me this? It meant all the tweaks I'd been doing with timeouts, setting them beyond 15-20 mins, were completely
-useless, since the connection was already broken at the 4 min mark anyway!
+This explained everything. It even explained why switching to a streaming response with `include_thoughts` had helped a
+little: the stream kept sending data over the connection, so it never sat idle long enough to get dropped. So I went and
+checked our NAT gateway's config, and sure enough, its idle-timeout was set to the default 4 minutes. It almost seemed
+too good to be true. If this was really it, how had it ever worked at all? And how did no one else knew, or tell me? It
+also meant all the tweaks I had done, cranking the timeout up past 15-20 minutes were pointless, the connection was
+already dead at the 4-minute mark regardless!
 
-To fully convince myself, I wrote a test script that ran the same job with & without the keepalive socket options (
-below)
-on the production pods.
+To fully convince myself, I wrote a test script that ran on the same production enviornment, with & without the
+keepalive socket options (see below).
 
 ```python
-# probe every ~60s (< the NAT's 4 min idle timeout) to keep the mapping alive
-opts = [(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)]
-opts += [
+# probe every ~60s (< the NAT's 4 min idle timeout) to keep the connection alive
+opts = [
+    (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
     (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 60),
     (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 15),
     (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 4),
@@ -104,12 +103,12 @@ opts += [
 transport = httpx.HTTPTransport(socket_options=opts)
 ```
 
-And indeed it did confirm the issue! The keepalive socket options worked perfectly. With the fix, the success rate
+And indeed this confirmed the issue! The keepalive socket options worked perfectly. With the fix, the success rate
 reached almost 100% & the jobs that sometimes took over a day are all now completing within a couple of hours.
 
 ## Failing Loudly!
 
-The most annoying thing about this whole saga is how silent the failure was. I don't mind things failing, but they
+The most annoying thing about this whole fiasco is how silent the failure was. I don't mind things failing, but they
 should fail loudly! Instead, every layer misled me. The NAT gateway dropped the connection silently (I'm sure it's by
 design for a good reason, but still). The client raised a `ReadTimeout`, pinning the blame on the server for failing to
 respond in time (from its perspective, completely correct). And none of my "fixes" addressed the root cause, yet each
@@ -117,9 +116,10 @@ seemed to help just enough to keep me looking in the wrong place: retries masked
 time), and switching to a streaming response genuinely sped things up (lower time to first byte), further convincing me
 the real problem was that my calls were simply too heavy for Gemini to handle.
 
-This behaviour of NAT gateways, and the TCP keepalive probes that work around it, seems to be well documented. But I
-doubt it would be on anyone's list of likely root causes unless they'd hit it before, especially when working in a
-far-flung domain like I was. If I hadn't had claude, I'm not sure I'd ever have pinpointed it. On the bright side, most
-LLM providers have (very recently) started offering some sort of polling/offloading for heavy jobs, like Gemini's
-[background execution](https://ai.google.dev/gemini-api/docs/background-execution) and OpenAI's
-[background mode](https://developers.openai.com/api/docs/guides/background).
+Apparently, this behaviour of NAT gateways, and the use of TCP keepalive probes for the same seems to be well
+documented. But I doubt it would be on anyone's shortlist of likely causes unless they've experienced it before,
+especially when the bug sits so far from the domain you're actually working in. I'm not sure if I'd
+ever have pinpointed it without Claude's help. On the bright side, most LLM providers have (very recently) started
+offering some sort of polling/offloading for heavy jobs, like
+Gemini's [background execution](https://ai.google.dev/gemini-api/docs/background-execution) and
+OpenAI's[background mode](https://developers.openai.com/api/docs/guides/background).
