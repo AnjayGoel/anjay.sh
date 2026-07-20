@@ -78,8 +78,7 @@ a bug, someone would've found it by now.
 
 Anyway, having eliminated everything else, I finally read what claude was saying properly. The more I read, the more it
 made sense. Its argument: since the job ran in a k8s cluster on the cloud, the egress almost certainly went out through
-a
-NAT gateway, and NAT gateways usually have an idle-timeout that drops connections after they've been idle for a while.
+a NAT gateway, and NAT gateways usually have an idle-timeout that drops connections after they've been idle for a while.
 Sure enough, our egress did go through a NAT gateway; I knew that. But it had never occurred to me that they'd have an
 idle-timeout. On second thought, of course they do, why wouldn't they? The catch though is, they usually drop the
 connection silently, without sending an `RST` or `FIN` to either side, so the client has no idea the connection is even
