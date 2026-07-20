@@ -47,21 +47,24 @@ started failing outright; no amount of retries would save them.
 
 ## Fixing the wrong things
 
-Now, we decided to do the long-pending thing: fixing our own code. Instead of feeding the whole video to Gemini, lets split it
-into chunks, process each, & reconcile the results later. Reconciliation was the harder task, and the merged output was
-never quite as good as one-shotting the whole video, but it was what needed to be done. This change worked pretty well
-in all the test runs on my PC. But once it hit production, We started seeing the same issue again. The `ReadTimeout`s got
-less frequent, but more chunks just meant more single points of failure. Ultimately it didn't help much. It was an
-architecturally sound decision, one that would let us scale beyond just two hours of input, it just didn't fix the
-actual problem.
+Now, we decided to do the long-pending thing: fixing our own code. Instead of feeding the whole video to Gemini, lets
+split it into chunks, process each, & reconcile the results later. Reconciliation was the harder task, and the merged
+output was never quite as good as one-shotting the whole video, but it was what needed to be done. This change worked
+pretty well in all the test runs on my PC. But once it hit production, We started seeing the same issue again. The
+`ReadTimeout`s got less frequent, but more chunks just meant more single points of failure. Ultimately it didn't help
+much. It was an architecturally sound decision, one that would let us scale beyond just two hours of input, it just
+didn't fix the actual problem.
 
 At this point I could sense something was wrong. The inputs now being fed to Gemini were well within its capabilities;
-it shouldn't have been timing out at all. And I'd always had a nagging feeling that somehow the pipeline ran better on my local
+it shouldn't have been timing out at all. And I'd always had a nagging feeling that somehow the pipeline ran better on
+my local
 setup, all my local testing worked perfectly and took few to no retries. Now that feeling was too strong to ignore:
 clearly, there was a mismatch between the local and production environments. I searched online, found a single
-possibly-related [Github Issue](https://github.com/googleapis/python-genai/issues/1893), tried its solutions in vain. After brainstorming, I came up with a few ideas of my own (
+possibly-related [Github Issue](https://github.com/googleapis/python-genai/issues/1893), tried its solutions in vain.
+After brainstorming, I came up with a few ideas of my own (
 btw, claude didn't like most of them): setting `max_keepalive_connections` to 0 to force a new connection every time,
-initialising a fresh client per call, etc. The idea/hypothesis being: if this is an issue with a stale client or a pooled connection
+initialising a fresh client per call, etc. The idea/hypothesis being: if this is an issue with a stale client or a
+pooled connection
 gone bad, forcing a brand-new connection each time might fix it. As claude expected, this didn't work at all.
 
 ## The smoking gun
@@ -72,7 +75,8 @@ down to TCP-level options felt absurd. Surely it can't be the client? Millions o
 a bug, someone would've found it by now.
 
 Anyway, having eliminated everything else, I finally read what claude was saying properly. The more I read, the more it
-made sense. Its argument: since the job ran in a k8s cluster on the cloud, the egress almost certainly went out through a
+made sense. Its argument: since the job ran in a k8s cluster on the cloud, the egress almost certainly went out through
+a
 NAT gateway, and NAT gateways usually have an idle-timeout that drops connections after they've been idle for a while.
 Sure enough, our egress did go through a NAT gateway; I knew that. But it had never occurred to me that they'd have an
 idle-timeout. On second thought, of course they do, why wouldn't they? The catch though is, they usually drop the
@@ -83,7 +87,8 @@ never had a reason to use.
 This explained everything. It even explained why switching to a streaming response with `include_thoughts` had helped a
 little: the stream kept sending data over the connection, so it never sat idle long enough to get dropped. So I went and
 checked our NAT gateway's config, and sure enough, its idle-timeout was set to the default 4 minutes. It almost seemed
-too good to be true. If this was really it, how did it work at all till now? And how did no one else know, or tell me? It
+too good to be true. If this was really it, how did it work at all till now? And how did no one else know, or tell me?
+It
 also meant all the tweaks we had done, cranking the timeout up past 15-20 minutes were pointless, the connection was
 already dead at the 4-minute mark regardless!
 
@@ -106,18 +111,19 @@ reached almost 100% & the jobs that sometimes took over a day are all now comple
 
 ## Red herrings all the way down!
 
-The most annoying thing about this whole fiasco is how every layer seems to have misled me. The NAT gateway dropped the
-connection silently (I'm sure it's by design for a good reason, but still). The client raised a `ReadTimeout`, pinning
-the blame on the server for failing to respond in time (from its perspective, completely correct). And none of my "
-fixes" addressed the root cause, yet each seemed to help just enough to keep me looking in the wrong place: retries
+The most annoying thing about this whole fiasco is how every layer seems to have misled us. The NAT gateway dropped the
+connection silently (surely by design for a good reason, but still). The client raised a `ReadTimeout`, pinning
+the blame on the server for failing to respond in time (from its perspective, completely correct). And none of our "
+fixes" addressed the root cause, yet each seemed to help just enough to keep us looking in the wrong place: retries
 masked the errors (at the cost of processing time), and switching to a streaming response genuinely sped things up (
-lower time to first byte), further convincing me the real problem was that my calls were simply too heavy for Gemini to
+lower time to first byte), further convincing us the real problem was that the calls were simply too heavy for Gemini to
 handle.
 
 Apparently, this behaviour of NAT gateways, and the use of TCP keepalive probes for the same seems to be well
-documented. But I doubt it would be on anyone's shortlist of likely causes unless they've experienced it before,
+documented. But it's unlikely to be on anyone's shortlist of possible causes unless they've experienced it before,
 especially when the bug sits so far from the domain you're actually working in. I'm not sure if I'd
 ever have pinpointed it without Claude's help. On the bright side, most LLM providers have (very recently) started
-offering some sort of polling/offloading for heavy jobs, like
+moving away from the ancient 2023-style synchronous chat-completion focused APIs to more agent-friendly APIs with
+some sort of polling/offloading for heavy jobs, like
 Gemini's [background execution](https://ai.google.dev/gemini-api/docs/background-execution) and
-OpenAI's[background mode](https://developers.openai.com/api/docs/guides/background).
+OpenAI's [background mode](https://developers.openai.com/api/docs/guides/background).
