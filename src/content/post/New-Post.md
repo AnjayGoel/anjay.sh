@@ -57,14 +57,14 @@ less frequent, but more chunks just meant more single points of failure. Ultimat
 architecturally sound decision, one that would let us scale beyond just two hours of input, it just didn't fix the
 actual problem.
 
-At this point I could sense something was wrong. The inputs I was giving to Gemini was now far less than its
-capabilities, it should not be timing out. And I'd always felt the pipeline worked better on my local setup somehow;
-all my local testing ran perfectly fine, and took few to none retries. Now that feeling was too strong to ignore.
-Clearly, there was a mismatch between my local and production. I searched online, found a single possibly-related
-ticket, tried its solutions in vain. After brainstorming, I came up with a few ideas of my own (btw, claude didn't think
-much of them): setting `max_keepalive_connections` to 0 to force a new connection every time, initialising a
-client per call, etc. My thinking was, if this was an issue with the client or the connection pool it's holding, maybe I
-could isolate it to a single call. As claude expected, this didn't work at all.
+At this point I could sense something was wrong. The inputs I was feeding Gemini were now well within its capabilities;
+it shouldn't have been timing out at all. And I'd always had a nagging feeling the pipeline ran better on my local
+setup, all my local testing worked perfectly and took few to no retries. Now that feeling was too strong to ignore:
+clearly, there was a mismatch between the local and production enviornments. I searched online, found a single
+possibly-related Github Issue, tried its solutions in vain. After brainstorming, I came up with a few ideas of my own (
+btw, claude didn't like most of them): setting `max_keepalive_connections` to 0 to force a new connection every time,
+initialising a fresh client per call, etc. My idea being: if this is an issue with a stale client or a pooled connection
+gone bad, forcing a brand-new connection each time might fix it. As claude expected, this didn't work at all.
 
 ## The gotcha
 
