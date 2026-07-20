@@ -5,12 +5,13 @@ tags: [ programming ]
 description: "A bug that hid behind a perfectly normal-looking failure for months"
 ---
 
-I've written a few RCA-themed posts here in the past. They're pretty fun to write about & a chance to look back and tell
+I've written a few RCA-themed posts here in the past. They're pretty fun to write about & give a chance to look back and
+tell
 the whole story. This is one of them. What makes this one interesting is how long it took me to even realize there *was*
 an issue in the first place. The bug masked itself behind a perfectly normal failure mode, silently influencing a lot of
-the architectural decisions I made along the way. And it got progressively worse over time.
+the architectural decisions and got progressively worse over time.
 
-### The background story
+## The background story
 
 Early this year, I started working on something new, quite different from my day-to-day work on our consumer apps. The
 project relied heavily on multimodal LLMs, particularly Gemini 3.1, which unfortunately is still the best model for
@@ -19,32 +20,34 @@ was use them for small bits of a larger system: summarising text, generating emb
 Nothing where they were the core of the system, nothing that pushed them to the limits of their context windows &
 thinking levels.
 
-### Just add retries!
+## Just add retries!
 
 Within a few weeks I had a POC, and within a month it was in production. The initial version was primitive & shabby,
-with a success rate (% of the batch jobs that actually completed and produced outputs) well under 70%. While I
+with a success rate (percentage of the batch jobs that actually completed and produced outputs) well under 70%. While I
 chipped away at most of the failures over time, one category stuck around: the Gemini API calls failing, for all sorts
-of reasons: rate-limits, timeouts, valid but incorrect structured responses. I asked folks in the company with far more
-LLM experience than me. The advice was reasonable: add a timeout to the client, set `vertexai=True`, add a proper
+of reasons: rate-limits, timeouts, valid but incorrect structured responses. So, I asked folks in the company with far
+more
+LLM experience than me. The advice I got was reasonable: add a timeout to the client, set `vertexai=True`, add a proper
 `ThinkingConfig`, validate the json outputs. And if it still fails? Just add retries! And it was good advice, you can't
 expect an API running trillion-parameter models to work perfectly every time, they're bound to glitch once in a while,
 right? So I did, wrapping every Gemini call in a tenacity retry decorator. And it worked, the success rate shot
 up.
 
-### Death by a thousand retries
+## Death by a thousand retries
 
 Over a month or two, the quality of the results improved, and with it the requirements grew. This forced me to add a few
 pipeline steps that fed Gemini a whole video at once, often up to two hours long. To make that fit, I leaned on hacks
-like speeding the video up and dropping the `MediaResolution`. Most of these calls timed out, throwing a `ReadTimeout`.
-But it worked, or at least it worked *once*, given the absurd number of retries I had put in place. Those retries
-also made the account hit rate-limits more often, so naturally the next thing I did was to add exponential backoff, bump
-up the client timeouts even further, etc. But now a job that could finish in under an hour
-sometimes took a full day. Since it was a `ReadTimeout`, I also switched to `generate_content_stream` with
-`include_thoughts` set to true. And it worked, reducing the number of retries needed. Clearly it was my fault for
-borderline abusing the Gemini API. A while later, I'm not sure what happened, but Gemini calls started failing outright;
-no amount of retries would save them.
+like speeding the video up and dropping the `MediaResolution`, etc. Most of these calls timed out, throwing a
+`ReadTimeout`. But it worked, or at least it worked *once*, given the absurd number of retries I had put in place.
 
-### Attempts at a fix
+Those retries also made the account hit rate-limits more often, so naturally the next thing I did was to add exponential
+backoff, bump up the client timeouts even further, etc. But now a job that could finish in under an hour
+sometimes took a full day. Since it was a `ReadTimeout`, I also switched to `generate_content_stream` with
+`include_thoughts` set to true, which bought a little breathing room and cut down the number of retries needed. Clearly
+it was my fault for pushing Gemini to its limits. A while later, I'm not sure what happened, but Gemini calls
+started failing outright; no amount of retries would save them.
+
+## Attempts at a fix
 
 So I decided to do the long pending thing, fix my own code. Instead of throwing the whole video, I will break it down to
 parts, process them, & reconcile/merge the data later. The reconciliation was a much harder task, with its output being
@@ -63,7 +66,7 @@ connection everytime, initialising a client per call etc. My idea was, if this i
 connection pool its holding, maybe I can isolate / contain it to per call. Like claude expected, this didn't work at
 all.
 
-### The gottcha
+## The gottcha
 
 Defeated, I went back to claude, one of the things it was persistently telling me was to try was to set some socket
 options in the underlying code. I haven't given it a proper read. Because, blaming it on the client was already a
@@ -101,7 +104,7 @@ transport = httpx.HTTPTransport(socket_options=opts)
 And indeed did it confirmed the issue! The keepalive socket options worked perfectly. With the fix, the success rate
 reached almost 100% & the jobs that sometimes took over a day, are all now completing within a couple of hours.
 
-### Failing Loudly!
+## Failing Loudly!
 
 The most annoying thing about this is how silent the failure. I don't mind things failing, but they should fail loudly!
 The NAT Gateways dropped the connection silently (I am sure its by design for a good reason, but still), the client
