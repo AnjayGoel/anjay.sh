@@ -1,8 +1,8 @@
 ---
-title: "When the stack trace lies"
-publishDate: 2026-07-16 01:30:47 +0530
-tags: [ programming ]
-description: "A bug that hid behind a perfectly normal-looking failure for months"
+title: "The bug that blamed everyone but itself"
+publishDate: 2026-07-21 01:30:47 +0530
+tags: [ programming, rca ]
+description: "RCA of a bug that hid behind a perfectly normal-looking failure for months"
 ---
 
 I've written a few RCA-themed posts here in the past. They're pretty fun to write about & give a chance to look back and
@@ -22,14 +22,13 @@ thinking levels.
 ## Just add retries!
 
 Within a few weeks I had a POC, and within a month it was in production. The initial version was primitive & shabby,
-with a success rate (percentage of the batch jobs that actually completed and produced outputs) well under 70%. While I
+with a success rate (the % of jobs that ran end to end and produced usable output) well under 70%. While I
 chipped away at most of the failures over time, one category stuck around: the Gemini API calls failing, for all sorts
 of reasons: rate-limits, timeouts, valid but incorrect structured responses. So I turned to folks in the company with
 far more LLM experience than me. The advice I got was reasonable: add a timeout to the client, set `vertexai=True`, add
 a proper`ThinkingConfig`, validate the json outputs. And if it still fails? Just add retries! And it was good advice,
-you
-can't expect an API running trillion-parameter models to work perfectly every time, they're bound to glitch once in a
-while, right? So I did, wrapping every Gemini call in a tenacity retry decorator. And it worked, the success rate shot
+you can't expect an API running trillion-parameter models to work perfectly every time, they're bound to glitch once in
+a while, right? So I did, wrapping every Gemini call in a tenacity retry decorator. And it worked, the success rate shot
 up.
 
 ## Death by a thousand retries
@@ -60,8 +59,8 @@ actual problem.
 At this point I could sense something was wrong. The inputs I was feeding Gemini were now well within its capabilities;
 it shouldn't have been timing out at all. And I'd always had a nagging feeling the pipeline ran better on my local
 setup, all my local testing worked perfectly and took few to no retries. Now that feeling was too strong to ignore:
-clearly, there was a mismatch between the local and production enviornments. I searched online, found a single
-possibly-related Github Issue, tried its solutions in vain. After brainstorming, I came up with a few ideas of my own (
+clearly, there was a mismatch between the local and production environments. I searched online, found a single
+possibly-related [Github Issue](https://github.com/googleapis/python-genai/issues/1893), tried its solutions in vain. After brainstorming, I came up with a few ideas of my own (
 btw, claude didn't like most of them): setting `max_keepalive_connections` to 0 to force a new connection every time,
 initialising a fresh client per call, etc. My idea being: if this is an issue with a stale client or a pooled connection
 gone bad, forcing a brand-new connection each time might fix it. As claude expected, this didn't work at all.
@@ -106,15 +105,15 @@ transport = httpx.HTTPTransport(socket_options=opts)
 And indeed this confirmed the issue! The keepalive socket options worked perfectly. With the fix, the success rate
 reached almost 100% & the jobs that sometimes took over a day are all now completing within a couple of hours.
 
-## Failing Loudly!
+## Red herrings all the way down!
 
-The most annoying thing about this whole fiasco is how silent the failure was. I don't mind things failing, but they
-should fail loudly! Instead, every layer misled me. The NAT gateway dropped the connection silently (I'm sure it's by
-design for a good reason, but still). The client raised a `ReadTimeout`, pinning the blame on the server for failing to
-respond in time (from its perspective, completely correct). And none of my "fixes" addressed the root cause, yet each
-seemed to help just enough to keep me looking in the wrong place: retries masked the errors (at the cost of processing
-time), and switching to a streaming response genuinely sped things up (lower time to first byte), further convincing me
-the real problem was that my calls were simply too heavy for Gemini to handle.
+The most annoying thing about this whole fiasco is how every layer seems to have misled me. The NAT gateway dropped the
+connection silently (I'm sure it's by design for a good reason, but still). The client raised a `ReadTimeout`, pinning
+the blame on the server for failing to respond in time (from its perspective, completely correct). And none of my "
+fixes" addressed the root cause, yet each seemed to help just enough to keep me looking in the wrong place: retries
+masked the errors (at the cost of processing time), and switching to a streaming response genuinely sped things up (
+lower time to first byte), further convincing me the real problem was that my calls were simply too heavy for Gemini to
+handle.
 
 Apparently, this behaviour of NAT gateways, and the use of TCP keepalive probes for the same seems to be well
 documented. But I doubt it would be on anyone's shortlist of likely causes unless they've experienced it before,

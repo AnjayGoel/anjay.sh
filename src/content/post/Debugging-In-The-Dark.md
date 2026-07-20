@@ -1,7 +1,7 @@
 ---
 title: "Debugging In The Dark"
 publishDate: 2025-12-24 11:24:00 +0530
-tags: [ dns, networking ]
+tags: [ programming, dns, networking, rca ]
 description: "TL;DR: It was the DNS, it's always the DNS."
 ---
 
