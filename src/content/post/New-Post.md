@@ -10,7 +10,7 @@ tell the whole story. This is one of them. What makes this one interesting is ho
 *was* an issue in the first place. The bug masked itself behind a perfectly normal failure mode, silently influencing a
 lot of the architectural decisions and got progressively worse over time.
 
-## The background story
+## The backstory
 
 Early this year, I started working on something new, quite different from my day-to-day work on our consumer apps. The
 project relied heavily on multimodal LLMs, particularly Gemini 3.1, which unfortunately is still the best model for
@@ -47,7 +47,7 @@ sometimes took a full day. Since it was a `ReadTimeout`, I also switched to `gen
 it was my fault for pushing Gemini past its limits. A while later, Gemini tipped over for good, most if not all calls
 started failing outright; no amount of retries would save them.
 
-## Attempts at a fix
+## Fixing the wrong things
 
 Now, I decided to do the long-pending thing: fix my own code. Instead of feeding Gemini the whole video, I'd split it
 into chunks, process each, & reconcile the results later. Reconciliation was the harder task, and the merged output was
@@ -66,10 +66,10 @@ btw, claude didn't like most of them): setting `max_keepalive_connections` to 0 
 initialising a fresh client per call, etc. My idea being: if this is an issue with a stale client or a pooled connection
 gone bad, forcing a brand-new connection each time might fix it. As claude expected, this didn't work at all.
 
-## The gotcha
+## The smoking gun
 
 Defeated, I went back to claude. One thing it kept pushing me to try was setting some socket options on the client's
-underlying HTTP transport. I'd been putting it off: blaming the client was already a stretch, and going all the way
+underlying HTTP transport. I'd been brushing it off: blaming the client was already a stretch, and going all the way
 down to TCP-level options felt absurd. Surely it can't be the client? Millions of people must be using it; if there were
 a bug, someone would've found it by now.
 
