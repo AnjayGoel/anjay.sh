@@ -70,9 +70,9 @@ each time might fix it. As Claude expected, this didn't work at all.
 
 ## The smoking gun
 
-Defeated, I went back to Claude. One thing it kept pushing was to try setting some socket options on the client's
+Defeated, I went back to Claude. One thing it kept pushing was to try setting some socket options in the client's
 underlying HTTP transport. I'd been brushing it off: blaming the client was already a stretch, and going all the way
-down to TCP-level options felt absurd. Surely it can't be the client? Millions of people must be using it; if there were
+down to TCP socket options felt absurd. Surely it can't be the client? Millions of people must be using it; if there were
 a bug, someone would've found it by now.
 
 Anyway, having eliminated everything else, I finally read what Claude was saying properly. The more I read, the more it
