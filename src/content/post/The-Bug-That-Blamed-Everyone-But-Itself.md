@@ -56,7 +56,7 @@ architecturally sound decision, one that would let us scale beyond just two hour
 actual problem.
 
 At this point I could sense something was wrong. The inputs now being fed to Gemini were well within its capabilities;
-it shouldn't have been timing out at all. And I'd always had a nagging feeling the pipeline ran better on my local
+it shouldn't have been timing out at all. And I'd always had a nagging feeling that somehow the pipeline ran better on my local
 setup, all my local testing worked perfectly and took few to no retries. Now that feeling was too strong to ignore:
 clearly, there was a mismatch between the local and production environments. I searched online, found a single
 possibly-related [Github Issue](https://github.com/googleapis/python-genai/issues/1893), tried its solutions in vain. After brainstorming, I came up with a few ideas of my own (
@@ -66,15 +66,15 @@ gone bad, forcing a brand-new connection each time might fix it. As claude expec
 
 ## The smoking gun
 
-Defeated, I went back to claude. One thing it kept pushing me to try was setting some socket options on the client's
+Defeated, I went back to claude. One thing it kept pushing was to try setting some socket options on the client's
 underlying HTTP transport. I'd been brushing it off: blaming the client was already a stretch, and going all the way
 down to TCP-level options felt absurd. Surely it can't be the client? Millions of people must be using it; if there were
 a bug, someone would've found it by now.
 
 Anyway, having eliminated everything else, I finally read what claude was saying properly. The more I read, the more it
-made sense. Its argument: since the job ran in a k8s cluster on the cloud, my egress almost certainly went out through a
+made sense. Its argument: since the job ran in a k8s cluster on the cloud, the egress almost certainly went out through a
 NAT gateway, and NAT gateways usually have an idle-timeout that drops connections after they've been idle for a while.
-Sure enough, our egress did go through a NAT gateway, I knew that. But it had never occurred to me, that they'd have an
+Sure enough, our egress did go through a NAT gateway; I knew that. But it had never occurred to me that they'd have an
 idle-timeout. On second thought, of course they do, why wouldn't they? The catch though is, they usually drop the
 connection silently, without sending an `RST` or `FIN` to either side, so the client has no idea the connection is even
 dead. To avoid the idle-timeouts, one needs to enable TCP keepalive socket options. Again, something I'd read about but
@@ -83,11 +83,11 @@ never had a reason to use.
 This explained everything. It even explained why switching to a streaming response with `include_thoughts` had helped a
 little: the stream kept sending data over the connection, so it never sat idle long enough to get dropped. So I went and
 checked our NAT gateway's config, and sure enough, its idle-timeout was set to the default 4 minutes. It almost seemed
-too good to be true. If this was really it, how had it ever worked at all? And how did no one else knew, or tell me? It
-also meant all the tweaks I had done, cranking the timeout up past 15-20 minutes were pointless, the connection was
+too good to be true. If this was really it, how did it work at all till now? And how did no one else know, or tell me? It
+also meant all the tweaks we had done, cranking the timeout up past 15-20 minutes were pointless, the connection was
 already dead at the 4-minute mark regardless!
 
-To fully convince myself, I wrote a test script that ran on the same production enviornment, with & without the
+To fully convince myself, I wrote a test script that ran on the same production environment, with & without the
 keepalive socket options (see below).
 
 ```python
