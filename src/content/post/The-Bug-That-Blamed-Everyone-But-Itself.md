@@ -119,10 +119,8 @@ reached almost 100% & the jobs that sometimes took over a day are all now comple
 
 The most annoying thing about this whole fiasco is how every layer seems to have misled us. The NAT gateway dropped the
 connection silently (surely by design for a good reason, but still). The client raised a `ReadTimeout`, pinning
-the blame on the server for failing to respond in time (from its perspective, completely correct). And none of our "
-fixes" addressed the root cause, yet each seemed to help just enough to keep us looking in the wrong place: retries
-masked the errors (at the cost of processing time), and switching to a streaming response actually sped things up (
-lower time to first byte). All of it convinced us that the real problem was that the calls were simply too heavy for
+the blame on the server for failing to respond in time (from its perspective, completely correct). And none of our "fixes" addressed the root cause, yet each seemed to help just enough to keep us looking in the wrong place: retries
+masked the errors (at the cost of processing time), and switching to a streaming response actually sped things up (lower time to first byte). All of it convinced us that the real problem was that the calls were simply too heavy for
 Gemini to handle.
 
 Apparently, this behaviour of NAT gateways, and the use of TCP keepalive probes for the same are fairly well
