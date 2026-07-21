@@ -1,8 +1,8 @@
 ---
-title: "The bug that blamed everyone but itself"
+title: "The Bug That Blamed Everyone But Itself"
 publishDate: 2026-07-20 11:10:00 +0530
 tags: [ programming, rca ]
-description: "An interesting RCA of a bug that hid behind a perfectly normal-looking failure for months"
+description: "RCA of a bug that hid behind a perfectly normal-looking failure for months, quietly getting worse the whole time."
 ---
 
 I've written a few of these RCA posts before, they're a fun chance to look back & tell the whole story. This one's
